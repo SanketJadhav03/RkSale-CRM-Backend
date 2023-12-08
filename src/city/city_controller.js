@@ -72,8 +72,8 @@ const updated = async(req,res)=>{
 } 
 const deleted = async(req,res)=>{
     try {
-        const { city_id } = req.body;
-        const city = await City.findByPk(city_id);
+        const { id } = req.body;
+        const city = await City.findByPk(id);
           if (!city) {
          return res.status(404).json({ error: "City not found" });
      }   
