@@ -70,8 +70,8 @@ const update = async(req,res)=>{
         })
         return res.json({ message: "Category updated successfully!", status: 1 });
     } catch (error) {
-        console.error("Error updating city:", error);
-    res.status(500).json({ error: "Error updating city" });
+        console.error("Error updating Category:", error);
+    res.status(500).json({ error: "Error updating Category" });
     }
 }
 

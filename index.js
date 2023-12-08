@@ -37,6 +37,9 @@ expressApp.use("/api", source);
 const category = require('./src/category/category_routes')
 expressApp.use("/api",category)
 
+// product routes 
+const product = require('./src/product/product_routes')
+expressApp.use("/api",product)
 
 // lead status routes 
 const leadStatus = require('./src/lead_status/lead_route')
