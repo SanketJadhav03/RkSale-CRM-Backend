@@ -28,9 +28,14 @@ const city = require("./src/city/city_route");
 expressApp.use("/api", city);
 
 
-// city routes
+// source routes
 const source = require("./src/source/source_route");
 expressApp.use("/api", source);
+
+
+// source routes
+const branch = require("./src/branch/branch_route");
+expressApp.use("/api", branch);
 
 
 // category routes
