@@ -28,9 +28,14 @@ const city = require("./src/city/city_route");
 expressApp.use("/api", city);
 
 
+// city routes
+const source = require("./src/source/source_route");
+expressApp.use("/api", source);
+
+
 // category routes
-// const category = require('./src/category/category_routes')
-// expressApp.use("/api",category)
+const category = require('./src/category/category_routes')
+expressApp.use("/api",category)
 
 
 // lead status routes 
