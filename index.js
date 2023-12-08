@@ -26,6 +26,11 @@ checked
 // city routes
 const city = require("./src/city/city_route");
 expressApp.use("/api", city);
+
+
+// category routes
+const category = require('./src/category/category_routes')
+expressApp.use("/api",category)
 // ################################ END #####################################################
 expressApp.listen(8888, () => {
     console.log(`Server is running on http://localhost:${8888}`);
