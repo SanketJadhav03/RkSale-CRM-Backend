@@ -1,22 +1,22 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db/db_config'); // Your Sequelize connection
 
-const City = sequelize.define('tbl_city', {
-  city_id: {
+const LeadStatus = sequelize.define('tbl_lead', {
+  lead_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
   },
-  city_name: {
+  lead_name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  city_status: {
+  lead_status: {
     type: DataTypes.INTEGER,
     defaultValue: 1,
     allowNull: false,
   },
 });
 
-module.exports = City;
+module.exports = LeadStatus;

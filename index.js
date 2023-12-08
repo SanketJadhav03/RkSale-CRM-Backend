@@ -29,8 +29,13 @@ expressApp.use("/api", city);
 
 
 // category routes
-const category = require('./src/category/category_routes')
-expressApp.use("/api",category)
+// const category = require('./src/category/category_routes')
+// expressApp.use("/api",category)
+
+
+// lead status routes 
+const leadStatus = require('./src/lead_status/lead_route')
+expressApp.use("/api",leadStatus)
 // ################################ END #####################################################
 expressApp.listen(8888, () => {
     console.log(`Server is running on http://localhost:${8888}`);
