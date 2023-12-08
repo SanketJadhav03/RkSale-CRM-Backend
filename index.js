@@ -41,6 +41,10 @@ expressApp.use("/api",category)
 const product = require('./src/product/product_routes')
 expressApp.use("/api",product)
 
+// Reference route
+const Reference = require('./src/reference/reference_routes')
+expressApp.use("/api",Reference)
+
 // lead status routes 
 const leadStatus = require('./src/lead_status/lead_route')
 expressApp.use("/api",leadStatus)
