@@ -39,12 +39,12 @@ const show = async(req,res) =>{
         const {id} = req.params;
         const reference = await Reference.findByPk(id);
         if (!reference){
-            return res.status(404).json({ error: "Reference not found" });
+            return res.status(404).json({ error: "Customer not found" });
     
         }
         res.json(reference)
     } catch (error) {
-        res.status(500).json({ error: "Error showing Reference by id" });
+        res.status(500).json({ error: "Error showing Customer by id" });
         
     }
     }
