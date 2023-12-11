@@ -17,6 +17,7 @@ expressApp.use(cors());
 checked
   .sync({ force:  false }) // if false then not drop created table else it will drop tables and every time gives new tables 
   .then(() => {
+    require('./db/create_data')
     console.log("Database created!");
   })
   .catch((error) => {
@@ -27,6 +28,8 @@ checked
 const city = require("./src/city/city_route");
 expressApp.use("/api", city);
 
+// rolehaspermission
+  
 
 // source routes
 const source = require("./src/source/source_route");
@@ -54,6 +57,9 @@ expressApp.use("/api",Reference)
 const leadStatus = require('./src/lead_status/lead_route')
 expressApp.use("/api",leadStatus)
 
+// roles routes 
+const roles = require('./src/roles/roles_routes')
+expressApp.use("/api",roles)
 
 // customer route 
 const Customer = require('./src/customer/customer_routes')
