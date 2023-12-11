@@ -53,6 +53,11 @@ expressApp.use("/api",Reference)
 // lead status routes 
 const leadStatus = require('./src/lead_status/lead_route')
 expressApp.use("/api",leadStatus)
+
+
+// customer route 
+const Customer = require('./src/customer/customer_routes')
+expressApp.use("/api",Customer)
 // ################################ END #####################################################
 expressApp.listen(8888, () => {
     console.log(`Server is running on http://localhost:${8888}`);
