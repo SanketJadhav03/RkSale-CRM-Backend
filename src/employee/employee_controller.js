@@ -12,18 +12,10 @@ const index = async(req,res)=>{
 }
 const store = async(req,res)=>{
     try {
-        const { lead_name } = req.body;
-        const existingEmployee = await Employee.findOne({
-            where: {
-              lead_name: lead_name,
-            },
-          });
-      
-          if (existingEmployee) {
-            return res.json({ message: "Employee name already exists", status: 0 });
-          }
+   
         await Employee.create({
-            lead_name
+            employee_name,
+            
         });
         return res.status(201).json({ message: 'Employee added successfully', status: 1});
     } catch (error) {
