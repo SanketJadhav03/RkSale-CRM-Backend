@@ -39,7 +39,6 @@ const update  = async(req,res)=>{
                 rhp_role_id: role_id
             }
         })
-res.json(oldPermissionsList)
         // DELETE THE OLD DATA
         for (const permissionId of oldPermissionsList) {
             try {
