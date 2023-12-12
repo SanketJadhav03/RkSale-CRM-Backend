@@ -34,7 +34,7 @@ async function initializeDatabase() {
       const permissionsLists = await Permission.findAll();
       for (const permission of permissionsLists) {
         await RoleHasPermission.create({
-          rhp_role_id: 2,
+          rhp_role_id: 1,
           rhp_permission_id: permission.permission_id,
         });
       }

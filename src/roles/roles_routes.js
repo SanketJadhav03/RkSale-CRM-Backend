@@ -6,5 +6,7 @@ router.get('/roles/list',roles_controller.index);
 
 router.post('/roles/store',roles_controller.store)
 
+router.put('/roles/update',roles_controller.update)
+
 
 module.exports = router;
