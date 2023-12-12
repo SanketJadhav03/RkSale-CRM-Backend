@@ -6,24 +6,40 @@ async function initializeDatabase() {
 
     const staticPermissions = [
       {
-        permission_name: "Dashboard",
+        permission_name: "dashboard",
         permission_path: "/dashboard",
         permission_category: "DASHBOARD",
+      },
+      {
+        permission_name: "category",
+        permission_path: "/category",
+        permission_category: "CATEGORY",
+      },
+      {
+        permission_name: "brand",
+        permission_path: "/brand",
+        permission_category: "BRAND",
+      },
+      {
+        permission_name: "sidebar",
+        permission_path: "/sidebar",
+        permission_category: "SIDEBAR",
       }
     ];
 
-    await Permission.bulkCreate(staticPermissions);
-    console.log("Static permissions inserted successfully.");
+      await Permission.bulkCreate(staticPermissions);
+      console.log("Static permissions inserted successfully.");
 
-    await Roles.create({ role_name: "Admin" });
-    const permissionsLists = await Permission.findAll();
-    for (const permissionId of permissionsLists) {
-      await RoleHasPermission.create({
-        rhp_role_id: 1,
-        rhp_permission_id: permissionId.permission_id,
-      });
-    }
-    console.log("Initialization successful.");
+      await Roles.create({ role_name: "Admin" });
+      const permissionsLists = await Permission.findAll();
+      for (const permission of permissionsLists) {
+        await RoleHasPermission.create({
+          rhp_role_id: 2,
+          rhp_permission_id: permission.permission_id,
+        });
+      }
+      
+      console.log("Initialization successful.");
   }
 
 

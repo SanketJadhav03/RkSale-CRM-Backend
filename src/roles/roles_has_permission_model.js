@@ -14,6 +14,10 @@ const RoleHasPermission = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
+        rhp_permission_id:{
+            type:DataTypes.INTEGER,
+            allowNull:false
+        }
       
     },
     {
