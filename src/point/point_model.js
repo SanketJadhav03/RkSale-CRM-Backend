@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require("../db/db_config");
 
-const Point = sequelize.define('tbl_permission', {
+const Point = sequelize.define('tbl_point', {
     point_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -9,7 +9,7 @@ const Point = sequelize.define('tbl_permission', {
         primaryKey: true,
     },
     point_type: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull:false,
     },
     point_name: {
