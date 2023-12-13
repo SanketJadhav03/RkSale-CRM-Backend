@@ -61,6 +61,10 @@ expressApp.use("/api",leadStatus)
 const roles = require('./src/roles/roles_routes')
 expressApp.use("/api",roles)
 
+// point routes 
+const point = require('./src/point/point_routes')
+expressApp.use("/api",point)
+
 // customer route 
 const Customer = require('./src/customer/customer_routes')
 expressApp.use("/api",Customer)
