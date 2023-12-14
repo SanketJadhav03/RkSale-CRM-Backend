@@ -1,24 +1,50 @@
-// # in working don't push
-const express = require("express")
-const router = express.Router();
-const employeeController = require("./employee_controller")
+const router = require("express").Router();
+const controller = require("./employee_controller");
+const multer = require("multer");
+const url_helper = require("../../url_helper");
 
-// get for all cities
-router.get("/employee/list",employeeController.index)
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, `${url_helper}/all_images/employee`);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
 
+const upload = multer({ storage: storage });
 
-// post to save data  
-router.post("/employee/store",employeeController.store)
+// GET all employees
+router.get("/employee/list", controller.index);
 
+// POST create a new employee with multiple image upload
+router.post(
+  "/employee/store",
+  upload.fields([
+    { name: "employee_aadhar", maxCount: 1 },
+    { name: "employee_pan", maxCount: 1 },
+    { name: "employee_profile", maxCount: 1 },
+    { name: "employee_qr_code", maxCount: 1 },
+  ]),
+  controller.store
+);
 
-// get to employee by id
-router.get("/employee/show/:id",employeeController.show)
+// GET a specific employee by ID
+router.get("/employee/show/:id", controller.show);
 
-// put to update data
-router.put("/employee/update",employeeController.updated)
+// PUT update a specific employee by ID with multiple image upload
+router.put(
+  "/employee/update",
+  upload.fields([
+    { name: "employee_aadhar", maxCount: 1 },
+    { name: "employee_pan", maxCount: 1 },
+    { name: "employee_profile", maxCount: 1 },
+    { name: "employee_qr_code", maxCount: 1 },
+  ]),
+  controller.updated
+);
 
-// delete the data 
-router.delete("/employee/delete/:id",employeeController.deleted)
-
+// DELETE delete a specific employee by ID
+router.delete("/employee/delete/:id", controller.deleted);
 
 module.exports = router;

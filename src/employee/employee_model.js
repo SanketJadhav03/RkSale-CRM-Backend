@@ -37,15 +37,35 @@ const Employee = sequelize.define('tbl_employee', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  employee_hr_access: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  employee_emergency: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   employee_address: {
     type: DataTypes.STRING,
     allowNull: true,
   },
   employee_role: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
-  employee_adhar: {
+  employee_aadhar: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  employee_profile: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  employee_pan: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  employee_qr_code: {
     type: DataTypes.STRING,
     allowNull: true
   },

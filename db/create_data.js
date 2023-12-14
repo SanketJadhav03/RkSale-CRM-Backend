@@ -46,6 +46,9 @@ const findindAlready = async () => {
   try {
     if (await Roles.count() == 0) {
       initializeDatabase();
+      require("../imageDir/dir");
+    }else{
+      console.error("Unable to create database");
     }
   } catch (error) {
     console.log("Error");
