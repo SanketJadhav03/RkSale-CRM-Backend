@@ -73,6 +73,6 @@ expressApp.use("/api", Customer);
 const Employee = require("./src/employee/employee_route");
 expressApp.use("/api", Employee);
 // ################################ END #####################################################
-expressApp.listen(8888, () => {
-  console.log(`Server is running on http://localhost:${8888}`);
+expressApp.listen(8880, () => {
+  console.log(`Server is running on http://localhost:${8880}`);
 });
