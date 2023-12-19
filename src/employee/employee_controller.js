@@ -10,8 +10,7 @@ const index = async (req, res) => {
   try {
     const employee = await sequelize.query(
       `select * from tbl_employees 
-      Inner join tbl_roles on tbl_roles.role_id = tbl_employees.employee_role
-      Inner join tbl_branches on tbl_branches.branch_id = tbl_employees.employee_branch
+
       `,
       {
         model: Employee,
