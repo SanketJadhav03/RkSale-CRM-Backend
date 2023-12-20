@@ -31,55 +31,80 @@ const store = async (req, res) => {
       employee_salary,
       employee_email,
       employee_password,
-      employee_branch,
-      employee_hr_access,
       employee_emergency,
       employee_address,
       employee_role,
     } = req.body;
-  
+
     const rootPath = process.cwd();
-  
+
     if (!req.files || Object.keys(req.files).length === 0) {
-      return res.status(400).json({ error: 'No file uploaded' });
+      return res.status(400).json({ error: "No file uploaded" });
     }
-  
+
     const employeeProfile = req.files.employee_profile;
     const employeeAdhaar = req.files.employee_aadhar;
     const employeePan = req.files.employee_pan;
     const employeeQrCode = req.files.employee_qr_code;
-  
+
     const validateAndMove = (file, uploadPath) => {
       if (!file) {
         // Skip the file if it's null
-        console.log('File is null');
+        console.log("File is null");
         return null;
       }
-  
+
       if (!file.name) {
-        return res.status(400).json({ error: 'Invalid file object' });
+        return res.status(400).json({ error: "Invalid file object" });
       }
-  
+
       file.mv(uploadPath, (err) => {
         if (err) {
-          console.error('Error moving file:', err);
-          return res.status(500).json({ error: 'Error uploading file' });
+          console.error("Error moving file:", err);
+          return res.status(500).json({ error: "Error uploading file" });
         }
         // Do something with the file path, for example, save it in the database
         // ...
       });
-  
+
       return file.filename; // Return the filename for use in the database
     };
-  
-    const employeeAdhaarFilename = validateAndMove(employeeAdhaar, path.join(rootPath, 'public/all_image', Date.now() + '-' + (employeeAdhaar ? employeeAdhaar.name : '')));
-    const employeeProfileFilename = validateAndMove(employeeProfile, path.join(rootPath, 'public/all_image', Date.now() + '-' + (employeeProfile ? employeeProfile.name : '')));
-    const employeePanFilename = validateAndMove(employeePan, path.join(rootPath, 'public/all_image', Date.now() + '-' + (employeePan ? employeePan.name : '')));
-    const employeeQrCodeFilename = validateAndMove(employeeQrCode, path.join(rootPath, 'public/all_image', Date.now() + '-' + (employeeQrCode ? employeeQrCode.name : '')));
-  
+
+    const employeeAdhaarFilename = validateAndMove(
+      employeeAdhaar,
+      path.join(
+        rootPath,
+        "public/all_image",
+        Date.now() + "-" + (employeeAdhaar ? employeeAdhaar.name : "")
+      )
+    );
+    const employeeProfileFilename = validateAndMove(
+      employeeProfile,
+      path.join(
+        rootPath,
+        "public/all_image",
+        Date.now() + "-" + (employeeProfile ? employeeProfile.name : "")
+      )
+    );
+    const employeePanFilename = validateAndMove(
+      employeePan,
+      path.join(
+        rootPath,
+        "public/all_image",
+        Date.now() + "-" + (employeePan ? employeePan.name : "")
+      )
+    );
+    const employeeQrCodeFilename = validateAndMove(
+      employeeQrCode,
+      path.join(
+        rootPath,
+        "public/all_image",
+        Date.now() + "-" + (employeeQrCode ? employeeQrCode.name : "")
+      )
+    );
+
     // Check if at least one file is present
-    
-  
+
     const employee = await Employee.create({
       employee_name,
       employee_eid,
@@ -87,8 +112,6 @@ const store = async (req, res) => {
       employee_salary,
       employee_email,
       employee_password,
-      employee_branch,
-      employee_hr_access,
       employee_emergency,
       employee_address,
       employee_role,
@@ -97,13 +120,14 @@ const store = async (req, res) => {
       employee_pan: employeePanFilename,
       employee_qr_code: employeeQrCodeFilename,
     });
-  
-    return res.status(200).json({ data: employee, message: 'Files uploaded successfully' });
+
+    return res
+      .status(200)
+      .json({ data: employee, message: "Files uploaded successfully" });
   } catch (error) {
-    console.error('Error handling file upload:', error);
-    res.status(500).json({ error: 'Error handling file upload' });
+    console.error("Error handling file upload:", error);
+    res.status(500).json({ error: "Error handling file upload" });
   }
-  
 };
 const show = async (req, res) => {
   try {
@@ -128,8 +152,6 @@ const updated = async (req, res) => {
       employee_salary,
       employee_email,
       employee_password,
-      employee_branch,
-      employee_hr_access,
       employee_emergency,
       employee_address,
       employee_role,
@@ -202,8 +224,6 @@ const updated = async (req, res) => {
       employee_salary,
       employee_email,
       employee_password,
-      employee_branch,
-      employee_hr_access,
       employee_emergency,
       employee_address,
       employee_role,
@@ -222,16 +242,16 @@ const deleted = async (req, res) => {
   try {
     const { id } = req.params;
     const employeeStatus = await Employee.findByPk(id);
- const deactivatedemployee = await employeeStatus.update({
-    employee_status:2
-  })
+    const deactivatedemployee = await employeeStatus.update({
+      employee_status: 2,
+    });
 
-  if (deactivatedemployee){
-    res.json({message:"Employee Deactivated Successfullly"})
-  }else {
-    res.json({message:"Employee Deactivation Failed"})
-  }
-  }catch(e){
+    if (deactivatedemployee) {
+      res.json({ message: "Employee Deactivated Successfullly" });
+    } else {
+      res.json({ message: "Employee Deactivation Failed" });
+    }
+  } catch (e) {
     console.log(e);
   }
 };

@@ -1,8 +1,8 @@
 // # in working don't push
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db/db_config'); // Your Sequelize connection
+const { DataTypes } = require("sequelize");
+const sequelize = require("../db/db_config"); // Your Sequelize connection
 
-const Employee = sequelize.define('tbl_employee', {
+const Employee = sequelize.define("tbl_employee", {
   employee_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -33,14 +33,7 @@ const Employee = sequelize.define('tbl_employee', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  employee_branch: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  employee_hr_access: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-  },
+
   employee_emergency: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -55,19 +48,19 @@ const Employee = sequelize.define('tbl_employee', {
   },
   employee_aadhar: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
   },
   employee_profile: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
   },
   employee_pan: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
   },
   employee_qr_code: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
   },
   employee_status: {
     type: DataTypes.INTEGER,
