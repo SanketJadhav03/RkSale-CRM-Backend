@@ -3,13 +3,107 @@ const Roles = require("./roles_model")
 const Permission = require('../permission/permission_model')
 const RoleHasPermission = require('./roles_has_permission_model')
 
-const index = async(req,res) =>{
+const index = async (req, res) => {
 
     const GetallRoles = await Roles.findAll();
     res.status(200).json(GetallRoles);
 }
+const create = async (req, res) => {
+    const category = await Permission.findAll({
+        where: {
+            permission_category: 'CATEGORY',
+        },
+    });
+    const task = await Permission.findAll({
+        where: {
+            permission_category: 'TASK',
+        },
+    });
+    const reprot = await Permission.findAll({
+        where: {
+            permission_category: 'REPORT',
+        },
+    });
+    const leads = await Permission.findAll({
+        where: {
+            permission_category: 'LEADS',
+        },
+    });
 
-const store = async(req,res)=>{
+
+    const newUser = await Permission.findAll({
+        where: {
+            permission_category: 'NEWUSER',
+        },
+    });
+    const roles = await Permission.findAll({
+        where: {
+            permission_category: 'ROLES',
+        },
+    });
+    const point = await Permission.findAll({
+        where: {
+            permission_category: 'POINT',
+        },
+    });
+    const customer = await Permission.findAll({
+        where: {
+            permission_category: 'CUSTOMER',
+        },
+    });
+    const source = await Permission.findAll({
+        where: {
+            permission_category: 'SOURCE',
+        },
+    });
+    const references = await Permission.findAll({
+        where: {
+            permission_category: 'REFERENCES',
+        },
+    });
+    const city = await Permission.findAll({
+        where: {
+            permission_category: 'CITY',
+        },
+    });
+    const salary = await Permission.findAll({
+        where: {
+            permission_category: 'SALARY',
+        },
+    });
+    const product = await Permission.findAll({
+        where: {
+            permission_category: 'PRODUCT',
+        },
+    });
+    const branch = await Permission.findAll({
+        where: {
+            permission_category: 'BRANCH',
+        },
+    });
+    const leadsstatus = await Permission.findAll({
+        where: {
+            permission_category: 'LEADSSTATUS',
+        },
+    });
+    const whatsapp = await Permission.findAll({
+        where: {
+            permission_category: 'WHATSAPP',
+        },
+    });
+    const accountdepartment = await Permission.findAll({
+        where: {
+            permission_category: 'ACCOUNTDEPARTMENT',
+        },
+    });
+    res.status(200).json({
+        category, task, reprot, leads, newUser,
+        roles, point, customer, source, references, city, salary, product
+        , branch, leadsstatus, whatsapp, accountdepartment
+        ,
+    });
+}
+const store = async (req, res) => {
     try {
         const { role_name, permissionsLists } = req.body;
         const role = await Roles.create({ role_name });
@@ -27,7 +121,7 @@ const store = async(req,res)=>{
     }
 }
 
-const update  = async(req,res)=>{
+const update = async (req, res) => {
     try {
         const { role_name, permissionList, role_id } = req.body;
         const role = await Roles.findByPk(role_id);
@@ -74,6 +168,7 @@ const update  = async(req,res)=>{
 
 module.exports = {
     index,
+    create,
     store,
     update
 }
