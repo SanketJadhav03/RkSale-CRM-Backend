@@ -18,7 +18,7 @@ const index = async (req, res) => {
 const store = async (req, res) => {
     try {
 
-        const { data, customer_name,
+        const {  customer_name,
             customer_whatsapp_no,
             customer_city,
             customer_alternative_no,

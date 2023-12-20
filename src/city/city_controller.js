@@ -1,5 +1,4 @@
 
-const { Op } = require("sequelize");
 const City = require("./city_model")
 
 const index = async(req,res)=>{
@@ -47,15 +46,7 @@ const show = async(req,res)=>{
 const updated = async(req,res)=>{
     try {
         const { city_id, city_name } = req.body;
-       const existingCity = await City.findOne({
-        where: {
-          city_name: city_name,
-          city_id: { [Op.ne]: city_id },
-        },  
-      });
-      if (existingCity) {
-        return res.json({ message: "City name already exists", status: 0 });
-      }
+    
           const city = await City.findByPk(city_id);
           if (!city) {
          return res.status(404).json({ error: "City not found" });

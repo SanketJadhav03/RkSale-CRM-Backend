@@ -1,7 +1,7 @@
 const express = require("express");
 const expressApp = express();
 const cors = require("cors");
-const path = require("path");
+const fileUpload = require('express-fileupload');
 // const checked = require("./src/db/db_config");
 // const checkPermissions = require("./src/auth/permissionMiddleware");
 const sqlite3 = require("sqlite3").verbose();
@@ -16,6 +16,10 @@ expressApp.use(express.static(imagesPath));
 
 expressApp.use(express.json());
 expressApp.use(cors());
+expressApp.use(fileUpload({
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit, adjust as needed
+}));
+
 // create data
 // checked
 //   .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
@@ -77,8 +81,11 @@ const Employee = require("./src/employee/employee_route");
 expressApp.use("/back-end", Employee);
 
 
-const SubCategory = require('./src/subcategory/subcategory_routes')
+
+const SubCategory = require('./src/subcategory/subcategory_routes');
+
 expressApp.use('/back-end', SubCategory)
+
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
 expressApp.listen(port, () => {
