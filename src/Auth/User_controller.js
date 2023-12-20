@@ -1,7 +1,9 @@
 const { Op } = require("sequelize");
-const User = require("./User_model");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+
+const User = require("./User_model")
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 const login = async (req, res) => {
   try {
     // Extract email and password from the request body
@@ -52,6 +54,7 @@ const index = async (req, res) => {
   }
 };
 const store = async (req, res) => {
+<<<<<<< HEAD
   try {
     // Extract data from the request body
     const {
@@ -100,6 +103,93 @@ const store = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+=======
+    try {
+        // Extract data from the request body
+        const {
+            user_type,
+            hr_type,
+            name,
+            address,
+            user_role_id,
+            salary,
+            mobile_no,
+            emergency_contact,
+            email,
+            password,
+
+        } = req.body;
+
+        const rootPath = process.cwd();
+
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const profile_photo = req.files.profile_photo;
+        const aadhar_card = req.files.aadhar_card;
+        const pan_card = req.files.pan_card;
+        const bank_passbook = req.files.bank_passbook;
+
+        const validateAndMove = (file, uploadPath) => {
+            if (!file) {
+                // Skip the file if it's null
+                console.log('File is null');
+                return null;
+            }
+
+            if (!file.name) {
+                return res.status(400).json({ error: 'Invalid file object' });
+            }
+
+            file.mv(uploadPath, (err) => {
+                if (err) {
+                    console.error('Error moving file:', err);
+                    return res.status(500).json({ error: 'Error uploading file' });
+                }
+                // Do something with the file path, for example, save it in the database
+                // ...
+            });
+
+            return file.filename; // Return the filename for use in the database
+        };
+
+        const profile_photoFilename = validateAndMove(profile_photo, path.join(rootPath, 'public/all_image/user/profile', Date.now() + '-' + (profile_photo ? profile_photo.name : '')));
+        const aadhar_cardFilename = validateAndMove(aadhar_card, path.join(rootPath, 'public/all_image/user/aadhar', Date.now() + '-' + (aadhar_card ? aadhar_card.name : '')));
+        const pan_cardFilename = validateAndMove(pan_card, path.join(rootPath, 'public/all_image/user/pan', Date.now() + '-' + (pan_card ? pan_card.name : '')));
+        const bank_passbookFilename = validateAndMove(bank_passbook, path.join(rootPath, 'public/all_image/user/bank_passbook', Date.now() + '-' + (bank_passbook ? bank_passbook.name : '')));
+
+        // Hash the password using bcrypt
+        const hashedPassword = await bcrypt.hash(password, 10); // 10 is the number of salt rounds
+
+        // Create a new user in the database
+        const newUser = await User.create({
+            user_type,
+            hr_type,
+            name,
+            address,
+            user_role_id,
+            salary,
+            mobile_no,
+            emergency_contact,
+            profile_photo: profile_photoFilename,
+            email,
+            aadhar_card: aadhar_cardFilename,
+            pan_card: pan_cardFilename,
+            bank_passbook: bank_passbookFilename,
+            password: hashedPassword,
+            status: 1
+        });
+
+        // Send a success response with the created user data
+        res.status(201).json(newUser);
+    } catch (error) {
+        // Handle any errors that occur during the process
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+>>>>>>> aa3d403ccf99e092124c0ad62e595520da5bd33b
 // const show = async (req, res) => {
 //     try {
 //         const { id } = req.params;
