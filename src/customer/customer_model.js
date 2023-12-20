@@ -47,6 +47,15 @@ const Customer = sequelize.define('tbl_customer', {
   customer_address:{
     type:DataTypes.STRING,
     allowNull:true
+  },
+  customer_group:{
+    type:DataTypes.STRING,
+    allowNull:true
+  },
+  cusotmer_status:{
+    type:DataTypes.STRING,
+    allowNull:false,
+    defaultValue:1
   }
 });
 
