@@ -38,15 +38,9 @@ expressApp.use("/back-end", user);
 const city = require("./src/city/city_route");
 expressApp.use("/back-end", city);
 
-// // permission
-
 // // source routes
 const source = require("./src/source/source_route");
 expressApp.use("/back-end", source);
-
-// // source routes
-const branch = require("./src/branch/branch_route");
-expressApp.use("/back-end", branch);
 
 // category routes
 const category = require("./src/category/category_routes");
@@ -65,8 +59,7 @@ const leadStatus = require("./src/lead_status/lead_route");
 expressApp.use("/back-end", leadStatus);
 
 // roles routes
-const roles = require("./src/roles/roles_routes");
-expressApp.use("/back-end", roles);
+
 
 // point routes
 // const point = require("./src/point/point_routes");

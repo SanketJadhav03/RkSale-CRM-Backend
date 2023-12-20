@@ -222,44 +222,17 @@ const deleted = async (req, res) => {
   try {
     const { id } = req.params;
     const employeeStatus = await Employee.findByPk(id);
-    if (!employeeStatus) {
-      return res.status(404).json({ error: "Employee not found" });
-    }
+ const deactivatedemployee = await employeeStatus.update({
+    employee_status:2
+  })
 
-    if (employeeStatus.employee_aadhar != null) {
-      const imagePath = path.join(
-        `${url_helper}/all_images/employee`,
-        employeeStatus.employee_aadhar
-      );
-      await fs.unlink(imagePath);
-    }
-    if (employeeStatus.employee_qr_code != null) {
-      const imagePath = path.join(
-        `${url_helper}/all_images/employee`,
-        employeeStatus.employee_qr_code
-      );
-      await fs.unlink(imagePath);
-    }
-    if (employeeStatus.employee_profile != null) {
-      const imagePath = path.join(
-        `${url_helper}/all_images/employee`,
-        employeeStatus.employee_profile
-      );
-      await fs.unlink(imagePath);
-    }
-    if (employeeStatus.employee_pan != null) {
-      const imagePath = path.join(
-        `${url_helper}/all_images/employee`,
-        employeeStatus.employee_pan
-      );
-      await fs.unlink(imagePath);
-    }
-
-    await employeeStatus.destroy();
-    return res.json({ message: "Employee deleted successfully!", status: 1 });
-  } catch (error) {
-    console.error("Error deleting Employee:", error);
-    res.status(500).json({ error: "Error deleting Employee:" });
+  if (deactivatedemployee){
+    res.json({message:"Employee Deactivated Successfullly"})
+  }else {
+    res.json({message:"Employee Deactivation Failed"})
+  }
+  }catch(e){
+    console.log(e);
   }
 };
 module.exports = {
