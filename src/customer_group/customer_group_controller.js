@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const Customer = require("../customer/customer_model");
 const CustomerGroup = require("./customer_group_model");
-const allCustomerGroups = async(req, res) => {
+const allCustomerGroups = async (req, res) => {
   try {
     const customerGroup = await CustomerGroup.findAll();
     res.json(customerGroup);
@@ -10,19 +10,58 @@ const allCustomerGroups = async(req, res) => {
     res.status(500).json({ error: "Error fetching Customer Groups" });
   }
 }
+// const index = async (req, res) => {
+//   try {
+//     const page = req.query.page;
+//     const limit = req.query.limit;
+//     const offset = (page - 1) * limit;
+//     const customerGroups = await CustomerGroup.findAll({
+//       limit: limit,
+//       offset: offset,
+//     });
+//     res.json(customerGroups);
+//   } catch (error) {
+//     console.error("Error fetching Customer Groups:", error);
+//     res.status(500).json({ error: "Error fetching Customer Groups" });
+//   }
+// };
+
 const index = async (req, res) => {
   try {
-    const page = req.query.page;
-    const limit = req.query.limit;
+    // Pagination parameters with default values
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+
+    console.log('Page:', page);
+    console.log('Limit:', limit);
+
+    // Fetch customer groups with pagination
     const customerGroups = await CustomerGroup.findAll({
       limit: limit,
       offset: offset,
     });
+
+    // Check if customer groups were found
+    if (!customerGroups || customerGroups.length === 0) {
+      return res.status(404).json({ error: 'No customer groups found' });
+    }
+
+    // Log fetched customer groups
+    console.log('Fetched Customer Groups:', customerGroups);
+
+    // Return customer groups in the response
     res.json(customerGroups);
   } catch (error) {
-    console.error("Error fetching Customer Groups:", error);
-    res.status(500).json({ error: "Error fetching Customer Groups" });
+    // Handle any errors that occur during the process
+    console.error('Error fetching Customer Groups:', error);
+
+    // Handle Sequelize validation errors
+    if (error.name === 'SequelizeValidationError') {
+      return res.status(400).json({ error: 'Validation error', details: error.errors });
+    }
+
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
@@ -82,9 +121,9 @@ const update = async (req, res) => {
     if (!customerGroup) {
       return res.status(404).json({ error: "Customer Group not found" });
     }
-    await customerGroup.update({ 
-      customer_group_name, 
-      isSynced:updatedIsSynced 
+    await customerGroup.update({
+      customer_group_name,
+      isSynced: updatedIsSynced
     });
     return res.json({
       message: "Customer group updated successfully!",
@@ -106,7 +145,7 @@ const deleted = async (req, res) => {
 
     // Assuming Customer has a property called "customer_group_type"
     const customersInGroup = await Customer.findOne({
-      where: { customer_group_type: id },
+      where: { customer_group: id },
     });
 
     if (customersInGroup) {

@@ -52,6 +52,10 @@ expressApp.use("/back-end", category);
 const product = require("./src/product/product_routes");
 expressApp.use("/back-end", product);
 
+
+const customer_group = require("./src/customer_group/customer_group_routes");
+expressApp.use("/back-end", customer_group);
+
 // Reference route
 const Reference = require("./src/reference/reference_routes");
 expressApp.use("/back-end", Reference);
@@ -59,6 +63,15 @@ expressApp.use("/back-end", Reference);
 // lead status routes
 const leadStatus = require("./src/lead_status/lead_route");
 expressApp.use("/back-end", leadStatus);
+// Expences_Category  routes
+const Expences_Category = require("./src/expences_category/expences_category_routes");
+expressApp.use("/back-end", Expences_Category);
+// Related  routes
+const related = require("./src/related/related_route");
+expressApp.use("/back-end", related);
+// Tag  routes
+const tags = require("./src/tags/tags_route");
+expressApp.use("/back-end", tags);
 
 // roles routes
 
