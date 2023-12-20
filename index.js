@@ -1,8 +1,8 @@
 const express = require("express");
 const expressApp = express();
 const cors = require("cors");
-const fileUpload = require('express-fileupload');
-// const checked = require("./src/db/db_config");
+const fileUpload = require("express-fileupload");
+const checked = require("./src/db/db_config");
 // const checkPermissions = require("./src/auth/permissionMiddleware");
 const sqlite3 = require("sqlite3").verbose();
 const fs = require("fs");
@@ -16,20 +16,22 @@ expressApp.use(express.static(imagesPath));
 
 expressApp.use(express.json());
 expressApp.use(cors());
-expressApp.use(fileUpload({
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit, adjust as needed
-}));
+expressApp.use(
+  fileUpload({
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit, adjust as needed
+  })
+);
 
 // create data
-// checked
-//   .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
-//   .then(() => {
-//     require("./db/create_data");
-//     console.log("Database created!");
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   });
+checked
+  .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+  .then(() => {
+    require("./db/create_data");
+    console.log("Database created!");
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 
 // user routes
 const user = require("./src/Auth/User_route");
@@ -60,7 +62,6 @@ expressApp.use("/back-end", leadStatus);
 
 // roles routes
 
-
 // point routes
 // const point = require("./src/point/point_routes");
 // expressApp.use("/back-end", point);
@@ -73,11 +74,9 @@ expressApp.use("/back-end", Customer);
 const Employee = require("./src/employee/employee_route");
 expressApp.use("/back-end", Employee);
 
+const SubCategory = require("./src/subcategory/subcategory_routes");
 
-
-const SubCategory = require('./src/subcategory/subcategory_routes');
-
-expressApp.use('/back-end', SubCategory)
+expressApp.use("/back-end", SubCategory);
 
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;

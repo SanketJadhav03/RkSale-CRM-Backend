@@ -1,9 +1,4 @@
-const Permission = require('../src/permission/permission_model');
-const RoleHasPermission = require('../src/roles/roles_has_permission_model');
-const Roles = require('../src/roles/roles_model');
 async function initializeDatabase() {
-
-
   const staticPermissions = [
     {
       permission_name: "dashboard",
@@ -24,7 +19,7 @@ async function initializeDatabase() {
       permission_name: "sidebar",
       permission_path: "/sidebar",
       permission_category: "SIDEBAR",
-    }
+    },
   ];
 
   await Permission.bulkCreate(staticPermissions);
@@ -44,14 +39,13 @@ async function initializeDatabase() {
 
 const findindAlready = async () => {
   try {
-    if (await Roles.count() == 0) {
+    if ((await Roles.count()) == 0) {
       initializeDatabase();
-      require("../imageDir/dir");
-    }else{
+    } else {
       console.error("Unable to create database");
     }
   } catch (error) {
     console.log("Error");
   }
-}
+};
 module.exports = findindAlready();
