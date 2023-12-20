@@ -70,8 +70,12 @@ const Customer = require("./src/customer/customer_routes");
 expressApp.use("/back-end", Customer);
 
 // employee route
-// const Employee = require("./src/employee/employee_route");
-// expressApp.use("/back-end", Employee);
+const Employee = require("./src/employee/employee_route");
+expressApp.use("/back-end", Employee);
+
+
+const SubCategory = require('./src/subcategory/subcategory_routes')
+expressApp.use('/back-end',SubCategory)
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
 expressApp.listen(port, () => {

@@ -5,7 +5,7 @@ const url_helper = require("../../url_helper");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, `${url_helper}/all_images/employee`);
+    cb(null, `public/allimages`);
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + "-" + file.originalname);
