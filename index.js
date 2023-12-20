@@ -27,6 +27,9 @@ expressApp.use(cors());
 //     console.log(error);
 //   });
 
+// user routes
+const user = require("./src/Auth/User_route");
+expressApp.use("/back-end", user);
 // city routes
 const city = require("./src/city/city_route");
 expressApp.use("/back-end", city);
@@ -75,7 +78,7 @@ expressApp.use("/back-end", Employee);
 
 
 const SubCategory = require('./src/subcategory/subcategory_routes')
-expressApp.use('/back-end',SubCategory)
+expressApp.use('/back-end', SubCategory)
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
 expressApp.listen(port, () => {
