@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db/db_config'); // Your Sequelize connection
 
-const LeadStatus = sequelize.define('tbl_lead_status', {
+const LeadStatus = sequelize.define('tbl_lead_statuses', {
   lead_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
