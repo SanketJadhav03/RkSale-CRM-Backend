@@ -88,7 +88,8 @@ const store = async (req, res) => {
             business_logo: uploadedFilePath ? path.basename(uploadedFilePath) : null // Store file path in the database
         });
 
-        res.json(business);
+        // res.json(business);
+        return res.status(201).json({ message: 'Bussiness Setting added successfully !', status: 1 });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: "Failed To Create Business Setting!" });
@@ -198,7 +199,7 @@ const update = async (req, res) => {
             });
         }
 
-        res.json({ message: "Business Updated Successfully" });
+        return res.json({ message: "Category updated successfully!", status: 1 });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to update business" });
