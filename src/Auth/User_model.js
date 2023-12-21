@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db/db_config'); // Your Sequelize connection
+const { DataTypes } = require("sequelize");
+const sequelize = require("../db/db_config"); // Your Sequelize connection
 
-const User = sequelize.define('users', {
+const User = sequelize.define("users", {
   id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -10,11 +10,11 @@ const User = sequelize.define('users', {
   },
   user_type: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
   },
   hr_type: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
   },
   name: {
     type: DataTypes.STRING,
@@ -22,32 +22,31 @@ const User = sequelize.define('users', {
   },
   address: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   user_role_id: {
     type: DataTypes.INTEGER,
-
-    allowNull: false,
+    allowNull: true,
   },
   salary: {
     type: DataTypes.INTEGER,
 
-    allowNull: false,
+    allowNull: true,
   },
   mobile_no: {
     type: DataTypes.STRING,
 
-    allowNull: false,
+    allowNull: true,
   },
   emergency_contact: {
     type: DataTypes.STRING,
 
-    allowNull: false,
+    allowNull: true,
   },
   profile_photo: {
     type: DataTypes.STRING,
 
-    allowNull: false,
+    allowNull: true,
   },
   email: {
     type: DataTypes.STRING,
@@ -57,17 +56,17 @@ const User = sequelize.define('users', {
   aadhar_card: {
     type: DataTypes.STRING,
 
-    allowNull: false,
+    allowNull: true,
   },
   pan_card: {
     type: DataTypes.STRING,
 
-    allowNull: false,
+    allowNull: true,
   },
   bank_passbook: {
     type: DataTypes.STRING,
 
-    allowNull: false,
+    allowNull: true,
   },
   password: {
     type: DataTypes.STRING,
@@ -78,7 +77,7 @@ const User = sequelize.define('users', {
   status: {
     type: DataTypes.INTEGER,
 
-    allowNull: false,
+    allowNull: true,
   },
 });
 

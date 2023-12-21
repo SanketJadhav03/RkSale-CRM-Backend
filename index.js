@@ -13,8 +13,6 @@ const username = os.userInfo().username;
 // const imagesPath = `C:\\Users\\${username}\\AppData\\Roaming\\RkSalesCrm\\all_images`;
 // expressApp.use(express.static(imagesPath));
 
-
-
 expressApp.use(express.json());
 expressApp.use(cors());
 expressApp.use(
@@ -52,7 +50,6 @@ expressApp.use("/back-end", category);
 const product = require("./src/product/product_routes");
 expressApp.use("/back-end", product);
 
-
 const customer_group = require("./src/customer_group/customer_group_routes");
 expressApp.use("/back-end", customer_group);
 
@@ -76,8 +73,11 @@ expressApp.use("/back-end", tags);
 // roles routes
 
 // point routes
-// const point = require("./src/point/point_routes");
-// expressApp.use("/back-end", point);
+// ROLES & PERMISSIONS ROUTE
+const roles = require("./src/roles/role_routes");
+const permissions = require("./src/permissions/permission_route");
+expressApp.use("/back-end", roles);
+expressApp.use("/back-end", permissions);
 
 // customer route
 const Customer = require("./src/customer/customer_routes");
@@ -90,8 +90,8 @@ expressApp.use("/back-end", Employee);
 const SubCategory = require("./src/subcategory/subcategory_routes");
 expressApp.use("/back-end", SubCategory);
 
-const Leads = require('./src/leads/leads_routes')
-expressApp.use("/back-end",Leads)
+const Leads = require("./src/leads/leads_routes");
+expressApp.use("/back-end", Leads);
 
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;

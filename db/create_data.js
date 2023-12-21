@@ -1,4 +1,17 @@
+const User = require("../src/Auth/User_model");
+const Permission = require("../src/permissions/permission_model");
+const RoleHasPermission = require("../src/roles/role_has_permission_model");
+const bcrypt = require("bcrypt");
+const Role = require("../src/roles/role_model");
 async function initializeDatabase() {
+  const hashedPassword = await bcrypt.hash("super@ajspire.com", 10);
+  await User.create({
+    name: "Super Admin",
+    mobile_no: "9595775123",
+    password: hashedPassword,
+    email: "super@ajspire.com",
+    id: 1,
+  });
   const staticPermissions = [
     {
       permission_name: "dashboard",
@@ -25,7 +38,7 @@ async function initializeDatabase() {
   await Permission.bulkCreate(staticPermissions);
   console.log("Static permissions inserted successfully.");
 
-  await Roles.create({ role_name: "Admin" });
+  await Role.create({ role_name: "Admin" });
   const permissionsLists = await Permission.findAll();
   for (const permission of permissionsLists) {
     await RoleHasPermission.create({
@@ -39,7 +52,7 @@ async function initializeDatabase() {
 
 const findindAlready = async () => {
   try {
-    if ((await Roles.count()) == 0) {
+    if ((await User.count()) == 0) {
       initializeDatabase();
     } else {
       console.error("Unable to create database");
