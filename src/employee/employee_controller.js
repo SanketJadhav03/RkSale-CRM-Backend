@@ -35,29 +35,25 @@ const store = async (req, res) => {
       employee_address,
       employee_role,
     } = req.body;
-
+  
     const rootPath = process.cwd();
-
-    if (!req.files || Object.keys(req.files).length === 0) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
-
+  
     const employeeProfile = req.files.employee_profile;
     const employeeAdhaar = req.files.employee_aadhar;
     const employeePan = req.files.employee_pan;
     const employeeQrCode = req.files.employee_qr_code;
-
+  
     const validateAndMove = (file, uploadPath) => {
       if (!file) {
         // Skip the file if it's null
         console.log("File is null");
         return null;
       }
-
+  
       if (!file.name) {
         return res.status(400).json({ error: "Invalid file object" });
       }
-
+  
       file.mv(uploadPath, (err) => {
         if (err) {
           console.error("Error moving file:", err);
@@ -66,60 +62,67 @@ const store = async (req, res) => {
         // Do something with the file path, for example, save it in the database
         // ...
       });
-
+  
       return file.filename; // Return the filename for use in the database
     };
-
+  
+    // Use the validateAndMove function for each file, allowing null files
     const employeeAdhaarFilename = validateAndMove(
       employeeAdhaar,
       path.join(
         rootPath,
         "public/images/employee",
-"crm"+"-"+ (employeeAdhaar ? employeeAdhaar.name : "")
+        "crm" + "-" + (employeeAdhaar ? employeeAdhaar.name : "default.png")
       )
     );
+  
     const employeeProfileFilename = validateAndMove(
       employeeProfile,
       path.join(
         rootPath,
         "public/images/employee",
-        "crm"+"-" + (employeeProfile ? employeeProfile.name : "")
+        "crm" + "-" + (employeeProfile ? employeeProfile.name : "default.png")
       )
     );
+  
     const employeePanFilename = validateAndMove(
       employeePan,
       path.join(
         rootPath,
         "public/images/employee",
-       "crm" +"-" + (employeePan ? employeePan.name : "")
+        "crm" + "-" + (employeePan ? employeePan.name : "default.txt")
       )
     );
+  
     const employeeQrCodeFilename = validateAndMove(
       employeeQrCode,
       path.join(
         rootPath,
         "public/images/employee",
-       "crm" +"-" + (employeeQrCode ? employeeQrCode.name : "")
+        "crm" + "-" + (employeeQrCode ? employeeQrCode.name : "default.txt")
       )
     );
+  
     // Check if at least one file is present
-
+  
     const employee = await Employee.create({
-      employee_name,
-      employee_eid,
-      employee_mobile,
-      employee_salary,
-      employee_email,
-      employee_password,
-      employee_emergency,
-      employee_address,
-      employee_role,
-      employee_aadhar: req.files.employee_profile.filename,
-      employee_profile: employeeAdhaar.name,
-      employee_pan: employeePan.name,
-      employee_qr_code: employeeQrCode.name,
+      // ... (your existing code)
+      employee_name:employee_name,
+      employee_eid:employee_eid,
+      employee_mobile:employee_mobile,
+      employee_salary:employee_salary,
+      employee_email:employee_email,
+      employee_password:employee_password,
+      employee_emergency:employee_emergency,
+      employee_address:employee_address,
+      employee_role:employee_role,
+      // Update the conditions to check if the file is not null before accessing its properties
+      employee_aadhar: req.files.employee_profile ? req.files.employee_profile.name : null,
+      employee_profile: req.files.employee_aadhar ? req.files.employee_aadhar.name : null,
+      employee_pan:  req.files.employee_pan ? req.files.employee_pan.name : null,
+      employee_qr_code:  req.files.employee_qr_code ? req.files.employee_qr_code.name : null,
     });
-
+  
     return res
       .status(200)
       .json({ data: employee, message: "Files uploaded successfully" });
@@ -127,6 +130,7 @@ const store = async (req, res) => {
     console.error("Error handling file upload:", error);
     res.status(500).json({ error: "Error handling file upload" });
   }
+  
 };
 const show = async (req, res) => {
   try {
