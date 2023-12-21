@@ -72,6 +72,12 @@ expressApp.use("/back-end", related);
 // Tag  routes
 const tags = require("./src/tags/tags_route");
 expressApp.use("/back-end", tags);
+// Tag  routes
+const industry = require("./src/Indusrty/Indusrty_route");
+expressApp.use("/back-end", industry);
+// business setting  routes
+const business_setting = require("./src/business_settings/business_routes");
+expressApp.use("/back-end", business_setting);
 
 // roles routes
 

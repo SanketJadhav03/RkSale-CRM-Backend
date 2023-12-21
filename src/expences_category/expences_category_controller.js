@@ -57,7 +57,7 @@ const update = async (req, res) => {
             where: {
                 expences_category_name: expences_category_name,
                 expences_category_description: expences_category_description,
-                expences_category_id: { [Op.ne]: category_id },
+                expences_category_id: { [Op.ne]: expences_category_id },
             },
         });
         if (existingExpences_Categorys) {
