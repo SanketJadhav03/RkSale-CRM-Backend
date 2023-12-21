@@ -439,27 +439,27 @@ async function initializeDatabase() {
     {
       permission_name: "industry store",
       permission_path: "/back-end/industry/store",
-      permission_category: "TEMP",
+      permission_category: "INDUSTRY_TYPE",
     },
     {
       permission_name: "industry list",
       permission_path: "/back-end/industry/list",
-      permission_category: "TEMP",
+      permission_category: "INDUSTRY_TYPE",
     },
     {
       permission_name: "industry show",
       permission_path: "/back-end/industry/show",
-      permission_category: "TEMP",
+      permission_category: "INDUSTRY_TYPE",
     },
     {
       permission_name: "industry update",
       permission_path: "/back-end/industry/update",
-      permission_category: "TEMP",
+      permission_category: "INDUSTRY_TYPE",
     },
     {
       permission_name: "industry delete",
       permission_path: "/back-end/industry/delete",
-      permission_category: "TEMP",
+      permission_category: "INDUSTRY_TYPE",
     },
   ];
 
