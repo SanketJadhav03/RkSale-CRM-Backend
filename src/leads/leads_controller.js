@@ -189,6 +189,11 @@ const update = async(req,res)=>{
 
     })
 
+    if(updatedlead){
+      res.json({message:"Lead Updated SuccessFully"})
+    }else {
+      res.json({message:"Lead Updated Failed"})
+    }
   
   } catch (error) {
     console.log(error);
