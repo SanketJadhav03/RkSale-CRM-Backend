@@ -1,6 +1,7 @@
 const express = require("express");
 const expressApp = express();
 const cors = require("cors");
+const path = require('path')
 const fileUpload = require("express-fileupload");
 const checked = require("./src/db/db_config");
 // const checkPermissions = require("./src/auth/permissionMiddleware");
@@ -15,6 +16,8 @@ const username = os.userInfo().username;
 
 expressApp.use(express.json());
 expressApp.use(cors());
+expressApp.use(
+express.static(path.join(__dirname, 'public/images')));
 expressApp.use(
   fileUpload({
     limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit, adjust as needed
@@ -84,8 +87,8 @@ const Customer = require("./src/customer/customer_routes");
 expressApp.use("/back-end", Customer);
 
 // employee route
-const Employee = require("./src/employee/employee_route");
-expressApp.use("/back-end", Employee);
+// const Employee = require("./src/employee/employee_route");
+// expressApp.use("/back-end", Employee);
 
 const SubCategory = require("./src/subcategory/subcategory_routes");
 expressApp.use("/back-end", SubCategory);

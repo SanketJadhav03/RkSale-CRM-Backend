@@ -2,17 +2,13 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../db/db_config"); // Your Sequelize connection
 
 const User = sequelize.define("users", {
-  id: {
+  uid: {
     type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
   },
-  user_type: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-  },
-  hr_type: {
+  u_type: {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
@@ -53,30 +49,46 @@ const User = sequelize.define("users", {
 
     allowNull: false,
   },
-  aadhar_card: {
-    type: DataTypes.STRING,
-
-    allowNull: true,
-  },
-  pan_card: {
-    type: DataTypes.STRING,
-
-    allowNull: true,
-  },
-  bank_passbook: {
-    type: DataTypes.STRING,
-
-    allowNull: true,
-  },
   password: {
     type: DataTypes.STRING,
 
-    allowNull: false,
+    allowNull: true,
   },
 
+  aadhar_no: {
+    type: DataTypes.STRING,
+
+    allowNull: true,
+  },
+  aadhar_photo: {
+    type: DataTypes.STRING,
+
+    allowNull: true,
+  },
+  pan_no: {
+    type: DataTypes.STRING,
+
+    allowNull: true,
+  },
+
+  pan_photo: {
+    type: DataTypes.STRING,
+    allowNull: true
+
+  },
+  bank_passbook_photo: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null
+  },
+  user_upi: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null
+  },
   status: {
     type: DataTypes.INTEGER,
-
+    defaultValue:1,
     allowNull: true,
   },
 });
