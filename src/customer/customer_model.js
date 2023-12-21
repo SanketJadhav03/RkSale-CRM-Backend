@@ -24,19 +24,11 @@ const Customer = sequelize.define('tbl_customer', {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
-  customer_birth_date: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
   customer_email: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  customer_marriage_annieversary_date: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
-  customer_organization_name:{
+  customer_compnay_name:{
     type:DataTypes.STRING,
     allowNull:false,
   },

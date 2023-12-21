@@ -74,35 +74,34 @@ const store = async (req, res) => {
       employeeAdhaar,
       path.join(
         rootPath,
-        "public/all_image",
-        Date.now() + "-" + (employeeAdhaar ? employeeAdhaar.name : "")
+        "public/images/employee",
+"crm"+"-"+ (employeeAdhaar ? employeeAdhaar.name : "")
       )
     );
     const employeeProfileFilename = validateAndMove(
       employeeProfile,
       path.join(
         rootPath,
-        "public/all_image",
-        Date.now() + "-" + (employeeProfile ? employeeProfile.name : "")
+        "public/images/employee",
+        "crm"+"-" + (employeeProfile ? employeeProfile.name : "")
       )
     );
     const employeePanFilename = validateAndMove(
       employeePan,
       path.join(
         rootPath,
-        "public/all_image",
-        Date.now() + "-" + (employeePan ? employeePan.name : "")
+        "public/images/employee",
+       "crm" +"-" + (employeePan ? employeePan.name : "")
       )
     );
     const employeeQrCodeFilename = validateAndMove(
       employeeQrCode,
       path.join(
         rootPath,
-        "public/all_image",
-        Date.now() + "-" + (employeeQrCode ? employeeQrCode.name : "")
+        "public/images/employee",
+       "crm" +"-" + (employeeQrCode ? employeeQrCode.name : "")
       )
     );
-
     // Check if at least one file is present
 
     const employee = await Employee.create({
@@ -115,10 +114,10 @@ const store = async (req, res) => {
       employee_emergency,
       employee_address,
       employee_role,
-      employee_aadhar: employeeAdhaarFilename,
-      employee_profile: employeeProfileFilename,
-      employee_pan: employeePanFilename,
-      employee_qr_code: employeeQrCodeFilename,
+      employee_aadhar: req.files.employee_profile.filename,
+      employee_profile: employeeAdhaar.name,
+      employee_pan: employeePan.name,
+      employee_qr_code: employeeQrCode.name,
     });
 
     return res

@@ -10,9 +10,10 @@ const os = require("os");
 // const authenticateToken = require("./src/auth/authMiddleware");
 // const url_helper = require("./url_helper");
 const username = os.userInfo().username;
+// const imagesPath = `C:\\Users\\${username}\\AppData\\Roaming\\RkSalesCrm\\all_images`;
+// expressApp.use(express.static(imagesPath));
 
-const imagesPath = `C:\\Users\\${username}\\AppData\\Roaming\\RkSalesCrm\\all_images`;
-expressApp.use(express.static(imagesPath));
+
 
 expressApp.use(express.json());
 expressApp.use(cors());
@@ -21,7 +22,6 @@ expressApp.use(
     limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit, adjust as needed
   })
 );
-
 // create data
 checked
   .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
@@ -88,8 +88,10 @@ const Employee = require("./src/employee/employee_route");
 expressApp.use("/back-end", Employee);
 
 const SubCategory = require("./src/subcategory/subcategory_routes");
-
 expressApp.use("/back-end", SubCategory);
+
+const Leads = require('./src/leads/leads_routes')
+expressApp.use("/back-end",Leads)
 
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
