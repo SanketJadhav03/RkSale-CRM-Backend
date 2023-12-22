@@ -61,6 +61,8 @@ const index = async (req, res) => {
 };
 const store = async (req, res) => {
   try {
+
+    // return res.json(req);
     // Extract data from the request body
     const {
       u_type,
@@ -165,11 +167,11 @@ const store = async (req, res) => {
       aadhar_no: aadhar_no,
       pan_no: pan_no,
       user_upi: user_upi,
-      date_of_joining:date_of_joining,
-      last_experience:last_experience,
-      last_working_company:last_working_company,
-      last_company_salary:last_company_salary,
-      shift_id:shift_id,
+      date_of_joining: date_of_joining,
+      last_experience: last_experience,
+      last_working_company: last_working_company,
+      last_company_salary: last_company_salary,
+      shift_id: shift_id,
       profile_photo: req.files.profile_photo ? req.files.profile_photo.name : null,
       aadhar_photo: req.files.aadhar_photo ? req.files.aadhar_photo.name : null,
       pan_photo: req.files.pan_photo ? req.files.pan_photo.name : null,
@@ -177,7 +179,7 @@ const store = async (req, res) => {
     });
 
     // Send a success response with the created user data
-    res.status(201).json(newUser);
+    res.status(201).json({ message: 'Employee added successfully', status: 1, newUser });
   } catch (error) {
     // Handle any errors that occur during the process
     console.error(error);
@@ -308,11 +310,11 @@ const updated = async (req, res) => {
       aadhar_no: aadhar_no,
       pan_no: pan_no,
       user_upi: user_upi,
-      date_of_joining:date_of_joining,
-      last_experience:last_experience,
-      last_working_company:last_working_company,
-      last_company_salary:last_company_salary,
-      shift_id:shift_id,
+      date_of_joining: date_of_joining,
+      last_experience: last_experience,
+      last_working_company: last_working_company,
+      last_company_salary: last_company_salary,
+      shift_id: shift_id,
       profile_photo: req.files.profile_photo ? req.files.profile_photo : user.profile_photo,
       aadhar_photo: req.files.aadhar_photo ? req.files.aadhar_photo : user.aadhar_photo,
       pan_photo: req.files.pan_photo ? req.files.pan_photo : user.pan_photo,

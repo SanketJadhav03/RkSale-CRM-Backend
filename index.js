@@ -17,7 +17,7 @@ const username = os.userInfo().username;
 expressApp.use(express.json());
 expressApp.use(cors());
 expressApp.use(
-express.static(path.join(__dirname, 'public/images')));
+  express.static(path.join(__dirname, 'public/images')));
 expressApp.use(
   fileUpload({
     limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit, adjust as needed
@@ -104,11 +104,11 @@ expressApp.use("/back-end", Leads);
 
 // Task Routes 
 const task = require('./src/task/task_routes')
-expressApp.use('/back-end',task)
+expressApp.use('/back-end', task)
 
 // Task Routes 
 const shift = require('./src/shift/shift_routes')
-expressApp.use('/back-end',shift)
+expressApp.use('/back-end', shift)
 
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
