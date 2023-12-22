@@ -82,17 +82,23 @@ res.json({error:"Failed To Store Attendance"})
 }
 
 const index = async(req,res) =>{
-    try {   
-
-            // Define the startOfDay and endOfDay variables here
-            const today = new Date();
-            const startOfDay = new Date(today);
-            startOfDay.setUTCHours(0, 0, 0, 0);
+    try {
+        const today = new Date();
+        const startOfDay = new Date(today);
+        startOfDay.setUTCHours(0, 0, 0, 0);
     
-            const endOfDay = new Date(today);
-            endOfDay.setUTCHours(23, 59, 59, 999);
+        const endOfDay = new Date(today);
+        endOfDay.setUTCHours(23, 59, 59, 999);
     
-            // Execute a query to find an existing entry for the specific time
+        // Set the desired start and end times (2:00 pm and 4:00 pm)
+        const startTime = new Date(today);
+        startTime.setUTCHours(14, 0, 0, 0);
+    
+        const endTime = new Date(today);
+        endTime.setUTCHours(16, 0, 0, 0);
+    
+        // Check if the current time is within the desired time range
+        if (today >= startTime && today <= endTime) {
             const existingEntry = await sequelize.query(
                 `SELECT * FROM tbl_attendances
                 INNER JOIN users ON tbl_attendances.user_id = users.uid
@@ -106,19 +112,16 @@ const index = async(req,res) =>{
                 }
             );
     
-            // If there is no existing entry, create a new one with random null fields
             if (!existingEntry || existingEntry.length === 0) {
-                // Generate random values for fields (adjust based on your actual field names and types)
                 const randomFields = {
                     field1: Math.random() > 0.5 ? 'value1' : null,
                     field2: Math.random() > 0.5 ? 'value2' : null,
                     // Add more fields as needed
                 };
     
-                // Create a new entry with the specific time and random null fields
                 await sequelize.query(
-                    `INSERT INTO tbl_attendances (user_id, attendance_date, field1, field2)
-                    VALUES (:userId, :attendanceDate, :field1, :field2)`,
+                    `INSERT INTO tbl_attendances (user_id, attendance_date)
+                    VALUES (:userId, :attendanceDate)`,
                     {
                         type: QueryTypes.INSERT,
                         replacements: {
@@ -130,7 +133,6 @@ const index = async(req,res) =>{
                 );
             }
     
-            // Retrieve the updated data after creating the entry
             const updatedData = await sequelize.query(
                 `SELECT * FROM tbl_attendances
                 INNER JOIN users ON tbl_attendances.user_id = users.uid
@@ -145,11 +147,29 @@ const index = async(req,res) =>{
             );
     
             res.json(updatedData);
-
-} catch (error) {
+        } else {
+            // If outside the time range, store a static null entry
+            await sequelize.query(
+                `INSERT INTO tbl_attendances (user_id, attendance_date)
+                VALUES (:userId, :attendanceDate)`,
+                {
+                    type: QueryTypes.INSERT,
+                    replacements: {
+                        userId: 1,
+                        attendanceDate: today,
+                    },
+                }
+            );
+    
+            res.json({ message: 'Outside of the desired time range. Stored null entry.' });
+        }
+    } catch (error) {
         console.log(error);
-        res.json({error:"Failed To Get Attendance"})
-}
+        res.json({ error: 'Failed To Get Attendance' });
+    }
+    
+    
+    
 }
 
 const todayattendance = async(req,res) =>{

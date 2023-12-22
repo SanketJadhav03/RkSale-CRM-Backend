@@ -3,14 +3,10 @@ const expressApp = express();
 const cors = require("cors");
 const path = require('path')
 const fileUpload = require("express-fileupload");
-const checked = require("./src/db/db_config");
+// const checked = require("./src/db/db_config");
 // const checkPermissions = require("./src/auth/permissionMiddleware");
-const sqlite3 = require("sqlite3").verbose();
-const fs = require("fs");
-const os = require("os");
 // const authenticateToken = require("./src/auth/authMiddleware");
 // const url_helper = require("./url_helper");
-const username = os.userInfo().username;
 // const imagesPath = `C:\\Users\\${username}\\AppData\\Roaming\\RkSalesCrm\\all_images`;
 // expressApp.use(express.static(imagesPath));
 
@@ -24,15 +20,15 @@ expressApp.use(
   })
 );
 // create data
-checked
-  .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
-  .then(() => {
-    require("./db/create_data");
-    console.log("Database created!");
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+// checked
+//   .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+//   .then(() => {
+//     require("./db/create_data");
+//     console.log("Database created!");
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
 
 // user routes
 const user = require("./src/Auth/User_route");
