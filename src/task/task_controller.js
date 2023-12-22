@@ -1,6 +1,7 @@
 const { QueryTypes } = require('sequelize');
 const sequelize = require('../db/db_config');
 const Task = require('./task_model')
+const fs = require('fs')
 const path = require('path')
 
 const store = async(req,res)=>{
@@ -129,8 +130,82 @@ const show = async(req,res)=>{
       }
 }
 
+const update = async(req,res)=>{
+  try {
+    const {
+      task_id,
+      customer,
+        product,
+        value,
+        today_date,
+        minimum_due_date,
+        ref_by,
+        maximum_due_date,
+        source,
+        priority,
+        description,
+        assigned_by,
+        tags,
+        repeat_every_day,
+        status}= req.body;
+    const existingtask = await Task.findByPk(task_id);
+    if (!existingtask) {
+      return res.status(404).json({ message: "Lead Not Found" });
+    }
+
+    // res.json(existinglead)
+    // Check if a new file is provided in the request
+    if (req.files && req.files.image) {
+      const uploadedFile = req.files.image;
+      const filePath = `public/images/task/${"crm-"+existingtask.image}`;
+
+      // Remove the existing file
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error('Error deleting existing file:', err);
+        }
+      });
+
+      // Save the new file
+      uploadedFile.mv(`public/images/task/${"crm-"+uploadedFile.name}`, (err) => {
+        if (err) {
+          console.error('Error saving new file:', err);
+        }
+      });
+    }
+
+    const updatedtask = await existingtask.update({
+      customer:customer,
+      product:product,
+      value:value,
+      today_date:today_date,
+      minimum_due_date:minimum_due_date,
+      ref_by:ref_by,
+      maximum_due_date:maximum_due_date,
+      source:source,
+      priority:priority,
+      description:description,
+      assigned_by:assigned_by,
+      tags:tags,
+      status:status,
+      file: req.files && req.files.image ? req.files.image.name : existinglead.image,
+
+    })
+
+    if(updatedtask){
+      res.json({message:"Task Updated SuccessFully"})
+    }else {
+      res.json({message:"Task Updated Failed"})
+    }
+  
+  } catch (error) {
+    console.log(error);
+  }
+}
 module.exports = {
     store,
     index,
-    show
+    show,
+    update
+  
 }

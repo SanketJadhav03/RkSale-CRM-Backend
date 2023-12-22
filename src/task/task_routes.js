@@ -8,4 +8,6 @@ router.get('/task/list',controller.index)
 
 router.get('/task/show/:id',controller.show)
 
+router.put('/task/update',controller.update)
+
 module.exports = router;
