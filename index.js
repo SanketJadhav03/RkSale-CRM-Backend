@@ -106,9 +106,14 @@ expressApp.use("/back-end", Leads);
 const task = require('./src/task/task_routes')
 expressApp.use('/back-end',task)
 
-// Task Routes 
+// Shift Routes 
 const shift = require('./src/shift/shift_routes')
 expressApp.use('/back-end',shift)
+
+
+// Attendance Routes
+const attendance = require('./src/attendance/attendance_routes')
+expressApp.use("/back-end",attendance)
 
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
