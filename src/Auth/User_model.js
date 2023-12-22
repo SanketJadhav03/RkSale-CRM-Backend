@@ -81,12 +81,36 @@ const User = sequelize.define("users", {
     allowNull: true,
     defaultValue: null
   },
+  date_of_joining: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    defaultValue: null
+  },
+  last_experience: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null
+  },
+  last_working_company: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null
+  },
+  last_company_salary: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null
+  },
+  shift_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: null
+  },
   user_upi: {
     type: DataTypes.STRING,
     allowNull: true,
     defaultValue: null
   },
-   
   status: {
     type: DataTypes.INTEGER,
     defaultValue:1,
