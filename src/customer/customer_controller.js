@@ -4,13 +4,22 @@ const { Op, Model } = require('sequelize');
 const sequelize = require('../db/db_config');
 
 const index = async (req, res) => {
-    const customers = await sequelize.query(
-        'SELECT tbl_customers.*, tbl_cities.* FROM tbl_customers JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id',
-        {
-            model: Customer,
-            mapToModel: true, // Map the result to the Customer model
-        }
-    );
+    const customers = await sequelize.query
+
+
+        (
+            `SELECT * FROM tbl_customers 
+            INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
+            INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
+           
+            `,
+            {
+                model: Customer,
+                mapToModel: true, // Map the result to the Customer model
+            }
+        );
+
+
     res.json(customers);
 }
 
@@ -18,28 +27,27 @@ const index = async (req, res) => {
 const store = async (req, res) => {
     try {
 
-        const { customer_name,
+        const {
+            customer_name,
             customer_whatsapp_no,
-            customer_city,
             customer_alternative_no,
-            customer_birth_date,
             customer_email,
-            customer_marriage_annieversary_date,
-            customer_organization_name,
+            customer_city,
+            customer_group,
             customer_designation,
-            customer_address
+            customer_address,
+            customer_compnay_name
         } = req.body;
         await Customer.create({
             customer_name,
             customer_whatsapp_no,
-            customer_city,
             customer_alternative_no,
-            customer_birth_date,
             customer_email,
-            customer_marriage_annieversary_date,
-            customer_organization_name,
+            customer_city,
+            customer_group,
             customer_designation,
-            customer_address
+            customer_address,
+            customer_compnay_name
         });
         return res.status(201).json({ message: 'Customer added successfully', status: 1 });
     } catch (error) {
@@ -68,14 +76,13 @@ const update = async (req, res) => {
     try {
         const { customer_id, customer_name,
             customer_whatsapp_no,
-            customer_city,
             customer_alternative_no,
-            customer_birth_date,
             customer_email,
-            customer_marriage_annieversary_date,
-            customer_organization_name,
+            customer_city,
+            customer_group,
             customer_designation,
-            customer_address
+            customer_address,
+            customer_compnay_name
 
         } = req.body;
 
@@ -85,16 +92,15 @@ const update = async (req, res) => {
         }
 
         await customer.update({
-            customer_name,
+            customer_id, customer_name,
             customer_whatsapp_no,
-            customer_city,
             customer_alternative_no,
-            customer_birth_date,
             customer_email,
-            customer_marriage_annieversary_date,
-            customer_organization_name,
+            customer_city,
+            customer_group,
             customer_designation,
-            customer_address
+            customer_address,
+            customer_compnay_name
         })
         return res.json({ message: "Customer updated successfully!", status: 1 });
     } catch (error) {
