@@ -3,6 +3,7 @@ const sequelize = require('../db/db_config');
 const Leads = require('./leads_model')
 const path = require("path");
 const fs = require('fs');
+const Notifaction = require('../notification/notification_model');
 
 const store = async(req,res)=>{
 try {
@@ -58,22 +59,32 @@ customer,
         )
       );
    const newLead = await Leads.create({
-    customer:customer,
-  product:product,
-  value:value,
-  today_date:today_date,
-  minimum_due_date:minimum_due_date,
-  ref_by:ref_by,
-  maximum_due_date:maximum_due_date,
-  source:source,
-  priority:priority,
-  description:description,
-  assigned_by:assigned_by,
-  tags:tags,
-  status:status,
-  image:req.files.image.name
+    customer:customer ? customer : null,
+  product:product ? product : null ,
+  value:value ? value : null,
+  today_date:today_date ? today_date : nulll,
+  minimum_due_date:minimum_due_date ? minimum_due_date :null,
+  ref_by:ref_by ? ref_by : null,
+  maximum_due_date:maximum_due_date ? maximum_due_date : null,
+  source:source ? source : null,
+  priority:priority ? priority : null,
+  description:description ? description : null,
+  assigned_by:assigned_by ? assigned_by : null,
+  tags:tags ? tags : null,
+  status:status ? status : null,
+  image:req.files.image ? req.files.image.name : null
+    })
+
+    await Notifaction.create({
+      customer_id:customer,
+      lead_id:newLead.lead_id,
+      task_id:0,
+      customer_notification:1
     })
     res.json(newLead)
+
+
+
 } catch (error) {
     console.log(error);
     return res.json({error:"Failed To Create Lead !!"})

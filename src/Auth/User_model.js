@@ -86,6 +86,7 @@ const User = sequelize.define("users", {
     allowNull: true,
     defaultValue: null
   },
+   
   status: {
     type: DataTypes.INTEGER,
     defaultValue:1,

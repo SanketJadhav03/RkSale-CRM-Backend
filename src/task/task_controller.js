@@ -2,7 +2,8 @@ const { QueryTypes } = require('sequelize');
 const sequelize = require('../db/db_config');
 const Task = require('./task_model')
 const fs = require('fs')
-const path = require('path')
+const path = require('path');
+const Notifaction = require('../notification/notification_model');
 
 const store = async(req,res)=>{
 try {
@@ -74,6 +75,12 @@ const image = req.files.image;
         repeat_every_day:repeat_every_day,
         status:status,
         image:imagepath
+      })
+      await Notifaction.create({
+        customer_id:customer,
+        lead_id:0,
+        task_id:newtask.task_id,
+        customer_notification:1
       })
 
       res.json(newtask)
