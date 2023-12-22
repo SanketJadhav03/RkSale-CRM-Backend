@@ -49,7 +49,11 @@ const login = async (req, res) => {
 
 const index = async (req, res) => {
   try {
-    const userstatus = await User.findAll();
+    const userstatus = await User.findAll({
+      where: {
+        u_type: 2
+      }
+    });
     res.json(userstatus);
   } catch (error) {
     console.log(error);
@@ -89,11 +93,11 @@ const store = async (req, res) => {
         console.log("File is null");
         return null;
       }
-  
+
       if (!file.name) {
         return res.status(400).json({ error: "Invalid file object" });
       }
-  
+
       file.mv(uploadPath, (err) => {
         if (err) {
           console.error("Error moving file:", err);
@@ -102,12 +106,12 @@ const store = async (req, res) => {
         // Do something with the file path, for example, save it in the database
         // ...
       });
-  
+
       return file.filename; // Return the filename for use in the database
     };
-  
+
     // Use the validateAndMove function for each file, allowing null files
-validateAndMove(
+    validateAndMove(
       profile_photo,
       path.join(
         rootPath,
@@ -144,22 +148,22 @@ validateAndMove(
     );
     // Create a new user in the database
     const newUser = await User.create({
-      u_type:u_type,
-      name:name,
-      address:address,
-      user_role_id:user_role_id,
-      salary:salary,
-      mobile_no:mobile_no,
-      emergency_contact:emergency_contact,
-      email:email,
-      password:hashedPassword,
-      aadhar_no:aadhar_no,
-      pan_no:pan_no,
-      user_upi:user_upi,
+      u_type: u_type,
+      name: name,
+      address: address,
+      user_role_id: user_role_id,
+      salary: salary,
+      mobile_no: mobile_no,
+      emergency_contact: emergency_contact,
+      email: email,
+      password: hashedPassword,
+      aadhar_no: aadhar_no,
+      pan_no: pan_no,
+      user_upi: user_upi,
       profile_photo: req.files.profile_photo ? req.files.profile_photo.name : null,
       aadhar_photo: req.files.aadhar_photo ? req.files.aadhar_photo.name : null,
-      pan_photo:  req.files.pan_photo ? req.files.pan_photo.name : null,
-      bank_passbook_photo:  req.files.bank_passbook_photo ? req.files.bank_passbook_photo.name : null,
+      pan_photo: req.files.pan_photo ? req.files.pan_photo.name : null,
+      bank_passbook_photo: req.files.bank_passbook_photo ? req.files.bank_passbook_photo.name : null,
     });
 
     // Send a success response with the created user data
@@ -172,17 +176,17 @@ validateAndMove(
 };
 
 const show = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const user = await User.findByPk(id);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        res.json(user);
-    } catch (error) {
-        console.error("Error showing User by id:", error);
-        res.status(500).json({ error: "Error showing User by id" });
+  try {
+    const { id } = req.params;
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
+    res.json(user);
+  } catch (error) {
+    console.error("Error showing User by id:", error);
+    res.status(500).json({ error: "Error showing User by id" });
+  }
 }
 const updated = async (req, res) => {
   try {
@@ -206,7 +210,7 @@ const updated = async (req, res) => {
 
     if (req.files && req.files.profile_photo) {
       const uploadedFile = req.files.profile_photo;
-      const filePath = `public/images/user/${"crm-"+user.profile_photo}`;
+      const filePath = `public/images/user/${"crm-" + user.profile_photo}`;
 
       // Remove the existing file
       fs.unlink(filePath, (err) => {
@@ -216,7 +220,7 @@ const updated = async (req, res) => {
       });
 
       // Save the new file
-      uploadedFile.mv(`public/images/leads/${"crm-"+uploadedFile.name}`, (err) => {
+      uploadedFile.mv(`public/images/leads/${"crm-" + uploadedFile.name}`, (err) => {
         if (err) {
           console.error('Error saving new file:', err);
         }
@@ -225,7 +229,7 @@ const updated = async (req, res) => {
 
     if (req.files && req.files.aadhar_photo) {
       const uploadedFile = req.files.aadhar_photo;
-      const filePath = `public/images/user/${"crm-"+user.aadhar_photo}`;
+      const filePath = `public/images/user/${"crm-" + user.aadhar_photo}`;
 
       // Remove the existing file
       fs.unlink(filePath, (err) => {
@@ -235,7 +239,7 @@ const updated = async (req, res) => {
       });
 
       // Save the new file
-      uploadedFile.mv(`public/images/leads/${"crm-"+uploadedFile.name}`, (err) => {
+      uploadedFile.mv(`public/images/leads/${"crm-" + uploadedFile.name}`, (err) => {
         if (err) {
           console.error('Error saving new file:', err);
         }
@@ -244,7 +248,7 @@ const updated = async (req, res) => {
 
     if (req.files && req.files.pan_photo) {
       const uploadedFile = req.files.pan_photo;
-      const filePath = `public/images/user/${"crm-"+user.pan_photo}`;
+      const filePath = `public/images/user/${"crm-" + user.pan_photo}`;
 
       // Remove the existing file
       fs.unlink(filePath, (err) => {
@@ -254,7 +258,7 @@ const updated = async (req, res) => {
       });
 
       // Save the new file
-      uploadedFile.mv(`public/images/leads/${"crm-"+uploadedFile.name}`, (err) => {
+      uploadedFile.mv(`public/images/leads/${"crm-" + uploadedFile.name}`, (err) => {
         if (err) {
           console.error('Error saving new file:', err);
         }
@@ -263,7 +267,7 @@ const updated = async (req, res) => {
 
     if (req.files && req.files.bank_passbook_photo) {
       const uploadedFile = req.files.pan_photo;
-      const filePath = `public/images/user/${"crm-"+user.bank_passbook_photo}`;
+      const filePath = `public/images/user/${"crm-" + user.bank_passbook_photo}`;
 
       // Remove the existing file
       fs.unlink(filePath, (err) => {
@@ -273,27 +277,27 @@ const updated = async (req, res) => {
       });
 
       // Save the new file
-      uploadedFile.mv(`public/images/user/${"crm-"+uploadedFile.name}`, (err) => {
+      uploadedFile.mv(`public/images/user/${"crm-" + uploadedFile.name}`, (err) => {
         if (err) {
           console.error('Error saving new file:', err);
         }
       });
     }
- const updateduser = await user.update({
-  name:name,
-  address:address,
-  salary:salary,
-  mobile_no:mobile_no,
-  emergency_contact:emergency_contact,
-  email:email,
-  aadhar_no:aadhar_no,
-  pan_no:pan_no,
-  user_upi:user_upi,
-  profile_photo:req.files.profile_photo ? req.files.profile_photo :user.profile_photo,
-  aadhar_photo:req.files.aadhar_photo ? req.files.aadhar_photo :user.aadhar_photo,
-  pan_photo:req.files.pan_photo ? req.files.pan_photo :user.pan_photo,
-  bank_passbook_photo:req.files.bank_passbook_photo ? req.files.bank_passbook_photo :user.bank_passbook_photo,
- 
+    const updateduser = await user.update({
+      name: name,
+      address: address,
+      salary: salary,
+      mobile_no: mobile_no,
+      emergency_contact: emergency_contact,
+      email: email,
+      aadhar_no: aadhar_no,
+      pan_no: pan_no,
+      user_upi: user_upi,
+      profile_photo: req.files.profile_photo ? req.files.profile_photo : user.profile_photo,
+      aadhar_photo: req.files.aadhar_photo ? req.files.aadhar_photo : user.aadhar_photo,
+      pan_photo: req.files.pan_photo ? req.files.pan_photo : user.pan_photo,
+      bank_passbook_photo: req.files.bank_passbook_photo ? req.files.bank_passbook_photo : user.bank_passbook_photo,
+
 
 
 
