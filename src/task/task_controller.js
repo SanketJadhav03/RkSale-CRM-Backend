@@ -116,7 +116,7 @@ const show = async (req, res) => {
         INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
         INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
         INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
-        INNER JOIN tbl_lead_statuses ON tbl_task.status = tbl_lead_statuses.lead_id
+        INNER JOIN tbl_lead_statuses ON tbl_task.status = tbl_lead_statuses.lead_status_id
         WHERE tbl_tasks.task_id = :id
         `,
 

@@ -56,7 +56,7 @@ const updated = async (req, res) => {
         if (existingLeadStatus) {
             return res.json({ message: "LeadStatus name already exists", status: 0 });
         }
-        const leadStatus = await LeadStatus.findByPk(lead_id);
+        const leadStatus = await LeadStatus.findByPk(lead_status_id);
         if (!leadStatus) {
             return res.status(404).json({ error: "LeadStatus not found" });
         }
