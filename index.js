@@ -3,7 +3,7 @@ const expressApp = express();
 const cors = require("cors");
 const path = require('path')
 const fileUpload = require("express-fileupload");
-// const checked = require("./src/db/db_config");
+const checked = require("./src/db/db_config");
 // const checkPermissions = require("./src/auth/permissionMiddleware");
 // const authenticateToken = require("./src/auth/authMiddleware");
 // const url_helper = require("./url_helper");
@@ -20,15 +20,15 @@ expressApp.use(
   })
 );
 // create data
-// checked
-//   .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
-//   .then(() => {
-//     require("./db/create_data");
-//     console.log("Database created!");
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   });
+checked
+  .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+  .then(() => {
+    require("./db/create_data");
+    console.log("Database created!");
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 
 // user routes
 const user = require("./src/Auth/User_route");
@@ -111,6 +111,9 @@ expressApp.use('/back-end',shift)
 const attendance = require('./src/attendance/attendance_routes')
 expressApp.use("/back-end",attendance)
 
+
+const notification = require('./src/notification/notification_routes')
+expressApp.use("/back-end",notification)
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
 expressApp.listen(port, () => {

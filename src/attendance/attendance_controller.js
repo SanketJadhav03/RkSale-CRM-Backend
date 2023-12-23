@@ -68,7 +68,7 @@ try {
         in_location:in_location ? in_location :null,
         out_time:out_time ? out_time : null,
         out_location:out_location ? out_location : null,
-        remark:remark ? remark : null,
+        remark:1,
         in_photo:intime_image ? imageintime : null,
         out_photo:outime_image ? outime_image: null,
 
@@ -81,96 +81,96 @@ res.json({error:"Failed To Store Attendance"})
 }
 }
 
-const index = async(req,res) =>{
+const index = async (req, res) => {
     try {
         const today = new Date();
-        const startOfDay = new Date(today);
-        startOfDay.setUTCHours(0, 0, 0, 0);
-    
-        const endOfDay = new Date(today);
-        endOfDay.setUTCHours(23, 59, 59, 999);
-    
-        // Set the desired start and end times (2:00 pm and 4:00 pm)
-        const startTime = new Date(today);
-        startTime.setUTCHours(14, 0, 0, 0);
-    
-        const endTime = new Date(today);
-        endTime.setUTCHours(16, 0, 0, 0);
-    
-        // Check if the current time is within the desired time range
-        if (today >= startTime && today <= endTime) {
-            const existingEntry = await sequelize.query(
-                `SELECT * FROM tbl_attendances
-                INNER JOIN users ON tbl_attendances.user_id = users.uid
-                WHERE tbl_attendances.attendance_date BETWEEN :startOfDay AND :endOfDay`,
-                {
-                    type: QueryTypes.SELECT,
-                    replacements: {
-                        startOfDay,
-                        endOfDay,
-                    },
+        const hours = String(today.getHours()).padStart(2, '0');
+        const minutes = String(today.getMinutes()).padStart(2, '0');
+        const seconds = String(today.getSeconds()).padStart(2, '0');
+        
+        const formattedTime = `${hours}:${minutes}:${seconds}`;
+        
+        const usersWithNoAttendance = await sequelize.query(
+            `SELECT u.uid AS user_id
+            FROM users u
+            INNER JOIN tbl_shifts s ON u.shift_id = s.shift_id
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM tbl_attendances a
+                WHERE a.user_id = u.uid
+            )
+            AND :formattedTime > s.shift_intime;            
+            `
+        ,
+            {
+                type: QueryTypes.SELECT,
+                replacements:{
+                    formattedTime
                 }
-            );
-    
-            if (!existingEntry || existingEntry.length === 0) {
-                const randomFields = {
-                    field1: Math.random() > 0.5 ? 'value1' : null,
-                    field2: Math.random() > 0.5 ? 'value2' : null,
-                    // Add more fields as needed
-                };
-    
-                await sequelize.query(
-                    `INSERT INTO tbl_attendances (user_id, attendance_date)
-                    VALUES (:userId, :attendanceDate)`,
-                    {
-                        type: QueryTypes.INSERT,
-                        replacements: {
-                            userId: 1,
-                            attendanceDate: today,
-                            ...randomFields,
-                        },
-                    }
-                );
             }
-    
-            const updatedData = await sequelize.query(
-                `SELECT * FROM tbl_attendances
-                INNER JOIN users ON tbl_attendances.user_id = users.uid
-                WHERE tbl_attendances.attendance_date BETWEEN :startOfDay AND :endOfDay`,
+        );
+        
+        for (const user of usersWithNoAttendance) {
+            // Check if the user already has an attendance record for today
+            const existingAttendance = await sequelize.query(
+                `SELECT 1
+                FROM tbl_attendances
+                WHERE user_id = :userId AND attendance_date = :attendanceDate`,
                 {
                     type: QueryTypes.SELECT,
                     replacements: {
-                        startOfDay,
-                        endOfDay,
-                    },
-                }
-            );
-    
-            res.json(updatedData);
-        } else {
-            // If outside the time range, store a static null entry
-            await sequelize.query(
-                `INSERT INTO tbl_attendances (user_id, attendance_date)
-                VALUES (:userId, :attendanceDate)`,
-                {
-                    type: QueryTypes.INSERT,
-                    replacements: {
-                        userId: 1,
+                        userId: user.user_id,
                         attendanceDate: today,
                     },
                 }
             );
-    
-            res.json({ message: 'Outside of the desired time range. Stored null entry.' });
+        
+            if (!existingAttendance || existingAttendance.length === 0) {
+                // If no attendance record exists, insert a new record
+                for (const user of usersWithNoAttendance) {
+                    await sequelize.query(
+                        `INSERT INTO tbl_attendances (user_id, attendance_date,remark)
+                        VALUES (:userId, :attendanceDate,0)`,
+                        {
+                            type: QueryTypes.INSERT,
+                            replacements: {
+                                userId: user.user_id,
+                                attendanceDate: today,
+                            },
+                        }
+                    );
+                }
+            }
         }
+        
+        const updatedData = await sequelize.query(
+            `SELECT 
+                tbl_attendances.*,
+                users.*,
+                tbl_shifts.shift_intime,
+                tbl_shifts.shift_outime
+            FROM tbl_attendances
+            INNER JOIN users ON tbl_attendances.user_id = users.uid
+            INNER JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
+            WHERE tbl_attendances.attendance_date = :today`,
+            {
+                type: QueryTypes.SELECT,
+                replacements:{today}
+            }
+        );
+        
+        // Return or handle updatedData as needed
+        
+    
+        res.json(updatedData);
     } catch (error) {
         console.log(error);
         res.json({ error: 'Failed To Get Attendance' });
     }
     
-    
-    
-}
+};
+
+
 
 const todayattendance = async(req,res) =>{
 
@@ -210,9 +210,26 @@ const todayattendance = async(req,res) =>{
     
     
     
+} 
+
+const attendancebyuser = async(req,res)=>{
+try {
+    const {id} = req.params;
+const UserAttendance = await Attendance.findAll({
+    where:{
+     user_id:id   
+    }
+})
+    
+    res.json(UserAttendance);
+} catch (error) {
+    console.log(error);
+    res.json({error:"Failed To Find Attendance By User"})
+}
 }
 module.exports = {
     store,
     index,
-    todayattendance
+    todayattendance,
+    attendancebyuser
 }

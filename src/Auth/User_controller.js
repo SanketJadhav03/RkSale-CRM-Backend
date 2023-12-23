@@ -1,10 +1,9 @@
-const { Op } = require("sequelize");
 
 const User = require("./User_model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const path = require('path')
-const fs = require('fs');
+const path = require('path');
+const sequelize = require("../db/db_config");
 
 const login = async (req, res) => {
   try {
@@ -72,7 +71,7 @@ const store = async (req, res) => {
   try {
     // Extract data from the request body
     const {
-      u_type,
+      
       name,
       address,
       user_role_id,
@@ -105,7 +104,6 @@ const store = async (req, res) => {
       if (!file) {
         // Skip the file if it's null
         console.log("File is null");
-        return null;
       }
 
       if (!file.name) {
@@ -125,6 +123,7 @@ const store = async (req, res) => {
     };
 
     // Use the validateAndMove function for each file, allowing null files
+    if (req.files.profile_photo){
     validateAndMove(
       profile_photo,
       path.join(
@@ -132,8 +131,10 @@ const store = async (req, res) => {
         "public/images/user",
         "crm" + "-" + (profile_photo ? profile_photo.name : null)
       )
-    );
+    )
+      }
 
+      if (req.files.adhaar_photo){
     validateAndMove(
       adhaar_photo,
       path.join(
@@ -142,7 +143,9 @@ const store = async (req, res) => {
         "crm" + "-" + (adhaar_photo ? adhaar_photo.name : null)
       )
     );
+      }
 
+      if (req.files.pan_photo){
     validateAndMove(
       pan_photo,
       path.join(
@@ -151,7 +154,9 @@ const store = async (req, res) => {
         "crm" + "-" + (pan_photo ? pan_photo.name : null)
       )
     );
-
+      }
+      
+      if(req.files.bank_passbook_photo){
     validateAndMove(
       bank_passbook_photo,
       path.join(
@@ -160,9 +165,9 @@ const store = async (req, res) => {
         "crm" + "-" + (bank_passbook_photo ? bank_passbook_photo.name : null)
       )
     );
+      }
     // Create a new user in the database
     const newUser = await User.create({
-      u_type: u_type,
       name: name,
       address: address,
       user_role_id: user_role_id,
@@ -183,6 +188,7 @@ const store = async (req, res) => {
       aadhar_photo: req.files.aadhar_photo ? req.files.aadhar_photo.name : null,
       pan_photo: req.files.pan_photo ? req.files.pan_photo.name : null,
       bank_passbook_photo: req.files.bank_passbook_photo ? req.files.bank_passbook_photo.name : null,
+      u_type:2,
     });
 
     // Send a success response with the created user data

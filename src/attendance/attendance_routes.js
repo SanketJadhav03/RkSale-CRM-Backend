@@ -8,4 +8,6 @@ router.get('/attendance/list',controller.index)
 
 router.get('/today/attendance',controller.todayattendance)
 
+router.get('/attendence/user/:id',controller.attendancebyuser)
+
 module.exports = router;
