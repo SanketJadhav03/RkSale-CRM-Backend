@@ -2,8 +2,11 @@
 const User = require("./User_model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+
 const path = require('path');
 const sequelize = require("../db/db_config");
+
+const fs = require("fs");
 
 const login = async (req, res) => {
   try {
@@ -48,6 +51,7 @@ const login = async (req, res) => {
 
 const index = async (req, res) => {
   try {
+
     const userstatus = await sequelize.query
 
 
@@ -63,12 +67,14 @@ const index = async (req, res) => {
       }
     );
 json(userstatus);
+
   } catch (error) {
     console.log(error);
   }
 };
 const store = async (req, res) => {
   try {
+    // return res.json(req);
     // Extract data from the request body
     const {
       
@@ -97,8 +103,6 @@ const store = async (req, res) => {
     const adhaar_photo = req.files.aadhar_photo;
     const pan_photo = req.files.pan_photo;
     const bank_passbook_photo = req.files.bank_passbook_photo;
-
-
 
     const validateAndMove = (file, uploadPath) => {
       if (!file) {
@@ -179,20 +183,26 @@ const store = async (req, res) => {
       aadhar_no: aadhar_no,
       pan_no: pan_no,
       user_upi: user_upi,
-      date_of_joining:date_of_joining,
-      last_experience:last_experience,
-      last_working_company:last_working_company,
-      last_company_salary:last_company_salary,
-      shift_id:shift_id,
-      profile_photo: req.files.profile_photo ? req.files.profile_photo.name : null,
+      date_of_joining: date_of_joining,
+      last_experience: last_experience,
+      last_working_company: last_working_company,
+      last_company_salary: last_company_salary,
+      shift_id: shift_id,
+      profile_photo: req.files.profile_photo
+        ? req.files.profile_photo.name
+        : null,
       aadhar_photo: req.files.aadhar_photo ? req.files.aadhar_photo.name : null,
       pan_photo: req.files.pan_photo ? req.files.pan_photo.name : null,
+
       bank_passbook_photo: req.files.bank_passbook_photo ? req.files.bank_passbook_photo.name : null,
       u_type:2,
+
     });
 
     // Send a success response with the created user data
-    res.status(201).json(newUser);
+    res
+      .status(201)
+      .json({ message: "Employee added successfully", status: 1, newUser });
   } catch (error) {
     // Handle any errors that occur during the process
     console.error(error);
@@ -212,7 +222,7 @@ const show = async (req, res) => {
     console.error("Error showing User by id:", error);
     res.status(500).json({ error: "Error showing User by id" });
   }
-}
+};
 const updated = async (req, res) => {
   try {
     const {
@@ -230,12 +240,13 @@ const updated = async (req, res) => {
       last_company_salary,
       shift_id,
       pan_no,
-      user_upi
+      user_upi,
     } = req.body;
     const user = await User.findByPk(uid);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+
 
 
     // if (req.files && req.files.profile_photo) {
@@ -257,9 +268,11 @@ const updated = async (req, res) => {
     //   });
     // }
 
+
     // if (req.files && req.files.aadhar_photo) {
     //   const uploadedFile = req.files.aadhar_photo;
     //   const filePath = `public/images/user/${"crm-" + user.aadhar_photo}`;
+
 
     //   // Remove the existing file
     //   fs.unlink(filePath, (err) => {
@@ -276,9 +289,11 @@ const updated = async (req, res) => {
     //   });
     // }
 
+
     // if (req.files && req.files.pan_photo) {
     //   const uploadedFile = req.files.pan_photo;
     //   const filePath = `public/images/user/${"crm-" + user.pan_photo}`;
+
 
     //   // Remove the existing file
     //   fs.unlink(filePath, (err) => {
@@ -315,6 +330,7 @@ const updated = async (req, res) => {
     // }
 
     
+
     const updateduser = await user.update({
       name: name,
       address: address,
@@ -325,6 +341,7 @@ const updated = async (req, res) => {
       aadhar_no: aadhar_no,
       pan_no: pan_no,
       user_upi: user_upi,
+
       date_of_joining:date_of_joining,
       last_experience:last_experience,
       last_working_company:last_working_company,
@@ -339,6 +356,8 @@ const updated = async (req, res) => {
 
 
     })
+
+     
 
     res.status(200).json({ message: "User updated successfully", user });
   } catch (error) {

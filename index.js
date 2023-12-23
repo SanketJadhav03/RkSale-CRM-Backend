@@ -13,7 +13,7 @@ const checked = require("./src/db/db_config");
 expressApp.use(express.json());
 expressApp.use(cors());
 expressApp.use(
-express.static(path.join(__dirname, 'public/images')));
+  express.static(path.join(__dirname, 'public/images')));
 expressApp.use(
   fileUpload({
     limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit, adjust as needed
@@ -100,11 +100,11 @@ expressApp.use("/back-end", Leads);
 
 // Task Routes 
 const task = require('./src/task/task_routes')
-expressApp.use('/back-end',task)
+expressApp.use('/back-end', task)
 
 // Shift Routes 
 const shift = require('./src/shift/shift_routes')
-expressApp.use('/back-end',shift)
+expressApp.use('/back-end', shift)
 
 
 // Attendance Routes
