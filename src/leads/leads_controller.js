@@ -79,7 +79,7 @@ const store = async (req, res) => {
       task_id: 0,
       customer_notification: 1,
     });
-    res.json(newLead);
+    return res.json({ message: "Lead added successfully!", status: 1 });
   } catch (error) {
     console.log(error);
     return res.json({ error: "Failed To Create Lead !!" });
