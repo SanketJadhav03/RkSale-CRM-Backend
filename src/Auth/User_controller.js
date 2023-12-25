@@ -1,49 +1,42 @@
+const { Op } = require("sequelize");
 
 const User = require("./User_model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
-const path = require('path');
-const sequelize = require("../db/db_config");
-
+const path = require("path");
 const fs = require("fs");
+const sequelize = require("../db/db_config");
 
 const login = async (req, res) => {
   try {
-    // Extract email and password from the request body
     const { email, password } = req.body;
 
     // Find the user by email in the database
     const user = await User.findOne({ where: { email: email } });
 
-    // If the user is not found, return an error
     if (!user) {
-      return res.status(401).json({ error: "Invalid Email " });
+      return res.status(401).json({ error: "Invalid Email" });
     }
 
     // Compare the provided password with the hashed password in the database
     const passwordMatch = await bcrypt.compare(password, user.password);
 
-    // If passwords do not match, return an error
     if (!passwordMatch) {
       return res.status(401).json({ error: "Invalid Password" });
     }
 
-    // Passwords match, generate a JWT token for authentication
-    const token = jwt.sign(
-      { userId: user.id },
-      "replace-with-a-strong-secret-key",
-      {
-        expiresIn: "1h",
-      }
-    );
-    // const token = 'yourAuthToken'; // Replace with a real authentication token
-    // res.cookie('authToken', token, { httpOnly: true, secure: true });
+    // Check if the user is an admin (You can determine this based on a role or a specific field in the user model)
+    const isAdmin = user.isAdmin; // Assuming isAdmin is a field in the User model
 
-    // Return the token in the response
-    res.status(200).json({ user, token });
+    // Generate a different token depending on whether the user is an admin or a regular user
+    const token = jwt.sign(
+      { userId: user.id, isAdmin: isAdmin },
+      "replace-with-a-strong-secret-key",
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({ user, token, isAdmin });
   } catch (error) {
-    // Handle any errors that occur during the process
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -51,23 +44,28 @@ const login = async (req, res) => {
 
 const index = async (req, res) => {
   try {
-
-    const userstatus = await sequelize.query
-
-
-    (
-      `SELECT * FROM users 
-      INNER JOIN roles ON users.user_role_id = roles.role_id
-      INNER JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
-      WHERE users.u_type= 2
-      `,
+    const userstatus = await sequelize.query(
+      `SELECT * 
+      FROM users 
+      LEFT JOIN roles ON users.user_role_id = roles.role_id 
+      LEFT JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id 
+      
+      AND (roles.role_id IS NOT NULL OR users.user_role_id IS NULL) 
+      AND (tbl_shifts.shift_id IS NOT NULL OR users.shift_id IS NULL)
+      
+        `,
       {
         model: User,
         mapToModel: true, // Map the result to the Customer model
       }
     );
-json(userstatus);
 
+    // const userstatus = await User.findAll({
+    //   where: {
+    //     u_type: 2
+    //   }
+    // });
+    res.json(userstatus);
   } catch (error) {
     console.log(error);
   }
@@ -77,7 +75,7 @@ const store = async (req, res) => {
     // return res.json(req);
     // Extract data from the request body
     const {
-      
+      u_type,
       name,
       address,
       user_role_id,
@@ -108,6 +106,7 @@ const store = async (req, res) => {
       if (!file) {
         // Skip the file if it's null
         console.log("File is null");
+        return null;
       }
 
       if (!file.name) {
@@ -127,7 +126,6 @@ const store = async (req, res) => {
     };
 
     // Use the validateAndMove function for each file, allowing null files
-    if (req.files.profile_photo){
     validateAndMove(
       profile_photo,
       path.join(
@@ -135,10 +133,8 @@ const store = async (req, res) => {
         "public/images/user",
         "crm" + "-" + (profile_photo ? profile_photo.name : null)
       )
-    )
-      }
+    );
 
-      if (req.files.adhaar_photo){
     validateAndMove(
       adhaar_photo,
       path.join(
@@ -147,9 +143,7 @@ const store = async (req, res) => {
         "crm" + "-" + (adhaar_photo ? adhaar_photo.name : null)
       )
     );
-      }
 
-      if (req.files.pan_photo){
     validateAndMove(
       pan_photo,
       path.join(
@@ -158,9 +152,7 @@ const store = async (req, res) => {
         "crm" + "-" + (pan_photo ? pan_photo.name : null)
       )
     );
-      }
-      
-      if(req.files.bank_passbook_photo){
+
     validateAndMove(
       bank_passbook_photo,
       path.join(
@@ -169,9 +161,9 @@ const store = async (req, res) => {
         "crm" + "-" + (bank_passbook_photo ? bank_passbook_photo.name : null)
       )
     );
-      }
     // Create a new user in the database
     const newUser = await User.create({
+      u_type: u_type,
       name: name,
       address: address,
       user_role_id: user_role_id,
@@ -193,10 +185,9 @@ const store = async (req, res) => {
         : null,
       aadhar_photo: req.files.aadhar_photo ? req.files.aadhar_photo.name : null,
       pan_photo: req.files.pan_photo ? req.files.pan_photo.name : null,
-
-      bank_passbook_photo: req.files.bank_passbook_photo ? req.files.bank_passbook_photo.name : null,
-      u_type:2,
-
+      bank_passbook_photo: req.files.bank_passbook_photo
+        ? req.files.bank_passbook_photo.name
+        : null,
     });
 
     // Send a success response with the created user data
@@ -247,90 +238,95 @@ const updated = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-
-
-    // if (req.files && req.files.profile_photo) {
-    //   const uploadedFile = req.files.profile_photo;
-    //   const filePath = `public/images/user/${"crm-" + user.profile_photo}`;
+    if (req.files && req.files.profile_photo) {
+      const uploadedFile = req.files.profile_photo;
+      const filePath = `public/images/user/${"crm-" + user.profile_photo}`;
 
       // Remove the existing file
-      // fs.unlink(filePath, (err) => {
-      //   if (err) {
-      //     console.error('Error deleting existing file:', err);
-      //   }
-      // });
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting existing file:", err);
+        }
+      });
 
       // Save the new file
-    //   uploadedFile.mv(`public/images/leads/${"crm-" + uploadedFile.name}`, (err) => {
-    //     if (err) {
-    //       console.error('Error saving new file:', err);
-    //     }
-    //   });
-    // }
+      uploadedFile.mv(
+        `public/images/user/${"crm-" + uploadedFile.name}`,
+        (err) => {
+          if (err) {
+            console.error("Error saving new file:", err);
+          }
+        }
+      );
+    }
 
+    if (req.files && req.files.aadhar_photo) {
+      const uploadedFile = req.files.aadhar_photo;
+      const filePath = `public/images/user/${"crm-" + user.aadhar_photo}`;
 
-    // if (req.files && req.files.aadhar_photo) {
-    //   const uploadedFile = req.files.aadhar_photo;
-    //   const filePath = `public/images/user/${"crm-" + user.aadhar_photo}`;
+      // Remove the existing file
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting existing file:", err);
+        }
+      });
 
+      // Save the new file
+      uploadedFile.mv(
+        `public/images/user/${"crm-" + uploadedFile.name}`,
+        (err) => {
+          if (err) {
+            console.error("Error saving new file:", err);
+          }
+        }
+      );
+    }
 
-    //   // Remove the existing file
-    //   fs.unlink(filePath, (err) => {
-    //     if (err) {
-    //       console.error('Error deleting existing file:', err);
-    //     }
-    //   });
+    if (req.files && req.files.pan_photo) {
+      const uploadedFile = req.files.pan_photo;
+      const filePath = `public/images/user/${"crm-" + user.pan_photo}`;
 
-    //   // Save the new file
-    //   uploadedFile.mv(`public/images/leads/${"crm-" + uploadedFile.name}`, (err) => {
-    //     if (err) {
-    //       console.error('Error saving new file:', err);
-    //     }
-    //   });
-    // }
+      // Remove the existing file
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting existing file:", err);
+        }
+      });
 
+      // Save the new file
+      uploadedFile.mv(
+        `public/images/user/${"crm-" + uploadedFile.name}`,
+        (err) => {
+          if (err) {
+            console.error("Error saving new file:", err);
+          }
+        }
+      );
+    }
 
-    // if (req.files && req.files.pan_photo) {
-    //   const uploadedFile = req.files.pan_photo;
-    //   const filePath = `public/images/user/${"crm-" + user.pan_photo}`;
+    if (req.files && req.files.bank_passbook_photo) {
+      const uploadedFile = req.files.pan_photo;
+      const filePath = `public/images/user/${
+        "crm-" + user.bank_passbook_photo
+      }`;
 
+      // Remove the existing file
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting existing file:", err);
+        }
+      });
 
-    //   // Remove the existing file
-    //   fs.unlink(filePath, (err) => {
-    //     if (err) {
-    //       console.error('Error deleting existing file:', err);
-    //     }
-    //   });
-
-    //   // Save the new file
-    //   uploadedFile.mv(`public/images/leads/${"crm-" + uploadedFile.name}`, (err) => {
-    //     if (err) {
-    //       console.error('Error saving new file:', err);
-    //     }
-    //   });
-    // }
-
-    // if (req.files && req.files.bank_passbook_photo) {
-    //   const uploadedFile = req.files.pan_photo;
-    //   const filePath = `public/images/user/${"crm-" + user.bank_passbook_photo}`;
-
-    //   // Remove the existing file
-    //   fs.unlink(filePath, (err) => {
-    //     if (err) {
-    //       console.error('Error deleting existing file:', err);
-    //     }
-    //   });
-
-    //   // Save the new file
-    //   uploadedFile.mv(`public/images/user/${"crm-" + uploadedFile.name}`, (err) => {
-    //     if (err) {
-    //       console.error('Error saving new file:', err);
-    //     }
-    //   });
-    // }
-
-    
-
+      // Save the new file
+      uploadedFile.mv(
+        `public/images/user/${"crm-" + uploadedFile.name}`,
+        (err) => {
+          if (err) {
+            console.error("Error saving new file:", err);
+          }
+        }
+      );
+    }
     const updateduser = await user.update({
       name: name,
       address: address,
@@ -341,23 +337,22 @@ const updated = async (req, res) => {
       aadhar_no: aadhar_no,
       pan_no: pan_no,
       user_upi: user_upi,
-
-      date_of_joining:date_of_joining,
-      last_experience:last_experience,
-      last_working_company:last_working_company,
-      last_company_salary:last_company_salary,
-      shift_id:shift_id,
-      // profile_photo: req.files.profile_photo ? req.files.profile_photo : user.profile_photo,
-      // aadhar_photo: req.files.aadhar_photo ? req.files.aadhar_photo : user.aadhar_photo,
-      // pan_photo: req.files.pan_photo ? req.files.pan_photo : user.pan_photo,
-      // bank_passbook_photo: req.files.bank_passbook_photo ? req.files.bank_passbook_photo : user.bank_passbook_photo,
-
-
-
-
-    })
-
-     
+      date_of_joining: date_of_joining,
+      last_experience: last_experience,
+      last_working_company: last_working_company,
+      last_company_salary: last_company_salary,
+      shift_id: shift_id,
+      profile_photo: req.files.profile_photo
+        ? req.files.profile_photo
+        : user.profile_photo,
+      aadhar_photo: req.files.aadhar_photo
+        ? req.files.aadhar_photo
+        : user.aadhar_photo,
+      pan_photo: req.files.pan_photo ? req.files.pan_photo : user.pan_photo,
+      bank_passbook_photo: req.files.bank_passbook_photo
+        ? req.files.bank_passbook_photo
+        : user.bank_passbook_photo,
+    });
 
     res.status(200).json({ message: "User updated successfully", user });
   } catch (error) {
@@ -365,25 +360,25 @@ const updated = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-// const deleted = async (req, res) => {
-//     try {
-//         const { id } = req.params;
-//         const branch = await Branch.findByPk(id);
-//         if (!branch) {
-//             return res.status(404).json({ error: "Branch not found" });
-//         }
-//         await branch.destroy();
-//         return res.json({ message: "Branch deleted successfully!", status: 1 });
-//     } catch (error) {
-//         console.error("Error deleting branch:", error);
-//         res.status(500).json({ error: "Error deleting branch:" });
-//     }
-// }
+const deleted = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const branch = await User.findByPk(id);
+    if (!branch) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    await branch.destroy();
+    return res.json({ message: "User deleted successfully!", status: 1 });
+  } catch (error) {
+    console.error("Error deleting User:", error);
+    res.status(500).json({ error: "Error deleting User:" });
+  }
+};
 module.exports = {
   index,
   login,
   show,
   store,
   updated,
-  // deleted
+  deleted,
 };

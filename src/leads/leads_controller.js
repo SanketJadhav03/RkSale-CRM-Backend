@@ -81,7 +81,7 @@ const store = async (req, res) => {
       task_id: 0,
       customer_notification: 1,
     });
-    res.json(newLead);
+    return res.json({ message: "Lead added successfully!", status: 1 });
   } catch (error) {
     console.log(error);
     return res.json({ error: "Failed To Create Lead !!" });
@@ -99,7 +99,7 @@ const index = async (req, res) => {
       INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
       INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
       INNER JOIN users ON tbl_leads.assigned_by = users.uid
-      INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_id
+      INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
       `,
       {
         type: QueryTypes.SELECT,
@@ -122,7 +122,7 @@ const show = async (req, res) => {
     INNER JOIN tbl_products ON tbl_leads.product = tbl_products.product_id
     INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
     INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
-    INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_id
+    INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
     WHERE tbl_leads.lead_id = :id
     `,
       {
