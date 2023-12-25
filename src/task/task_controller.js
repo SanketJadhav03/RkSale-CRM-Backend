@@ -94,6 +94,7 @@ const index = async (req, res) => {
         INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
         INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
         INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
+        INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
         INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
         `,
       {
