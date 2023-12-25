@@ -14,7 +14,7 @@ try {
 
     }= req.body;
     const rootPath = process.cwd();
-if (req.file && req.files.in_photo){
+
     const intime_image = req.files.in_photo;
 
     const validateAndMove = (file, uploadPath) => {
@@ -49,14 +49,14 @@ if (req.file && req.files.in_photo){
         )
       );
       
-        }
+
      const newAttendance = await Attendance.create({
         user_id:user_id ? user_id : null,
         attendance_date:attendance_date ? attendance_date : null,
         in_time:in_time ? in_time : null,
         in_location:in_location ? in_location :null,
         remark:1,
-        in_photo:req.files ? req.files.in_photo.name : null,
+        in_photo:intime_image ? imageintime : null,
         
 
       })
