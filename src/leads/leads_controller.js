@@ -22,7 +22,7 @@ const store = async (req, res) => {
       tags,
       status,
     } = req.body;
-    const leadsImage = req.files.image;
+    const leadsImage = req.file && req.files && req.files.image;
 
     const validateAndMove = (file, uploadPath) => {
       if (!file) {
@@ -48,6 +48,7 @@ const store = async (req, res) => {
     };
 
     const rootPath = process.cwd();
+    if(req.files.image){
     validateAndMove(
       leadsImage,
       path.join(
@@ -56,11 +57,12 @@ const store = async (req, res) => {
         "crm" + "-" + (leadsImage ? leadsImage.name : "")
       )
     );
+      }
     const newLead = await Leads.create({
       customer: customer ? customer : null,
       product: product ? product : null,
       value: value ? value : null,
-      today_date: today_date ? today_date : nulll,
+      today_date: today_date ? today_date : null,
       minimum_due_date: minimum_due_date ? minimum_due_date : null,
       ref_by: ref_by ? ref_by : null,
       maximum_due_date: maximum_due_date ? maximum_due_date : null,

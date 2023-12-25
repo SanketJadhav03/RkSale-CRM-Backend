@@ -34,7 +34,7 @@ const Leads = sequelize.define('tbl_leads', {
   },
   image:{
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   maximum_due_date: {
     type: DataTypes.DATE,
