@@ -53,7 +53,7 @@ const Leads = sequelize.define('tbl_leads', {
     allowNull: false,
   },
   assigned_by: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   tags: {
