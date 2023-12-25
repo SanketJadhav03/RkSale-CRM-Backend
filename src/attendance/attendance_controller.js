@@ -11,15 +11,11 @@ try {
         attendance_date,
         in_time,
         in_location,
-        out_time,
-        out_location,
-        remark,
 
     }= req.body;
     const rootPath = process.cwd();
-
+if (req.file && req.files.in_photo){
     const intime_image = req.files.in_photo;
-    const outime_image = req.files.out_photo;
 
     const validateAndMove = (file, uploadPath) => {
         if (!file) {
@@ -52,25 +48,16 @@ try {
           "crm" + "-" + (intime_image ? intime_image.name : null)
         )
       );
-      const outtimeimage = validateAndMove(
-        outime_image,
-        path.join(
-          rootPath,
-          "public/images/attendance",
-          "crm" + "-" + (outime_image ? outime_image.name : null)
-        )
-      );
-
+      
+        }
      const newAttendance = await Attendance.create({
         user_id:user_id ? user_id : null,
         attendance_date:attendance_date ? attendance_date : null,
         in_time:in_time ? in_time : null,
         in_location:in_location ? in_location :null,
-        out_time:out_time ? out_time : null,
-        out_location:out_location ? out_location : null,
         remark:1,
-        in_photo:intime_image ? imageintime : null,
-        out_photo:outime_image ? outime_image: null,
+        in_photo:req.files ? req.files.in_photo.name : null,
+        
 
       })
 
@@ -227,9 +214,20 @@ const UserAttendance = await Attendance.findAll({
     res.json({error:"Failed To Find Attendance By User"})
 }
 }
+
+const store_outime = async(req,res)=>{
+try {
+ 
+    
+} catch (error) {
+    console.log(error);
+    res.json({error:"Failed To Store Outtime"})
+}
+}
 module.exports = {
     store,
     index,
     todayattendance,
-    attendancebyuser
+    attendancebyuser,
+    store_outime
 }
