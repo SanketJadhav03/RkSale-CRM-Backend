@@ -81,7 +81,7 @@ const store = async (req, res) => {
       customer_notification: 1,
     });
 
-    res.json(newtask);
+    return res.json({ message: "Lead added successfully!", status: 1 });
   } catch (error) {
     console.log(error);
   }
@@ -202,9 +202,9 @@ const update = async (req, res) => {
     });
 
     if (updatedtask) {
-      res.json({ message: "Task Updated SuccessFully" });
+      return res.json({ message: "Lead added successfully!", status: 1 });
     } else {
-      res.json({ message: "Task Updated Failed" });
+      res.json({ message: "Task Updated Failed", status: 0 });
     }
   } catch (error) {
     console.log(error);
