@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db/db_config'); // Your Sequelize connection
+const { DataTypes } = require("sequelize");
+const sequelize = require("../db/db_config"); // Your Sequelize connection
 
-const Leads = sequelize.define('tbl_leads', {
+const Leads = sequelize.define("tbl_leads", {
   lead_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -24,7 +24,7 @@ const Leads = sequelize.define('tbl_leads', {
     type: DataTypes.DATE,
     allowNull: false,
   },
-  minimum_due_date : {
+  minimum_due_date: {
     type: DataTypes.DATE,
     allowNull: false,
   },
@@ -32,7 +32,7 @@ const Leads = sequelize.define('tbl_leads', {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  image:{
+  image: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -53,16 +53,16 @@ const Leads = sequelize.define('tbl_leads', {
     allowNull: false,
   },
   assigned_by: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   tags: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
-  status:{
-    type:DataTypes.INTEGER,
-    allowNull:false
+  status: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
   },
   lead_status: {
     type: DataTypes.INTEGER,
