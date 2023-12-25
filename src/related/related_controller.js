@@ -3,11 +3,21 @@ const Related = require("./related_model")
 
 const index = async (req, res) => {
     try {
-        const related = await Related.findAll();
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+      
+        const related = await Related.findAll({
+          limit: limitPerPage,
+          offset: offset,
+        });
+      
         res.json(related);
-    } catch (error) {
-        console.log(error);
-    }
+      } catch (error) {
+        console.error("Error getting related entries:", error);
+        res.status(500).json({ error: "Error getting related entries" });
+      }
+      
 }
 const store = async (req, res) => {
     try {

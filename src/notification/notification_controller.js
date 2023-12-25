@@ -7,11 +7,11 @@ try {
     const {id} = req.params;
      const data = await sequelize.query(
         `SELECT 
-        tbl_notifications.*,
-    FROM tbl_notifications
-    LEFT JOIN tbl_leads ON tbl_notifications.lead_id = tbl_leads.lead_id
-    LEFT JOIN tbl_tasks ON tbl_notifications.task_id = tbl_tasks.task_id
+        *
+    FROM tbl_notifications 
     WHERE tbl_notifications.customer_id = :id;
+   
+ 
 
         `,
         {

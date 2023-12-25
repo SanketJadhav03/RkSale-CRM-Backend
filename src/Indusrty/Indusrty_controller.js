@@ -3,11 +3,21 @@ const Indusrty = require("./Indusrty_model")
 
 const index = async (req, res) => {
     try {
-        const industry = await Indusrty.findAll();
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+      
+        const industry = await Indusrty.findAll({
+          limit: limitPerPage,
+          offset: offset,
+        });
+      
         res.json(industry);
-    } catch (error) {
-        console.log(error);
-    }
+      } catch (error) {
+        console.error("Error getting industry:", error);
+        res.status(500).json({ error: "Error getting industry" });
+      }
+      
 }
 // const store = async(req,res)=>{
 //     try {

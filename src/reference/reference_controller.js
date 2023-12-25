@@ -2,13 +2,22 @@ const Reference = require('./reference_model');
 const { Op, Model } = require('sequelize');
 
 const index = async(req,res)=>{
-    try{
-        const reference = await Reference.findAll();
-        res.json(reference)
-        }catch(e){
-            console.error("Error getting Reference:", error);
-            res.status(500).json({ error: "Error getting Reference" });
-        }
+    try {
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+      
+        const references = await Reference.findAll({
+          limit: limitPerPage,
+          offset: offset,
+        });
+      
+        res.json(references);
+      } catch (error) {
+        console.error("Error getting references:", error);
+        res.status(500).json({ error: "Error getting references" });
+      }
+      
 }
 
 

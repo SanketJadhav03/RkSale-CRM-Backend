@@ -4,23 +4,32 @@ const { Op, Model } = require('sequelize');
 const sequelize = require('../db/db_config');
 
 const index = async (req, res) => {
-    const customers = await sequelize.query
-
-
-        (
-            `SELECT * FROM tbl_customers 
-            INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
-            INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
-           
-            `,
-            {
-                model: Customer,
-                mapToModel: true, // Map the result to the Customer model
-            }
+    try {
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+      
+        const customers = await sequelize.query(
+          `
+          SELECT * FROM tbl_customers 
+          INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
+          INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
+          LIMIT :limit
+          OFFSET :offset
+          `,
+          {
+            model: Customer,
+            mapToModel: true, // Map the result to the Customer model
+            replacements: { limit: limitPerPage, offset: offset },
+          }
         );
-
-
-    res.json(customers);
+      
+        res.json(customers);
+      } catch (error) {
+        console.error("Error getting customers:", error);
+        res.status(500).json({ error: "Error getting customers" });
+      }
+      
 }
 
 
