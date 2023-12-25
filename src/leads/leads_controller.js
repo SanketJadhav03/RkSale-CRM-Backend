@@ -207,7 +207,7 @@ const update = async (req, res) => {
     });
 
     if (updatedlead) {
-      res.json({ message: "Lead Updated SuccessFully" });
+      res.json({ message: "Lead Updated SuccessFully", status: 1 });
     } else {
       res.json({ message: "Lead Updated Failed" });
     }
