@@ -6,13 +6,7 @@ const index = async(req,res)=>{
 try {
     const {id} = req.params;
      const data = await sequelize.query(
-        `SELECT 
-        *
-    FROM tbl_notifications 
-    WHERE tbl_notifications.customer_id = :id;
-   
- 
-
+        `
         `,
         {
           replacements: { id },

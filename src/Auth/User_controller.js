@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 
 const User = require("./User_model");
 const bcrypt = require("bcrypt");
@@ -6,6 +6,8 @@ const jwt = require("jsonwebtoken");
 const path = require("path");
 const fs = require("fs");
 const sequelize = require("../db/db_config");
+const DB = require("../../src/roles/role_has_permission_model");
+const Permissions = require("../../src/permissions/permission_model");
 
 const login = async (req, res) => {
   try {
@@ -35,11 +37,29 @@ const login = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({ user, token, isAdmin });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+      const rows = await DB.sequelize.query(
+        `
+        SELECT * FROM role_has_permissions
+        INNER JOIN permissions ON permissions.permission_id = role_has_permissions.rhp_permission_id
+        WHERE role_has_permissions.rhp_role_id = :roleId
+        `,
+        {
+          replacements: { roleId: user.user_role_id }, // Replace with the actual role ID
+          type: Sequelize.QueryTypes.SELECT,
+        }
+      );
+    
+      console.log(rows);
+      res.json({
+        token,
+        user,
+        authentication: true,
+        permissions: rows,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
 };
 
 const index = async (req, res) => {
