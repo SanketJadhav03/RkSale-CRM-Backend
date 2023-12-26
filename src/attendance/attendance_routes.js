@@ -2,14 +2,14 @@ const express = require('express')
 const router = express.Router();
 const controller = require('./attendance_controller')
 
-router.post('/attendance/intime/store',controller.store)
+router.post('/attendance/intime/store', controller.store)
 
-router.get('/attendance/list',controller.index)
+router.get('/attendance/list', controller.index)
 
-router.post('/attendance/outime/store',controller.store_outime)
+router.post('/attendance/outime/store', controller.store_outime)
 
-router.get('/today/attendance',controller.todayattendance)
+router.get('/today/attendance/:id', controller.todayattendance)
 
-router.get('/attendence/user/:id',controller.attendancebyuser)
+router.get('/attendence/user/:id', controller.attendancebyuser)
 
 module.exports = router;
