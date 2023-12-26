@@ -10,4 +10,6 @@ router.get('/leads/show/:id',controller.show)
 
 router.put('/leads/update/',controller.update)
 
+router.post('/leads/filter',controller.filterData)
+
 module.exports = router;

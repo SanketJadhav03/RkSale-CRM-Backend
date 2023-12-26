@@ -215,10 +215,38 @@ const update = async (req, res) => {
     console.log(error);
   }
 };
-
+const filterData = async (req, res) => {
+  try {
+    const { start_date, end_date } = req.body;
+    const data = await sequelize.query(
+      `SELECT * FROM tbl_leads 
+      INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
+      INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
+      INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
+      INNER JOIN tbl_products ON tbl_leads.product = tbl_products.product_id
+      INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
+      INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
+      INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
+    WHERE 
+        today_date >= :startDate AND today_date <= :endDate;`,
+      {
+        replacements: {
+          startDate: start_date,
+          endDate: end_date,
+        },
+        type: QueryTypes.SELECT,
+        model: Leads,
+      }
+    );
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   store,
   index,
   show,
   update,
+  filterData,
 };
