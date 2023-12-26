@@ -137,7 +137,7 @@ const index = async (req, res) => {
                 }
             }
         }
-
+        const todaysss = new Date().toISOString().split('T')[0]; // Get today's date in 'YYYY-MM-DD' format
         const updatedData = await sequelize.query(
             `SELECT 
                 tbl_attendances.*,
@@ -147,10 +147,10 @@ const index = async (req, res) => {
             FROM tbl_attendances
             INNER JOIN users ON tbl_attendances.user_id = users.uid
             INNER JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
-            WHERE tbl_attendances.attendance_date = :today`,
+            WHERE tbl_attendances.attendance_date = :todaysss`,
             {
                 type: QueryTypes.SELECT,
-                replacements: { today }
+                replacements: { todaysss }
             }
         );
 
@@ -167,7 +167,7 @@ const index = async (req, res) => {
 
 
 const todayattendance = async (req, res) => {
-
+    const { id } = req.params;
     const { Op, QueryTypes } = require('sequelize');
 
     try {
@@ -175,9 +175,11 @@ const todayattendance = async (req, res) => {
         const data = await sequelize.query(
             `SELECT * FROM tbl_attendances
             INNER JOIN users ON tbl_attendances.user_id = users.uid
+            WHERE tbl_attendances.user_id = :id
             `,
             {
                 type: QueryTypes.SELECT,
+                replacements: { id }
             }
         );
 
