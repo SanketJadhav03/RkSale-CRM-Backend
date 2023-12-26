@@ -112,16 +112,6 @@ async function initializeDatabase() {
       permission_category: "DASHBOARD",
     },
     {
-      permission_name: "leads list",
-      permission_path: "/leads-list",
-      permission_category: "LEADS",
-    },
-    {
-      permission_name: "task list",
-      permission_path: "/task-list",
-      permission_category: "TASK",
-    },
-    {
       permission_name: "category store",
       permission_path: "/back-end/category/store",
       permission_category: "CATEGORY",
