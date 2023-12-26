@@ -214,9 +214,8 @@ const update = async (req, res) => {
 
 const filterData = async (req, res) => {
   try {
-    const { start_date, end_date } = req.body;
-    const data = await sequelize.query(
-      `SELECT * 
+    const { start_date, end_date, customer_name } = req.body;
+    const sql = `SELECT * 
     FROM tbl_tasks 
     INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
     INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
@@ -224,16 +223,19 @@ const filterData = async (req, res) => {
     INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
     INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
     WHERE 
-        today_date >= :startDate AND today_date <= :endDate;`,
-      {
-        replacements: {
-          startDate: start_date,
-          endDate: end_date,
-        },
-        type: QueryTypes.SELECT,
-        model: Task,
-      }
-    );
+        today_date >= :startDate AND today_date <= :endDate `;
+    const replacements = {
+      startDate: start_date,
+      endDate: end_date,
+    };
+    if (customer_name > 0) {
+      sql += ` AND tbl_tasks.customer = '${customer_name}'`;
+    }
+    const data = await sequelize.query(sql, {
+      replacements,
+      type: QueryTypes.SELECT,
+      model: Task,
+    });
     res.json(data);
   } catch (error) {
     console.log(error);
