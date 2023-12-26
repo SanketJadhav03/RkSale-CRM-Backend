@@ -4,77 +4,76 @@ const sequelize = require('../db/db_config');
 const Attendance = require('./attendance_model')
 const path = require('path')
 
-const store = async(req,res)=>{
+
+const store = async (req, res) => {
     try {
         const {
-          user_id,
-          attendance_date,
-          in_time,
-          in_location,
+            user_id,
+            attendance_date,
+            in_time,
+            in_location,
+            attendance_in_latitude,
+            attendance_in_longitude,
+
+            // in_photo: '',
+
         } = req.body;
-      
         const rootPath = process.cwd();
-        const intime_image = req.files.in_photo;
-      
-        // Check if an attendance record already exists for the given user_id and attendance_date
-        const existingAttendance = await Attendance.findOne({
-          where: {
-            user_id: user_id,
-            attendance_date: attendance_date,
-          },
-        });
-      
-        if (existingAttendance) {
-          // If a record already exists, you can choose to update it or return an error
-          return res.status(400).json({ error: 'Attendance record already exists for the specified day' });
-        }
-      
+
+        const in_photo = req.files.in_photo;
+        // const outime_image = req.files.out_photo;
+
         const validateAndMove = (file, uploadPath) => {
-          if (!file) {
-            // Skip the file if it's null
-            console.log("File is null");
-            return null;
-          }
-      
-          if (!file.name) {
-            return res.status(400).json({ error: "Invalid file object" });
-          }
-      
-          file.mv(uploadPath, (err) => {
-            if (err) {
-              console.error("Error moving file:", err);
-              return res.status(500).json({ error: "Error uploading file" });
+            if (!file) {
+                // Skip the file if it's null
+                console.log("File is null");
+                return null;
             }
-            // Do something with the file path, for example, save it in the database
-            // ...
-          });
-      
-          return file.name; // Return the filename for use in the database
+
+            if (!file.name) {
+                return res.status(400).json({ error: "Invalid file object" });
+            }
+
+            file.mv(uploadPath, (err) => {
+                if (err) {
+                    console.error("Error moving file:", err);
+                    return res.status(500).json({ error: "Error uploading file" });
+                }
+                // Do something with the file path, for example, save it in the database
+                // ...
+            });
+
+            return file.name; // Return the filename for use in the database
         };
-      
+
         const imageintime = validateAndMove(
-          intime_image,
-          path.join(
-            rootPath,
-            "public/images/attendance",
-            "crm" + "-" + (intime_image ? intime_image.name : null)
-          )
+            in_photo,
+            path.join(
+                rootPath,
+                "public/images/attendance",
+                "crm" + "-" + (in_photo ? in_photo.name : null)
+            )
         );
-      
+
+
         const newAttendance = await Attendance.create({
-          user_id: user_id ? user_id : null,
-          attendance_date: attendance_date ? attendance_date : null,
-          in_time: in_time ? in_time : null,
-          in_location: in_location ? in_location : null,
-          in_photo: intime_image ? imageintime : null,
-        });
-      
-        res.json(newAttendance);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed To Store Attendance" });
-      }
-      
+            user_id: user_id ? user_id : null,
+            attendance_date: attendance_date ? attendance_date : null,
+            in_time: in_time ? in_time : null,
+            in_location: in_location ? in_location : null,
+            attendance_in_latitude: attendance_in_latitude ? attendance_in_latitude : null,
+            attendance_in_longitude: attendance_in_longitude ? attendance_in_longitude : null,
+            remark: 1,
+            in_photo: in_photo ? imageintime : null,
+
+        })
+
+        res.json(newAttendance)
+    } catch (error) {
+        console.log(error);
+        res.json({ error: "Failed To Store Attendance" })
+    }
+
 }
 
 const index = async (req, res) => {
@@ -83,9 +82,9 @@ const index = async (req, res) => {
         const hours = String(today.getHours()).padStart(2, '0');
         const minutes = String(today.getMinutes()).padStart(2, '0');
         const seconds = String(today.getSeconds()).padStart(2, '0');
-        
+
         const formattedTime = `${hours}:${minutes}:${seconds}`;
-        
+
         const usersWithNoAttendance = await sequelize.query(
             `SELECT u.uid AS user_id
             FROM users u
@@ -97,15 +96,15 @@ const index = async (req, res) => {
             )
             AND :formattedTime > s.shift_intime;            
             `
-        ,
+            ,
             {
                 type: QueryTypes.SELECT,
-                replacements:{
+                replacements: {
                     formattedTime
                 }
             }
         );
-        
+
         for (const user of usersWithNoAttendance) {
             // Check if the user already has an attendance record for today
             const existingAttendance = await sequelize.query(
@@ -120,7 +119,7 @@ const index = async (req, res) => {
                     },
                 }
             );
-        
+
             if (!existingAttendance || existingAttendance.length === 0) {
                 // If no attendance record exists, insert a new record
                 for (const user of usersWithNoAttendance) {
@@ -138,7 +137,7 @@ const index = async (req, res) => {
                 }
             }
         }
-        
+
         const updatedData = await sequelize.query(
             `SELECT 
                 tbl_attendances.*,
@@ -151,22 +150,23 @@ const index = async (req, res) => {
             WHERE tbl_attendances.attendance_date = :today`,
             {
                 type: QueryTypes.SELECT,
-                replacements:{today}
+                replacements: { today }
             }
         );
-        
+
         // Return or handle updatedData as needed
-        
-    
+
+
         res.json(updatedData);
     } catch (error) {
         console.log(error);
         res.json({ error: 'Failed To Get Attendance' });
     }
-    
+
 };
 
-const todayattendance = async(req,res) =>{
+
+const todayattendance = async (req, res) => {
 
     const { Op, QueryTypes } = require('sequelize');
 
@@ -180,106 +180,106 @@ const todayattendance = async(req,res) =>{
                 type: QueryTypes.SELECT,
             }
         );
-    
+
         // Define the startOfDay and endOfDay variables here
         const today = new Date();
         const startOfDay = new Date(today);
         startOfDay.setUTCHours(0, 0, 0, 0);
-    
+
         const endOfDay = new Date(today);
         endOfDay.setUTCHours(23, 59, 59, 999);
-    
+
         // Filter the results based on the date
         const todayAttendance = data.filter(item =>
             new Date(item.attendance_date).getTime() >= startOfDay.getTime() &&
             new Date(item.attendance_date).getTime() <= endOfDay.getTime()
         );
-    
+
         // Do something with todayAttendance, e.g., send it in the response
         res.json(todayAttendance);
     } catch (error) {
         res.json({ error: "Failed To Get Today Attendance" });
         console.error(error);
     }
-    
-    
-    
-} 
 
-const attendancebyuser = async(req,res)=>{
-try {
-    const {id} = req.params;
-const UserAttendance = await Attendance.findAll({
-    where:{
-     user_id:id   
+
+
+}
+
+const attendancebyuser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const UserAttendance = await Attendance.findAll({
+            where: {
+                user_id: id
+            }
+        })
+
+        res.json(UserAttendance);
+    } catch (error) {
+        console.log(error);
+        res.json({ error: "Failed To Find Attendance By User" })
     }
-})
-    
-    res.json(UserAttendance);
-} catch (error) {
-    console.log(error);
-    res.json({error:"Failed To Find Attendance By User"})
-}
 }
 
-const store_outime = async(req,res)=>{
+const store_outime = async (req, res) => {
     try {
         const {
             user_id,
             out_time,
             out_location,
-    
-        }= req.body;
+
+        } = req.body;
         const rootPath = process.cwd();
 
         const out_time_photo = req.files.out_photo;
-    
+
         const validateAndMove = (file, uploadPath) => {
             if (!file) {
-              // Skip the file if it's null
-              console.log("File is null");
-              return null;
+                // Skip the file if it's null
+                console.log("File is null");
+                return null;
             }
-      
+
             if (!file.name) {
-              return res.status(400).json({ error: "Invalid file object" });
+                return res.status(400).json({ error: "Invalid file object" });
             }
-      
+
             file.mv(uploadPath, (err) => {
-              if (err) {
-                console.error("Error moving file:", err);
-                return res.status(500).json({ error: "Error uploading file" });
-              }
-              // Do something with the file path, for example, save it in the database
-              // ...
+                if (err) {
+                    console.error("Error moving file:", err);
+                    return res.status(500).json({ error: "Error uploading file" });
+                }
+                // Do something with the file path, for example, save it in the database
+                // ...
             });
-      
+
             return file.name; // Return the filename for use in the database
-          };
-    
- validateAndMove(
+        };
+
+        validateAndMove(
             out_time_photo,
             path.join(
-              rootPath,
-              "public/images/attendance",
-              "crm" + "-" + (out_time_photo ? out_time_photo.name : null)
+                rootPath,
+                "public/images/attendance",
+                "crm" + "-" + (out_time_photo ? out_time_photo.name : null)
             )
-          );
-            
-const attendance = await Attendance.findOne({
-    where:{
-        user_id : user_id
-    }
-})
-const updatedAttendance = await attendance.update({
-    out_time:out_time,
-    out_location:out_location,
-    out_photo:req.files.out_photo.name
-})
-         res.json(updatedAttendance)
+        );
+
+        const attendance = await Attendance.findOne({
+            where: {
+                user_id: user_id
+            }
+        })
+        const updatedAttendance = await attendance.update({
+            out_time: out_time,
+            out_location: out_location,
+            out_photo: req.files.out_photo.name
+        })
+        res.json(updatedAttendance)
     } catch (error) {
         console.log(error);
-    res.json({error:"Failed To Store Attendance"})
+        res.json({ error: "Failed To Store Attendance" })
     }
 }
 module.exports = {
