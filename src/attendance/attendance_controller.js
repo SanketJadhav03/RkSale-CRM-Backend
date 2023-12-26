@@ -4,6 +4,7 @@ const sequelize = require('../db/db_config');
 const Attendance = require('./attendance_model')
 const path = require('path')
 
+
 const store = async (req, res) => {
     try {
         const {
@@ -72,6 +73,7 @@ const store = async (req, res) => {
         console.log(error);
         res.json({ error: "Failed To Store Attendance" })
     }
+
 }
 
 const index = async (req, res) => {
@@ -164,7 +166,6 @@ const index = async (req, res) => {
 };
 
 
-
 const todayattendance = async (req, res) => {
 
     const { Op, QueryTypes } = require('sequelize');
@@ -220,9 +221,71 @@ const attendancebyuser = async (req, res) => {
         res.json({ error: "Failed To Find Attendance By User" })
     }
 }
+
+const store_outime = async (req, res) => {
+    try {
+        const {
+            user_id,
+            out_time,
+            out_location,
+
+        } = req.body;
+        const rootPath = process.cwd();
+
+        const out_time_photo = req.files.out_photo;
+
+        const validateAndMove = (file, uploadPath) => {
+            if (!file) {
+                // Skip the file if it's null
+                console.log("File is null");
+                return null;
+            }
+
+            if (!file.name) {
+                return res.status(400).json({ error: "Invalid file object" });
+            }
+
+            file.mv(uploadPath, (err) => {
+                if (err) {
+                    console.error("Error moving file:", err);
+                    return res.status(500).json({ error: "Error uploading file" });
+                }
+                // Do something with the file path, for example, save it in the database
+                // ...
+            });
+
+            return file.name; // Return the filename for use in the database
+        };
+
+        validateAndMove(
+            out_time_photo,
+            path.join(
+                rootPath,
+                "public/images/attendance",
+                "crm" + "-" + (out_time_photo ? out_time_photo.name : null)
+            )
+        );
+
+        const attendance = await Attendance.findOne({
+            where: {
+                user_id: user_id
+            }
+        })
+        const updatedAttendance = await attendance.update({
+            out_time: out_time,
+            out_location: out_location,
+            out_photo: req.files.out_photo.name
+        })
+        res.json(updatedAttendance)
+    } catch (error) {
+        console.log(error);
+        res.json({ error: "Failed To Store Attendance" })
+    }
+}
 module.exports = {
     store,
     index,
     todayattendance,
-    attendancebyuser
+    attendancebyuser,
+    store_outime
 }

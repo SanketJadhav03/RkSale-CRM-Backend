@@ -4,11 +4,7 @@ const cors = require("cors");
 const path = require('path')
 const fileUpload = require("express-fileupload");
 const checked = require("./src/db/db_config");
-// const checkPermissions = require("./src/auth/permissionMiddleware");
-// const authenticateToken = require("./src/auth/authMiddleware");
-// const url_helper = require("./url_helper");
-// const imagesPath = `C:\\Users\\${username}\\AppData\\Roaming\\RkSalesCrm\\all_images`;
-// expressApp.use(express.static(imagesPath));
+
 
 expressApp.use(express.json());
 expressApp.use(cors());

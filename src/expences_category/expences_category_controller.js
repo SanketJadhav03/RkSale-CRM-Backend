@@ -3,12 +3,21 @@ const Expences_Category = require('../expences_category/expences_category_model'
 
 const index = async (req, res) => {
     try {
-        const Expences_Categorys = await Expences_Category.findAll();
-        res.json(Expences_Categorys)
-    } catch (e) {
-        console.error("Error getting Expences_Category:", error);
-        res.status(500).json({ error: "Error getting Expences_Category" });
-    }
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+      
+        const Expences_Categorys = await Expences_Category.findAll({
+          limit: limitPerPage,
+          offset: offset,
+        });
+      
+        res.json(Expences_Categorys);
+      } catch (error) {
+        console.error("Error getting Expences_Categorys:", error);
+        res.status(500).json({ error: "Error getting Expences_Categorys" });
+      }
+      
 }
 
 const store = async (req, res) => {

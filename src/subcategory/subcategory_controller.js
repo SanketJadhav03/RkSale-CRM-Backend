@@ -22,19 +22,25 @@ const store = async (req, res) => {
 
 const index = async (req, res) => {
     try {
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+      
         const result = await sequelize.query(
-            'SELECT * FROM tbl_subcategories INNER JOIN tbl_categories ON tbl_subcategories.category_id = tbl_categories.category_id',
-            {
-                type: QueryTypes.SELECT,
-                model: SubCategory, // Specify the model for Sequelize to map the result to
-            }
+          'SELECT * FROM tbl_subcategories INNER JOIN tbl_categories ON tbl_subcategories.category_id = tbl_categories.category_id LIMIT :limit OFFSET :offset',
+          {
+            type: QueryTypes.SELECT,
+            model: SubCategory, // Specify the model for Sequelize to map the result to
+            replacements: { limit: limitPerPage, offset: offset },
+          }
         );
-
+      
         res.json(result);
-    } catch (error) {
+      } catch (error) {
         console.error('Error retrieving data:', error);
         res.status(500).json({ error: 'Error retrieving data' });
-    }
+      }
+      
 };
 
 const show = async (req, res) => {

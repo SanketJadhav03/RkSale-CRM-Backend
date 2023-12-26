@@ -7,11 +7,21 @@ const fs = require("fs").promises;
 
 const index = async (req, res) => {
   try {
-    const expensesDetails = await Expenses.findAll();
+    const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+    const limitPerPage = 30;
+    const offset = (page - 1) * limitPerPage;
+  
+    const expensesDetails = await Expenses.findAll({
+      limit: limitPerPage,
+      offset: offset,
+    });
+  
     res.json(expensesDetails);
   } catch (error) {
-    console.log(error);
+    console.error("Error getting expensesDetails:", error);
+    res.status(500).json({ error: "Error getting expensesDetails" });
   }
+  
 };
 const store = async (req, res) => {
   try {

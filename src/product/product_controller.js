@@ -2,13 +2,22 @@ const { Op, Model } = require('sequelize');
 const Product = require('../product/product_model');
 
 const index = async(req,res)=>{
-    try{
-        const Products = await Product.findAll();
-        res.json(Products)
-        }catch(e){
-            console.error("Error getting Product:", error);
-            res.status(500).json({ error: "Error getting Product" });
-        }
+    try {
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+      
+        const Products = await Product.findAll({
+          limit: limitPerPage,
+          offset: offset,
+        });
+      
+        res.json(Products);
+      } catch (error) {
+        console.error("Error getting Products:", error);
+        res.status(500).json({ error: "Error getting Products" });
+      }
+      
 }
 
 const store = async(req,res)=>{

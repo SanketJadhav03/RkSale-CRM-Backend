@@ -22,45 +22,49 @@ const store = async (req, res) => {
       tags,
       status,
     } = req.body;
-    const leadsImage = req.files.image;
+    if (req.body.image !== undefined) {
+      const leadsImage = req.file && req.files && req.files.image;
 
-    const validateAndMove = (file, uploadPath) => {
-      if (!file) {
-        // Skip the file if it's null
-        console.log("File is null");
-        return null;
-      }
-
-      if (!file.name) {
-        return res.status(400).json({ error: "Invalid file object" });
-      }
-
-      file.mv(uploadPath, (err) => {
-        if (err) {
-          console.error("Error moving file:", err);
-          return res.status(500).json({ error: "Error uploading file" });
+      const validateAndMove = (file, uploadPath) => {
+        if (!file) {
+          // Skip the file if it's null
+          console.log("File is null");
+          return null;
         }
-        // Do something with the file path, for example, save it in the database
-        // ...
-      });
 
-      return file.filename; // Return the filename for use in the database
-    };
+        if (!file.name) {
+          return res.status(400).json({ error: "Invalid file object" });
+        }
 
-    const rootPath = process.cwd();
-    validateAndMove(
-      leadsImage,
-      path.join(
-        rootPath,
-        "public/images/leads",
-        "crm" + "-" + (leadsImage ? leadsImage.name : "")
-      )
-    );
+        file.mv(uploadPath, (err) => {
+          if (err) {
+            console.error("Error moving file:", err);
+            return res.status(500).json({ error: "Error uploading file" });
+          }
+          // Do something with the file path, for example, save it in the database
+          // ...
+        });
+
+        return file.filename; // Return the filename for use in the database
+      };
+
+      const rootPath = process.cwd();
+      if (req.files.image) {
+        validateAndMove(
+          leadsImage,
+          path.join(
+            rootPath,
+            "public/images/leads",
+            "crm" + "-" + (leadsImage ? leadsImage.name : "")
+          )
+        );
+      }
+    }
     const newLead = await Leads.create({
       customer: customer ? customer : null,
       product: product ? product : null,
       value: value ? value : null,
-      today_date: today_date ? today_date : nulll,
+      today_date: today_date ? today_date : null,
       minimum_due_date: minimum_due_date ? minimum_due_date : null,
       ref_by: ref_by ? ref_by : null,
       maximum_due_date: maximum_due_date ? maximum_due_date : null,
@@ -70,7 +74,7 @@ const store = async (req, res) => {
       assigned_by: assigned_by ? assigned_by : null,
       tags: tags ? tags : null,
       status: status ? status : null,
-      image: req.files.image ? req.files.image.name : null,
+      image: req.body.image !== undefined ? req.files.image.name : null,
     });
 
     await Notifaction.create({
@@ -96,7 +100,6 @@ const index = async (req, res) => {
       INNER JOIN tbl_products ON tbl_leads.product = tbl_products.product_id
       INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
       INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
-      INNER JOIN users ON tbl_leads.assigned_by = users.uid
       INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
       `,
       {
@@ -204,7 +207,7 @@ const update = async (req, res) => {
     });
 
     if (updatedlead) {
-      res.json({ message: "Lead Updated SuccessFully" });
+      res.json({ message: "Lead Updated SuccessFully", status: 1 });
     } else {
       res.json({ message: "Lead Updated Failed" });
     }

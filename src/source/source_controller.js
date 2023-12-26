@@ -3,12 +3,22 @@ const { Op } = require("sequelize");
 const Source = require("./source_model")
 
 const index = async(req,res)=>{
-    try{
-        const source = await Source.findAll();
-        res.json(source);
-    }catch(error){
-        console.log(error);
-    }
+    try {
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+      
+        const sources = await Source.findAll({
+          limit: limitPerPage,
+          offset: offset,
+        });
+      
+        res.json(sources);
+      } catch (error) {
+        console.error("Error getting sources:", error);
+        res.status(500).json({ error: "Error getting sources" });
+      }
+      
 }
 const store = async(req,res)=>{
     try {

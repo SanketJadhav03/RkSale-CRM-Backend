@@ -4,11 +4,21 @@ const LeadStatus = require("./lead_model")
 
 const index = async (req, res) => {
     try {
-        const leadstatus = await LeadStatus.findAll();
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+      
+        const leadstatus = await LeadStatus.findAll({
+          limit: limitPerPage,
+          offset: offset,
+        });
+      
         res.json(leadstatus);
-    } catch (error) {
-        console.log(error);
-    }
+      } catch (error) {
+        console.error("Error getting leadstatus:", error);
+        res.status(500).json({ error: "Error getting leadstatus" });
+      }
+      
 }
 const store = async (req, res) => {
     try {

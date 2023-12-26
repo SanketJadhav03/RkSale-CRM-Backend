@@ -17,13 +17,21 @@ const store = async(req,res)=>{
 
 const index = async(req,res) =>{
     try {
-        const shifts = await Shift.findAll();
-
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+      
+        const shifts = await Shift.findAll({
+          limit: limitPerPage,
+          offset: offset,
+        });
+      
         res.json(shifts);
-    } catch (error) {
-        console.log(error);
-        res.json({error:"Failed To Get Shifts"})
-    }
+      } catch (error) {
+        console.error("Error getting shifts:", error);
+        res.status(500).json({ error: "Error getting shifts" });
+      }
+      
 }
 
 const show = async(req,res) =>{
