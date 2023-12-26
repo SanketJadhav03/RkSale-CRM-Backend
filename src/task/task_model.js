@@ -53,11 +53,11 @@ const Task = sequelize.define('tbl_task', {
     allowNull: false,
   },
   assigned_by: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   tags: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   repeat_every_day:{

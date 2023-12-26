@@ -10,4 +10,8 @@ router.get('/task/show/:id',controller.show)
 
 router.put('/task/update',controller.update)
 
+
+router.post('/task/filter',controller.filterData);
+
+
 module.exports = router;

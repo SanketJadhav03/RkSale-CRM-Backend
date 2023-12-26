@@ -69,9 +69,9 @@ const index = async (req, res) => {
       FROM users 
       LEFT JOIN roles ON users.user_role_id = roles.role_id 
       LEFT JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id 
-      
       AND (roles.role_id IS NOT NULL OR users.user_role_id IS NULL) 
       AND (tbl_shifts.shift_id IS NOT NULL OR users.shift_id IS NULL)
+      WHERE users.u_type = 2 AND users.status = 1
       
         `,
       {
@@ -80,11 +80,7 @@ const index = async (req, res) => {
       }
     );
 
-    // const userstatus = await User.findAll({
-    //   where: {
-    //     u_type: 2
-    //   }
-    // });
+
     res.json(userstatus);
   } catch (error) {
     console.log(error);
@@ -326,9 +322,8 @@ const updated = async (req, res) => {
 
     if (req.files && req.files.bank_passbook_photo) {
       const uploadedFile = req.files.pan_photo;
-      const filePath = `public/images/user/${
-        "crm-" + user.bank_passbook_photo
-      }`;
+      const filePath = `public/images/user/${"crm-" + user.bank_passbook_photo
+        }`;
 
       // Remove the existing file
       fs.unlink(filePath, (err) => {
@@ -381,18 +376,27 @@ const updated = async (req, res) => {
   }
 };
 const deleted = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const branch = await User.findByPk(id);
-    if (!branch) {
+  const { id, status } = req.params;
+
+
+  if (status === '0') {
+
+    const user = await User.findByPk(id);
+    if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    await branch.destroy();
-    return res.json({ message: "User deleted successfully!", status: 1 });
-  } catch (error) {
-    console.error("Error deleting User:", error);
-    res.status(500).json({ error: "Error deleting User:" });
+
+    const updateduser = await user.update({
+
+      status: 0
+    });
+    res.status(200).json({ message: "User Deleted successfully", user });
+    // return res.json(updateduser);
+
   }
+  // return res.json({ id, status });
+
+
 };
 module.exports = {
   index,

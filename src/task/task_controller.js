@@ -81,7 +81,7 @@ const store = async (req, res) => {
       customer_notification: 1,
     });
 
-    res.json(newtask);
+    return res.json({ message: "Lead added successfully!", status: 1 });
   } catch (error) {
     console.log(error);
   }
@@ -94,6 +94,7 @@ const index = async (req, res) => {
         INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
         INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
         INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
+        INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
         INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
         `,
       {
@@ -202,10 +203,38 @@ const update = async (req, res) => {
     });
 
     if (updatedtask) {
-      res.json({ message: "Task Updated SuccessFully" });
+      return res.json({ message: "Lead added successfully!", status: 1 });
     } else {
-      res.json({ message: "Task Updated Failed" });
+      res.json({ message: "Task Updated Failed", status: 0 });
     }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const filterData = async (req, res) => {
+  try {
+    const { start_date, end_date } = req.body;
+    const data = await sequelize.query(
+      `SELECT * 
+    FROM tbl_tasks 
+    INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
+    INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
+    INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
+    INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
+    INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
+    WHERE 
+        today_date >= :startDate AND today_date <= :endDate;`,
+      {
+        replacements: {
+          startDate: start_date,
+          endDate: end_date,
+        },
+        type: QueryTypes.SELECT,
+        model: Task,
+      }
+    );
+    res.json(data);
   } catch (error) {
     console.log(error);
   }
@@ -215,4 +244,5 @@ module.exports = {
   index,
   show,
   update,
+  filterData,
 };
