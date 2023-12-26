@@ -8,15 +8,16 @@ const Attendance = sequelize.define('tbl_attendance', {
     primaryKey: true,
     autoIncrement: true,
   },
-user_id: {
+  user_id: {
     type: DataTypes.STRING,
     allowNull: true,
   },
   attendance_date: {
     type: DataTypes.DATE,
-    
+
     allowNull: true,
   },
+
   in_time: {
     type: DataTypes.TIME,
     allowNull: true,
@@ -24,6 +25,16 @@ user_id: {
   in_location: {
     type: DataTypes.STRING,
     allowNull: true,
+  },
+  attendance_in_latitude: {
+    type: DataTypes.STRING,
+
+    allowNull: null,
+  },
+  attendance_in_longitude: {
+    type: DataTypes.STRING,
+
+    allowNull: null,
   },
   in_photo: {
     type: DataTypes.STRING,
@@ -37,18 +48,28 @@ user_id: {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  attendance_out_latitude: {
+    type: DataTypes.STRING,
+
+    allowNull: null,
+  },
+  attendance_out_longitude: {
+    type: DataTypes.STRING,
+
+    allowNull: null,
+  },
   out_photo: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  remark:{
-    type:DataTypes.STRING,
-    allowNull:true,
+  remark: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
-  attendance_status:{
-    type:DataTypes.INTEGER,
-    defaultValue:1,
-    allowNull:true
+  attendance_status: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+    allowNull: true
 
   }
 });
