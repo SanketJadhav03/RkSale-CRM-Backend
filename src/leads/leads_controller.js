@@ -217,9 +217,8 @@ const update = async (req, res) => {
 };
 const filterData = async (req, res) => {
   try {
-    const { start_date, end_date } = req.body;
-    const data = await sequelize.query(
-      `SELECT * FROM tbl_leads 
+    const { start_date, end_date, customer_name } = req.body;
+    let sql = `SELECT * FROM tbl_leads 
       INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
       INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
       INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
@@ -227,17 +226,24 @@ const filterData = async (req, res) => {
       INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
       INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
       INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
-    WHERE 
-        today_date >= :startDate AND today_date <= :endDate;`,
-      {
-        replacements: {
-          startDate: start_date,
-          endDate: end_date,
-        },
-        type: QueryTypes.SELECT,
-        model: Leads,
-      }
-    );
+      WHERE today_date >= :startDate AND today_date <= :endDate`;
+
+    const replacements = {
+      startDate: start_date,
+      endDate: end_date,
+    };
+
+    if (customer_name > 0) {
+      sql += ` AND tbl_leads.customer = :customer_name`;
+      replacements.customer_name = customer_name;
+    }
+
+    const data = await sequelize.query(sql, {
+      replacements,
+      type: QueryTypes.SELECT,
+      model: Leads,
+    });
+
     res.json(data);
   } catch (error) {
     console.log(error);
