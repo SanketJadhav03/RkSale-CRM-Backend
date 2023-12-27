@@ -28,11 +28,10 @@ const login = async (req, res) => {
     }
 
     // Check if the user is an admin (You can determine this based on a role or a specific field in the user model)
-    const isAdmin = user.isAdmin; // Assuming isAdmin is a field in the User model
 
     // Generate a different token depending on whether the user is an admin or a regular user
     const token = jwt.sign(
-      { userId: user.id, isAdmin: isAdmin },
+      { userId: user.uid, email:user.email},
       "replace-with-a-strong-secret-key",
       { expiresIn: "1h" }
     );

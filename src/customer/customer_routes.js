@@ -1,8 +1,10 @@
 const express = require('express')
 const router = express.Router();
 const customer_controller = require('./customer_controller');
+const checkPermissions = require('../Auth/permissionMiddleware');
 
-router.get('/customer/list',customer_controller.index)
+
+router.get('/customer/list',checkPermissions,customer_controller.index)
 
 router.post('/customer/store',customer_controller.store)
 
