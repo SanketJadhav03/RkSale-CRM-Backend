@@ -37,7 +37,6 @@ const userDetails = await User.findOne({
     return;
   }
 
-  console.log(userDetails.user_role_id);
   
   // GETTING PERMISSIONS LIST
   const checkPermissionsFromDB = async (userDetails, permissionPath) => {
@@ -60,9 +59,10 @@ const userDetails = await User.findOne({
   };
   
   // Usage
+  console.log(finalURL);
   try {
     const rows = await checkPermissionsFromDB(userDetails, finalURL);
-    if (rows.length > 0) {
+    if (rows) {
       console.log("has permission");
       next();
     } else {
@@ -73,21 +73,8 @@ const userDetails = await User.findOne({
   } catch (error) {
     return response.status(500).json({ msg: "Internal Server Error" });
   }
-  
-          // Usage
-          try {
-            const rows = await checkPermissionsFromDB(userDetails.user_role_id, finalURL);
-            if (rows.length > 0) {
-              console.log("has permission");
-              next();
-            } else {
-              console.log(finalURL);
-              console.log("has no permission");
-              return response.status(401).json({ msg: "Unauthorized" });
-            }
-          } catch (error) {
-            return response.status(500).json({ msg: "Internal Server Error" });
-          }
+
+       
           
     });
 };

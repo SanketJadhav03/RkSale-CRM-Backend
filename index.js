@@ -4,7 +4,7 @@ const cors = require("cors");
 const path = require('path')
 const fileUpload = require("express-fileupload");
 const checked = require("./src/db/db_config");
-
+const checkPermissions = require('./src/Auth/permissionMiddleware');
 
 expressApp.use(express.json());
 expressApp.use(cors());
@@ -32,6 +32,7 @@ expressApp.use("/back-end", user);
 // city routes
 const city = require("./src/city/city_route");
 expressApp.use("/back-end", city);
+
 
 // // source routes
 const source = require("./src/source/source_route");

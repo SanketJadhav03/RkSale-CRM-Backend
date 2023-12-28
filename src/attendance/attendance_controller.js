@@ -136,7 +136,7 @@ const index = async (req, res) => {
       }
     }
     const todaysss = new Date().toISOString().split("T")[0]; // Get today's date in 'YYYY-MM-DD' format
-    const updatedData = await sequelize.query(
+    const data = await sequelize.query(
       `SELECT 
                 tbl_attendances.*,
                 users.*,
@@ -154,7 +154,7 @@ const index = async (req, res) => {
 
     // Return or handle updatedData as needed
 
-    res.json(updatedData);
+    res.json(data);
   } catch (error) {
     console.log(error);
     res.json({ error: "Failed To Get Attendance" });
