@@ -25,6 +25,10 @@ const Notifaction = sequelize.define('tbl_notification', {
     defaultValue:1,
     allowNull:false
  },
+ notification_type:{
+type:DataTypes.INTEGER,
+allowNull:true
+ },
 
  status:{
     type:DataTypes.INTEGER,
