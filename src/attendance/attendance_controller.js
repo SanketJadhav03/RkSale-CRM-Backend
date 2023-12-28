@@ -194,7 +194,7 @@ const todayattendance = async (req, res) => {
     );
 
     // Do something with todayAttendance, e.g., send it in the response
-    res.json(todayAttendance);
+    res.json({ todayAttendance });
   } catch (error) {
     res.json({ error: "Failed To Get Today Attendance" });
     console.error(error);
@@ -219,7 +219,7 @@ const attendancebyuser = async (req, res) => {
 
 const store_outime = async (req, res) => {
   try {
-    const { user_id, out_time, out_location } = req.body;
+    const { attendance_id, user_id, out_time, out_location, attendance_out_longitude, attendance_out_latitude } = req.body;
     const rootPath = process.cwd();
 
     const out_time_photo = req.files.out_photo;
@@ -258,12 +258,16 @@ const store_outime = async (req, res) => {
 
     const attendance = await Attendance.findOne({
       where: {
+        attendance_id: attendance_id,
         user_id: user_id,
+
       },
     });
     const updatedAttendance = await attendance.update({
       out_time: out_time,
       out_location: out_location,
+      attendance_out_latitude: attendance_out_latitude,
+      attendance_out_longitude: attendance_out_longitude,
       out_photo: req.files.out_photo.name,
     });
     res.json(updatedAttendance);
