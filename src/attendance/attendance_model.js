@@ -13,7 +13,7 @@ const Attendance = sequelize.define('tbl_attendance', {
     allowNull: true,
   },
   attendance_date: {
-    type: DataTypes.DATE,
+    type: DataTypes.DATEONLY,
 
     allowNull: true,
   },

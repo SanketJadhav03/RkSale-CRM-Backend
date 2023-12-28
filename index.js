@@ -17,7 +17,7 @@ expressApp.use(
 );
 // create data
 checked
-  .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+  .sync({ alter: true }) // if false then not drop created table else it will drop tables and every time gives new tables
   .then(() => {
     require("./db/create_data");
     console.log("Database created!");
@@ -26,6 +26,15 @@ checked
     console.log(error);
   });
 
+// checked
+// .sync({ force: true }) // if false then not drop created table else it will drop tables and every time gives new tables
+// .then(() => {
+//   require("./db/create_data");
+//   console.log("Database created!");
+// })
+// .catch((error) => {
+//   console.log(error);
+// });
 // user routes
 const user = require("./src/Auth/User_route");
 expressApp.use("/back-end", user);
@@ -36,6 +45,9 @@ expressApp.use("/back-end", city);
 // // source routes
 const source = require("./src/source/source_route");
 expressApp.use("/back-end", source);
+// // source routes
+const leave = require("./src/Leave/leave_routes");
+expressApp.use("/back-end", leave);
 
 // category routes
 const category = require("./src/category/category_routes");

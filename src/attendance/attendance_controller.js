@@ -68,7 +68,7 @@ const store = async (req, res) => {
       in_photo: in_photo ? imageintime : null,
     });
 
-    res.json(newAttendance);
+    return res.status(201).json({ message: 'Check in  successfully', status: 1 });
   } catch (error) {
     console.log(error);
     res.json({ error: "Failed To Store Attendance" });
@@ -162,16 +162,17 @@ const index = async (req, res) => {
 };
 
 const todayattendance = async (req, res) => {
+  const path = "/attendance";
   const { id } = req.params;
   const { Op, QueryTypes } = require("sequelize");
 
   try {
     // Execute the raw SQL query
     const data = await sequelize.query(
-      `SELECT * FROM tbl_attendances
-            INNER JOIN users ON tbl_attendances.user_id = users.uid
-            WHERE tbl_attendances.user_id = :id
-            `,
+      `SELECT tbl_attendances.*, users.*, tbl_attendances.in_photo 
+    FROM tbl_attendances
+    INNER JOIN users ON tbl_attendances.user_id = users.uid
+    WHERE tbl_attendances.user_id = :id`,
       {
         type: QueryTypes.SELECT,
         replacements: { id },
@@ -193,24 +194,49 @@ const todayattendance = async (req, res) => {
         new Date(item.attendance_date).getTime() <= endOfDay.getTime()
     );
 
-    // Do something with todayAttendance, e.g., send it in the response
-    res.json({ todayAttendance });
+    // Concatenate the folder path with image paths
+    const attendanceWithCompletePaths = todayAttendance.map((attendance) => {
+      return {
+        ...attendance,
+        in_photo: `/attendance/${attendance.in_photo}`, // Adjust field name if needed
+      };
+    });
+
+    res.json(attendanceWithCompletePaths);
   } catch (error) {
     res.json({ error: "Failed To Get Today Attendance" });
     console.error(error);
   }
+
 };
 
 const attendancebyuser = async (req, res) => {
   try {
     const { id } = req.params;
-    const UserAttendance = await Attendance.findAll({
-      where: {
-        user_id: id,
-      },
+    // const UserAttendance = await Attendance.findAll({
+    //   where: {
+    //     user_id: id,
+    //   },
+    // });
+    // Execute the raw SQL query
+    const UserAttendance = await sequelize.query(
+      `SELECT tbl_attendances.*, users.*, tbl_attendances.in_photo ,tbl_attendances.out_photo
+    FROM tbl_attendances
+    INNER JOIN users ON tbl_attendances.user_id = users.uid
+    WHERE tbl_attendances.user_id = :id`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: { id },
+      }
+    );
+    const attendanceWithCompletePaths = UserAttendance.map((attendance) => {
+      return {
+        ...attendance,
+        in_photo: `/attendance/${attendance.in_photo}`, // Adjust field name if needed
+        out_photo: `/attendance/${attendance.out_photo}`, // Adjust field name if needed
+      };
     });
-
-    res.json(UserAttendance);
+    res.json(attendanceWithCompletePaths);
   } catch (error) {
     console.log(error);
     res.json({ error: "Failed To Find Attendance By User" });
