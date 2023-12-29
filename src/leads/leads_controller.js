@@ -60,6 +60,7 @@ const store = async (req, res) => {
         );
       }
     }
+    const assignedByArray = JSON.parse(assigned_by);
     const newLead = await Leads.create({
       customer: customer ? customer : null,
       product: product ? product : null,
@@ -77,12 +78,17 @@ const store = async (req, res) => {
       image: req.body.image !== undefined ? req.files.image.name : null,
     });
 
-    await Notifaction.create({
-      customer_id: customer,
-      lead_id: newLead.lead_id,
-      task_id: 0,
-      customer_notification: 1,
-    });
+    await Promise.all(
+      assignedByArray.map(async (assignedUserId) => {
+        await Notifaction.create({
+          customer_id: assignedUserId,
+          lead_id: newLead.lead_id,
+          task_id: 0,
+          customer_notification: 1,
+          notification_type: 1,
+        });
+      })
+    );
     return res.json({ message: "Lead added successfully!", status: 1 });
   } catch (error) {
     console.log(error);

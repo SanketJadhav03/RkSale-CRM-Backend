@@ -79,6 +79,7 @@ const store = async (req, res) => {
       lead_id: 0,
       task_id: newtask.task_id,
       customer_notification: 1,
+      notification_type:2,
     });
 
     return res.json({ message: "Lead added successfully!", status: 1 });

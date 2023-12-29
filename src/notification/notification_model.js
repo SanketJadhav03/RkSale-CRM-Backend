@@ -14,11 +14,13 @@ const Notifaction = sequelize.define('tbl_notification', {
   },
   lead_id: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
+    defaultValue:null
   },
   task_id: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
+    defaultValue:null
   },
  customer_notification:{
     type:DataTypes.INTEGER,
