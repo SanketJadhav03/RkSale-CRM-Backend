@@ -49,7 +49,7 @@ const store = async (req, res) => {
       path.join(
         rootPath,
         "public/images/attendance",
-        "crm" + "-" + (in_photo ? in_photo.name : null)
+        (in_photo ? in_photo.name : null)
       )
     );
 
@@ -278,7 +278,7 @@ const store_outime = async (req, res) => {
       path.join(
         rootPath,
         "public/images/attendance",
-        "crm" + "-" + (out_time_photo ? out_time_photo.name : null)
+         (out_time_photo ? out_time_photo.name : null)
       )
     );
 
@@ -296,7 +296,8 @@ const store_outime = async (req, res) => {
       attendance_out_longitude: attendance_out_longitude,
       out_photo: req.files.out_photo.name,
     });
-    res.json(updatedAttendance);
+    // res.json(updatedAttendance);
+    return res.status(201).json({ message: 'Check Out successfully', status: 1 });
   } catch (error) {
     console.log(error);
     res.json({ error: "Failed To Store Attendance" });
