@@ -200,7 +200,7 @@ const update = async (req, res) => {
       file:
         req.files && req.files.image
           ? req.files.image.name
-          : existinglead.image,
+          : existingtask.image,
     });
 
     if (updatedtask) {
