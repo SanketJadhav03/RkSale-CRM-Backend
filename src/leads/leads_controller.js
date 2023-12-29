@@ -125,11 +125,13 @@ const show = async (req, res) => {
     const { id } = req.params;
     const data = await sequelize.query(
       `SELECT * FROM tbl_leads 
-    INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
-    INNER JOIN tbl_products ON tbl_leads.product = tbl_products.product_id
-    INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
-    INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
-    INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
+      INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
+      INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
+      INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
+      INNER JOIN tbl_products ON tbl_leads.product = tbl_products.product_id
+      INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
+      INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
+      INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
     WHERE tbl_leads.lead_id = :id
     `,
       {
@@ -223,7 +225,7 @@ const update = async (req, res) => {
 };
 const filterData = async (req, res) => {
   try {
-    const { start_date, end_date, customer_name } = req.body;
+    const { start_date, end_date, customer_name, assigned_by } = req.body;
     let sql = `SELECT * FROM tbl_leads 
       INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
       INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
@@ -243,7 +245,10 @@ const filterData = async (req, res) => {
       sql += ` AND tbl_leads.customer = :customer_name`;
       replacements.customer_name = customer_name;
     }
-
+    if (assigned_by > 0) {
+      sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
+      replacements.assigned_by = assigned_by;
+    }
     const data = await sequelize.query(sql, {
       replacements,
       type: QueryTypes.SELECT,
