@@ -15,10 +15,10 @@ router.post("/city/store",cityController.store)
 router.get("/city/show/:id",cityController.show)
 
 // put to update data
-router.put("/city/update",checkPermissions,cityController.updated)
+router.put("/city/update",cityController.updated)
 
 // delete the data 
-router.delete("/city/delete/:id",checkPermissions,cityController.deleted)
+router.delete("/city/delete/:id",cityController.deleted)
 
 
 module.exports = router;
