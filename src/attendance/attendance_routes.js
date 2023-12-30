@@ -6,6 +6,8 @@ router.post('/attendance/intime/store', controller.store)
 
 router.get('/attendance/list', controller.index)
 
+router.get('/attendance/lists', controller.adminindex)
+
 router.post('/attendance/outime/store', controller.store_outime)
 
 router.get('/today/attendance/:id', controller.todayattendance)

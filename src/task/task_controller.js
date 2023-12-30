@@ -74,6 +74,7 @@ const store = async (req, res) => {
       status: status,
       image: imagepath,
     });
+
     await Promise.all(
       assignedByArray.map(async (assignedUserId) => {
         await Notifaction.create({
@@ -85,6 +86,7 @@ const store = async (req, res) => {
         });
       })
     );
+
 
     return res.json({ message: "Task added successfully!", status: 1 });
   } catch (error) {
@@ -204,7 +206,7 @@ const update = async (req, res) => {
       file:
         req.files && req.files.image
           ? req.files.image.name
-          : existinglead.image,
+          : existingtask.image,
     });
 
     if (updatedtask) {
@@ -219,22 +221,26 @@ const update = async (req, res) => {
 
 const filterData = async (req, res) => {
   try {
-    const { start_date, end_date, customer_name } = req.body;
-    const sql = `SELECT * 
+    const { start_date, end_date, customer_name, assigned_by } = req.body;
+    let sql = `SELECT * 
     FROM tbl_tasks 
     INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
     INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
     INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
     INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
     INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
-    WHERE 
-        today_date >= :startDate AND today_date <= :endDate `;
+    WHERE today_date >= :startDate AND today_date <= :endDate`;
     const replacements = {
       startDate: start_date,
       endDate: end_date,
     };
     if (customer_name > 0) {
-      sql += ` AND tbl_tasks.customer = '${customer_name}'`;
+      sql += ` AND tbl_tasks.customer = :customer_name`;
+      replacements.customer_name = customer_name;
+    }
+    if (assigned_by > 0) {
+      sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
+      replacements.assigned_by = assigned_by;
     }
     const data = await sequelize.query(sql, {
       replacements,
