@@ -3,6 +3,7 @@ const router = express.Router();
 const controller = require('./leave_controller')
 
 router.post('/leave/store', controller.store)
+router.put('/leave/update', controller.updated)
 
 router.get('/leave/list/:type?', controller.index);
 // router.get('/leave/list/:type?', controller.index);

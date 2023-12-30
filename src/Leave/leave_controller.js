@@ -63,7 +63,37 @@ const store = async (req, res) => {
         res.json({ error: "Failed To Store Attendance" });
     }
 };
+const updated = async (req, res) => {
+    try {
+        const {
+            leave_id,
+            leave_status,
+            leave_reject_reason,
+            leave_approved_by,
+        } = req.body;
+        // return res.json(req.body);
 
+
+        const leave = await Leave.findOne({
+            where: {
+                leave_id: leave_id,
+                //   user_id: user_id,
+
+            },
+        });
+        const updatedleave = await leave.update({
+            leave_approved_by: leave_approved_by,
+            leave_status: leave_status,
+            leave_reject_reason: leave_reject_reason,
+
+        });
+
+        return res.status(201).json({ message: 'Leave Updated successfully', status: 1 });
+    } catch (error) {
+        console.log(error);
+        res.json({ error: "Failed To Store Attendance" });
+    }
+};
 const index = async (req, res) => {
     try {
         const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
@@ -259,4 +289,5 @@ module.exports = {
     store,
     index,
     userleave,
+    updated,
 };
