@@ -56,7 +56,7 @@ const store = async (req, res) => {
         "crm" + "-" + (image ? image.name : null)
       )
     );
-
+    const assignedByArray = JSON.parse(assigned_by);
     const newtask = await Task.create({
       customer: customer,
       product: product,
@@ -74,15 +74,19 @@ const store = async (req, res) => {
       status: status,
       image: imagepath,
     });
-    await Notifaction.create({
-      customer_id: customer,
-      lead_id: 0,
-      task_id: newtask.task_id,
-      customer_notification: 1,
-      notification_type:2,
-    });
+    await Promise.all(
+      assignedByArray.map(async (assignedUserId) => {
+        await Notifaction.create({
+          customer_id: assignedUserId,
+          lead_id: null,
+          task_id: newtask.task_id,
+          customer_notification: 1,
+          notification_type: 1,
+        });
+      })
+    );
 
-    return res.json({ message: "Lead added successfully!", status: 1 });
+    return res.json({ message: "Task added successfully!", status: 1 });
   } catch (error) {
     console.log(error);
   }
