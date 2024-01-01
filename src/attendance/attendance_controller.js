@@ -68,8 +68,8 @@ const store = async (req, res) => {
     if (Olddata && Olddata.length > 0) {
 
       return res.status(201).json({ message: 'already Check in  successfully', status: 1 });
-      
-    }else{
+
+    } else {
       const newAttendance = await Attendance.create({
         user_id: user_id ? user_id : null,
         attendance_date: attendance_date ? attendance_date : null,
@@ -141,7 +141,7 @@ const index = async (req, res) => {
         for (const user of usersWithNoAttendance) {
           await sequelize.query(
             `INSERT INTO tbl_attendances (user_id, attendance_date,remark)
-                        VALUES (:userId, :attendanceDate,0)`,
+                        VALUES (:userId, :attendanceDate,2)`,
             {
               type: QueryTypes.INSERT,
               replacements: {
