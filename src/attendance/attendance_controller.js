@@ -32,7 +32,7 @@ const store = async (req, res) => {
         attendance_date: attendance_date,
       },
     });
-
+    // return res.json(Olddata);
 
     const validateAndMove = (file, uploadPath) => {
       if (!file) {
@@ -65,9 +65,11 @@ const store = async (req, res) => {
         (in_photo ? in_photo.name : null)
       )
     );
-    if (!Olddata) {
+    if (Olddata && Olddata.length > 0) {
 
-
+      return res.status(201).json({ message: 'already Check in  successfully', status: 1 });
+      
+    }else{
       const newAttendance = await Attendance.create({
         user_id: user_id ? user_id : null,
         attendance_date: attendance_date ? attendance_date : null,
@@ -82,8 +84,9 @@ const store = async (req, res) => {
         remark: 1,
         in_photo: in_photo ? imageintime : null,
       });
+      return res.status(201).json({ message: 'Check in  successfully', status: 1 });
     }
-    return res.status(201).json({ message: 'Check in  successfully', status: 1 });
+    // return res.status(201).json({ message: 'czdcxcvvxdcv xcfully', status: 1 });
   } catch (error) {
     console.log(error);
     res.json({ error: "Failed To Store Attendance" });
