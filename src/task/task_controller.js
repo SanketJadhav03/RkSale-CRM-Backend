@@ -25,37 +25,44 @@ const store = async (req, res) => {
     } = req.body;
     const rootPath = process.cwd();
 
-    const validateAndMove = (file, uploadPath) => {
-      if (!file) {
-        // Skip the file if it's null
-        console.log("File is null");
-        return null;
-      }
+    if (req.body.image !== undefined) {
+      const leadsImage = req.file && req.files && req.files.image;
 
-      if (!file.name) {
-        return res.status(400).json({ error: "Invalid file object" });
-      }
-
-      file.mv(uploadPath, (err) => {
-        if (err) {
-          console.error("Error moving file:", err);
-          return res.status(500).json({ error: "Error uploading file" });
+      const validateAndMove = (file, uploadPath) => {
+        if (!file) {
+          // Skip the file if it's null
+          console.log("File is null");
+          return null;
         }
-        // Do something with the file path, for example, save it in the database
-        // ...
-      });
 
-      return file.name; // Return the filename for use in the database
-    };
-    const image = req.files.image;
-    const imagepath = validateAndMove(
-      image,
-      path.join(
-        rootPath,
-        "public/images/task",
-        "crm" + "-" + (image ? image.name : null)
-      )
-    );
+        if (!file.name) {
+          return res.status(400).json({ error: "Invalid file object" });
+        }
+
+        file.mv(uploadPath, (err) => {
+          if (err) {
+            console.error("Error moving file:", err);
+            return res.status(500).json({ error: "Error uploading file" });
+          }
+          // Do something with the file path, for example, save it in the database
+          // ...
+        });
+
+        return file.filename; // Return the filename for use in the database
+      };
+
+      const rootPath = process.cwd();
+      if (req.files.image) {
+        validateAndMove(
+          leadsImage,
+          path.join(
+            rootPath,
+            "public/images/leads",
+            "crm" + "-" + (leadsImage ? leadsImage.name : "")
+          )
+        );
+      }
+    }
     const assignedByArray = JSON.parse(assigned_by);
     const newtask = await Task.create({
       customer: customer,
@@ -72,7 +79,7 @@ const store = async (req, res) => {
       tags: tags,
       repeat_every_day: repeat_every_day,
       status: status,
-      image: imagepath,
+      image: req.body.image !== undefined ? req.files.image.name : null,
     });
 
     await Promise.all(

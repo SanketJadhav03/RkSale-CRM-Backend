@@ -3,68 +3,72 @@ const Notification = require('./notification_model');
 const sequelize = require('../db/db_config');
 
 const index = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const notifications = await Notification.findAll({
-        where: {
-          customer_id: id,
-        },
-      });
+  try {
+    const { id } = req.params;
+    const notifications = await Notification.findAll({
+      where: {
+        customer_id: id,
+      },
+    });
   
-      if (notifications.length > 0) {
-        // Use Promise.all to concurrently execute queries for each notification
-        const data = await Promise.all(notifications.map(async (notification) => {
-          let notificationData;
+    if (notifications.length > 0) {
+      // Use Promise.all to concurrently execute queries for each notification
+      const data = await Promise.all(notifications.map(async (notification) => {
+        let notificationData;
   
-          if (notification.lead_id !== null) {
-            notificationData = await sequelize.query(
-              `
-              SELECT *
-              FROM tbl_notifications
-              LEFT JOIN tbl_leads ON tbl_notifications.lead_id = tbl_leads.lead_id
-              WHERE tbl_notifications.customer_id = :id
-              AND tbl_notifications.lead_id = :leadId
-              AND tbl_notifications.status = 1
-              `,
-              {
-                replacements: { id, leadId: notification.lead_id },
-                type: QueryTypes.SELECT,
-              }
-            );
-          } else if (notification.task_id !== null) {
-            notificationData = await sequelize.query(
-              `
-              SELECT *
-              FROM tbl_notifications
-              LEFT JOIN tbl_tasks ON tbl_notifications.task_id = tbl_tasks.task_id
-              WHERE tbl_notifications.customer_id = :id
-              AND tbl_notifications.task_id = :taskId
-              AND tbl_notifications.status = 1
-              `,
-              {
-                replacements: { id, taskId: notification.task_id },
-                type: QueryTypes.SELECT,
-              }
-            );
-          }
-  
-          return notificationData;
-        }));
-  
-        console.log('Final Data:', data);
-  
-        if (data.length > 0) {
-          res.json(data);
-        } else {
-          res.json({ msg: "No data found" });
+        if (notification.lead_id !== null) {
+          notificationData = await sequelize.query(
+            `
+            SELECT *
+            FROM tbl_notifications
+            LEFT JOIN tbl_leads ON tbl_notifications.lead_id = tbl_leads.lead_id
+            WHERE tbl_notifications.customer_id = :id
+            AND tbl_notifications.lead_id = :leadId
+            AND tbl_notifications.status = 1
+            `,
+            {
+              replacements: { id, leadId: notification.lead_id },
+              type: QueryTypes.SELECT,
+            }
+          );
+        } else if (notification.task_id !== null) {
+          notificationData = await sequelize.query(
+            `
+            SELECT *
+            FROM tbl_notifications
+            LEFT JOIN tbl_tasks ON tbl_notifications.task_id = tbl_tasks.task_id
+            WHERE tbl_notifications.customer_id = :id
+            AND tbl_notifications.task_id = :taskId
+            AND tbl_notifications.status = 1
+            `,
+            {
+              replacements: { id, taskId: notification.task_id },
+              type: QueryTypes.SELECT,
+            }
+          );
         }
+  
+        return notificationData;
+      }));
+  
+      // Flatten the nested arrays
+      const flattenedData = data.flat();
+  
+      console.log('Final Data:', flattenedData);
+  
+      if (flattenedData.length > 0) {
+        res.json(flattenedData);
       } else {
-        res.json({ msg: "No notifications found" });
+        res.json({ msg: "No data found" });
       }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+    } else {
+      res.json({ msg: "No notifications found" });
     }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+  
   };
   
   
@@ -197,9 +201,33 @@ const showreaded = async(req,res) =>{
         res.status(500).json({ error: "Internal Server Error" });
     }
 }
+
+
+
+// Update the state with the merged array
+
+const deleted = async(req,res)=>{
+  const { data_array } = req.body;
+res.json(data_array)
+  try {
+    const deletedRows = await Notification.destroy({
+      where: {
+        notification_id: data_array,
+      },
+    });
+  
+    console.log(`Successfully deleted ${deletedRows} rows.`);
+    res.json({ success: true, deletedRows });
+  } catch (error) {
+    console.error("Failed To Delete", error);
+    res.status(500).json({ error: "Failed To Delete" });
+  }
+  
+}
 module.exports = {
     index,
     showFullData,
     statuschange,
-    showreaded
+    showreaded,
+    deleted
 }   
