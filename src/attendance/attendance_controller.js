@@ -393,6 +393,27 @@ INNER JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
     console.log(error);
   }
 };
+const getPresentAbsent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userAttendance = await sequelize.query(
+      `
+      SELECT * FROM tbl_attendances
+      WHERE tbl_attendances.user_id = :id
+      AND tbl_attendances.remark = 1
+      `,
+      {
+        type: QueryTypes.SELECT,
+        replacements: { id },
+      }
+    );
+
+    res.json(userAttendance);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed To Find Attendance By User" });
+  }
+};
 module.exports = {
   store,
   index,
@@ -401,4 +422,5 @@ module.exports = {
   store_outime,
   adminindex,
   filterData,
+  getPresentAbsent,
 };
