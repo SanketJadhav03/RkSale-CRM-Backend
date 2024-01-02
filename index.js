@@ -17,7 +17,7 @@ expressApp.use(
 );
 // create data
 checked
-  .sync({ alter: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+  .sync({ alter: true }) // if false then not drop created table else it will drop tables and every time gives new tables
   .then(() => {
     require("./db/create_data");
     console.log("Database created!");
@@ -119,6 +119,9 @@ expressApp.use('/back-end', shift)
 // Attendance Routes
 const attendance = require('./src/attendance/attendance_routes')
 expressApp.use("/back-end", attendance)
+// todo Routes
+const todo = require('./src/todo/todo_route')
+expressApp.use("/back-end", todo)
 
 
 const notification = require('./src/notification/notification_routes')
