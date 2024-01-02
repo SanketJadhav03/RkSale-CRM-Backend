@@ -6,9 +6,6 @@ const path = require("path");
 
 const store = async (req, res) => {
   try {
-
-
-
     const {
       user_id,
       attendance_date,
@@ -24,7 +21,6 @@ const store = async (req, res) => {
 
     const in_photo = req.files.in_photo;
     // const outime_image = req.files.out_photo;
-
 
     const Olddata = await Attendance.findAll({
       where: {
@@ -62,13 +58,13 @@ const store = async (req, res) => {
       path.join(
         rootPath,
         "public/images/attendance",
-        (in_photo ? in_photo.name : null)
+        in_photo ? in_photo.name : null
       )
     );
     if (Olddata && Olddata.length > 0) {
-
-      return res.status(201).json({ message: 'already Check in  successfully', status: 1 });
-
+      return res
+        .status(201)
+        .json({ message: "already Check in  successfully", status: 1 });
     } else {
       const newAttendance = await Attendance.create({
         user_id: user_id ? user_id : null,
@@ -84,7 +80,9 @@ const store = async (req, res) => {
         remark: 1,
         in_photo: in_photo ? imageintime : null,
       });
-      return res.status(201).json({ message: 'Check in  successfully', status: 1 });
+      return res
+        .status(201)
+        .json({ message: "Check in  successfully", status: 1 });
     }
     // return res.status(201).json({ message: 'czdcxcvvxdcv xcfully', status: 1 });
   } catch (error) {
@@ -226,7 +224,6 @@ const todayattendance = async (req, res) => {
     res.json({ error: "Failed To Get Today Attendance" });
     console.error(error);
   }
-
 };
 
 const attendancebyuser = async (req, res) => {
@@ -264,7 +261,14 @@ const attendancebyuser = async (req, res) => {
 
 const store_outime = async (req, res) => {
   try {
-    const { attendance_id, user_id, out_time, out_location, attendance_out_longitude, attendance_out_latitude } = req.body;
+    const {
+      attendance_id,
+      user_id,
+      out_time,
+      out_location,
+      attendance_out_longitude,
+      attendance_out_latitude,
+    } = req.body;
     const rootPath = process.cwd();
 
     const out_time_photo = req.files.out_photo;
@@ -297,7 +301,7 @@ const store_outime = async (req, res) => {
       path.join(
         rootPath,
         "public/images/attendance",
-        (out_time_photo ? out_time_photo.name : null)
+        out_time_photo ? out_time_photo.name : null
       )
     );
 
@@ -305,7 +309,6 @@ const store_outime = async (req, res) => {
       where: {
         attendance_id: attendance_id,
         user_id: user_id,
-
       },
     });
     const updatedAttendance = await attendance.update({
@@ -316,13 +319,14 @@ const store_outime = async (req, res) => {
       out_photo: req.files.out_photo.name,
     });
     // res.json(updatedAttendance);
-    return res.status(201).json({ message: 'Check Out successfully', status: 1 });
+    return res
+      .status(201)
+      .json({ message: "Check Out successfully", status: 1 });
   } catch (error) {
     console.log(error);
     res.json({ error: "Failed To Store Attendance" });
   }
 };
-
 
 const adminindex = async (req, res) => {
   try {
@@ -349,7 +353,27 @@ const adminindex = async (req, res) => {
     res.json({ error: "Failed To Get Attendance" });
   }
 };
+const getPresentAbsent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userAttendance = await sequelize.query(
+      `
+      SELECT * FROM tbl_attendances
+      WHERE tbl_attendances.user_id = :id
+      AND tbl_attendances.remark = 1
+      `,
+      {
+        type: QueryTypes.SELECT,
+        replacements: { id },
+      }
+    );
 
+    res.json(userAttendance);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed To Find Attendance By User" });
+  }
+};
 module.exports = {
   store,
   index,
@@ -357,4 +381,5 @@ module.exports = {
   attendancebyuser,
   store_outime,
   adminindex,
+  getPresentAbsent,
 };

@@ -14,4 +14,6 @@ router.get('/today/attendance/:id', controller.todayattendance)
 
 router.get('/attendence/user/:id', controller.attendancebyuser)
 
+router.get('/attendence/present/:id', controller.getPresentAbsent)
+
 module.exports = router;
