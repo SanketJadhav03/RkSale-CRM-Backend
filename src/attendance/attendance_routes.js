@@ -13,5 +13,5 @@ router.post('/attendance/outime/store', controller.store_outime)
 router.get('/today/attendance/:id', controller.todayattendance)
 
 router.get('/attendence/user/:id', controller.attendancebyuser)
-
+router.post('/attendence/filter', controller.filterData)
 module.exports = router;

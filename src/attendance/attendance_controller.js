@@ -350,6 +350,49 @@ const adminindex = async (req, res) => {
   }
 };
 
+const filterData = async (req, res) => {
+
+  try {
+    const { start_date, end_date, remark, employee } = req.body;
+    let sql = `SELECT 
+    tbl_attendances.*,
+    users.*,
+    tbl_shifts.shift_intime,
+    tbl_shifts.shift_outime
+FROM tbl_attendances
+INNER JOIN users ON tbl_attendances.user_id = users.uid
+INNER JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
+      WHERE today_date >= :startDate AND today_date <= :endDate`;
+
+    const replacements = {
+
+    };
+
+    if (start_date && end_date) {
+      sql += ` AND tbl_attendances.attendance_date >= :startDate AND tbl_attendances.attendance_date <= :endDate`;
+      replacements.startDate = start_date;
+      replacements.endDate = end_date;
+    }
+    if (employee > 0) {
+      sql += ` AND tbl_attendances.user_id = :employee`;
+      replacements.user_id = employee;
+    }
+    if (remark > 0) {
+      sql += ` AND tbl_attendances.remark = :remark`;
+      replacements.remark = remark;
+    }
+
+    const data = await sequelize.query(sql, {
+      replacements,
+      type: QueryTypes.SELECT,
+      model: Leads,
+    });
+
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   store,
   index,
@@ -357,4 +400,5 @@ module.exports = {
   attendancebyuser,
   store_outime,
   adminindex,
+  filterData,
 };
