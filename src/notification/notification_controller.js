@@ -207,12 +207,11 @@ const showreaded = async(req,res) =>{
 // Update the state with the merged array
 
 const deleted = async(req,res)=>{
-  const { data_array } = req.body;
-res.json(data_array)
+   
   try {
     const deletedRows = await Notification.destroy({
       where: {
-        notification_id: data_array,
+        notification_id: req.body,
       },
     });
   
