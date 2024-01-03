@@ -3,6 +3,7 @@ const Todo = require("./todo_model")
 
 const index = async (req, res) => {
     try {
+        const { id } = req.params;
         const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
         const limitPerPage = 30;
         const offset = (page - 1) * limitPerPage;
@@ -10,6 +11,9 @@ const index = async (req, res) => {
         const Todos = await Todo.findAll({
             limit: limitPerPage,
             offset: offset,
+            where: {
+                todo_user_id: id // Assuming 'id' holds the user ID you want to filter by
+            }
         });
 
         res.json(Todos);
@@ -85,12 +89,12 @@ const deleted = async (req, res) => {
             await Todos.update({
                 todo_status: todo_status,
             })
-            return res.json({ message: "Todos Resotred successfully!", status: 1 });
+            return res.json({ message: "Work Pending !", status: 1 });
         } else if (todo_status === 2) {
             await Todos.update({
                 todo_status: todo_status,
             })
-            return res.json({ message: "Todos deleted successfully!", status: 2 });
+            return res.json({ message: "Done successfully!", status: 2 });
         }
 
     } catch (error) {

@@ -3,7 +3,8 @@ const router = express.Router();
 const todoController = require("./todo_controller")
 
 // get for all todo
-router.get("/todo/list", todoController.index)
+// router.get("/todo/list", todoController.index)
+router.get("/todo/list/:id", todoController.index)
 
 
 // post to save data  

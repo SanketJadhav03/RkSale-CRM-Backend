@@ -4,14 +4,20 @@ const Business_setting = require('./business_model')
 const fs = require('fs');
 const path = require('path');
 const index = async (req, res) => {
-    const bussiness_setting = await sequelize.query(
+    const bussiness_settings = await sequelize.query(
         'SELECT tbl_business_settings.*, tbl_industry_types.* FROM tbl_business_settings JOIN tbl_industry_types ON tbl_business_settings.business_industry_type = tbl_industry_types.industry_type_id',
         {
             model: Business_setting,
             mapToModel: true, // Map the result to the Customer model
         }
     );
-    res.json(bussiness_setting);
+    // Modify business_logo path in each entry of the result
+    bussiness_settings.forEach((setting) => {
+        setting.business_logo = `/business_setting/${setting.business_logo}`;
+        // Modify the field directly in each object
+    });
+
+    res.json(bussiness_settings);
 }
 
 
