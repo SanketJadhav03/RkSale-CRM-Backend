@@ -12,12 +12,20 @@ const Leads = sequelize.define("tbl_leads", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  lead_created_by: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   product: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
   value: {
     type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  repeat_every_day: {
+    type: DataTypes.STRING,
     allowNull: false,
   },
   today_date: {

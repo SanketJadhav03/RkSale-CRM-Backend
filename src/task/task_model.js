@@ -8,6 +8,11 @@ const Task = sequelize.define('tbl_task', {
     primaryKey: true,
     autoIncrement: true,
   },
+  
+  task_created_by: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   customer: {
     type: DataTypes.INTEGER,
     allowNull: false,

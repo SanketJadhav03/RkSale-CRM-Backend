@@ -8,6 +8,7 @@ const Notifaction = require("../notification/notification_model");
 const store = async (req, res) => {
   try {
     const {
+      task_created_by,
       customer,
       product,
       value,
@@ -57,13 +58,14 @@ const store = async (req, res) => {
           path.join(
             rootPath,
             "public/images/task",
-            (leadsImage ? leadsImage.name : "")
+            leadsImage ? leadsImage.name : ""
           )
         );
       }
     }
     const assignedByArray = JSON.parse(assigned_by);
     const newtask = await Task.create({
+      task_created_by: task_created_by,
       customer: customer,
       product: product,
       value: value,
@@ -150,6 +152,7 @@ const update = async (req, res) => {
   try {
     const {
       task_id,
+      task_created_by,
       customer,
       product,
       value,
@@ -195,6 +198,7 @@ const update = async (req, res) => {
     }
 
     const updatedtask = await existingtask.update({
+      task_created_by: task_created_by,
       customer: customer,
       product: product,
       value: value,
@@ -204,13 +208,12 @@ const update = async (req, res) => {
       maximum_due_date: maximum_due_date,
       source: source,
       priority: priority,
+      repeat_every_day: repeat_every_day,
       description: description,
       assigned_by: assigned_by,
       tags: tags,
       status: status,
-      image:
-        req.files !==null? req.files.image.name
-          : existingtask.image,
+      image: req.files !== null ? req.files.image.name : existingtask.image,
     });
 
     if (updatedtask) {
@@ -246,6 +249,7 @@ const filterData = async (req, res) => {
       sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
       replacements.assigned_by = assigned_by;
     }
+    sql += ` ORDER BY tbl_tasks.createdAt DESC`;
     const data = await sequelize.query(sql, {
       replacements,
       type: QueryTypes.SELECT,

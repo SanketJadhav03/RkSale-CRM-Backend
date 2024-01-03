@@ -9,6 +9,7 @@ const store = async (req, res) => {
   try {
     const {
       customer,
+      lead_created_by,
       product,
       value,
       today_date,
@@ -18,6 +19,7 @@ const store = async (req, res) => {
       source,
       priority,
       description,
+      repeat_every_day,
       assigned_by,
       tags,
       status,
@@ -62,6 +64,7 @@ const store = async (req, res) => {
     }
     const assignedByArray = JSON.parse(assigned_by);
     const newLead = await Leads.create({
+      lead_created_by: lead_created_by,
       customer: customer ? customer : null,
       product: product ? product : null,
       value: value ? value : null,
@@ -74,6 +77,7 @@ const store = async (req, res) => {
       description: description ? description : null,
       assigned_by: assigned_by ? assigned_by : null,
       tags: tags ? tags : null,
+      repeat_every_day: repeat_every_day,
       status: status ? status : null,
       image: req.body.image !== undefined ? req.files.image.name : null,
     });
@@ -150,6 +154,7 @@ const update = async (req, res) => {
   try {
     const {
       lead_id,
+      lead_created_by,
       customer,
       product,
       value,
@@ -160,6 +165,7 @@ const update = async (req, res) => {
       source,
       priority,
       description,
+      repeat_every_day,
       assigned_by,
       tags,
       status,
@@ -194,6 +200,7 @@ const update = async (req, res) => {
     }
 
     const updatedlead = await existinglead.update({
+      lead_created_by: lead_created_by,
       customer: customer,
       product: product,
       value: value,
@@ -204,6 +211,7 @@ const update = async (req, res) => {
       source: source,
       priority: priority,
       description: description,
+      repeat_every_day: repeat_every_day,
       assigned_by: assigned_by,
       tags: tags,
       status: status,
@@ -248,6 +256,7 @@ const filterData = async (req, res) => {
       sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
       replacements.assigned_by = assigned_by;
     }
+    sql += ` ORDER BY tbl_leads.createdAt DESC`;
     const data = await sequelize.query(sql, {
       replacements,
       type: QueryTypes.SELECT,
