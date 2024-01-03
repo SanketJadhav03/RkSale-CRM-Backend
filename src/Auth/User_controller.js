@@ -31,34 +31,34 @@ const login = async (req, res) => {
 
     // Generate a different token depending on whether the user is an admin or a regular user
     const token = jwt.sign(
-      { userId: user.uid, email:user.email},
+      { userId: user.uid, email: user.email },
       "replace-with-a-strong-secret-key",
       { expiresIn: "1h" }
     );
 
-      const rows = await DB.sequelize.query(
-        `
+    const rows = await DB.sequelize.query(
+      `
         SELECT * FROM role_has_permissions
         INNER JOIN permissions ON permissions.permission_id = role_has_permissions.rhp_permission_id
         WHERE role_has_permissions.rhp_role_id = :roleId
         `,
-        {
-          replacements: { roleId: user.user_role_id }, // Replace with the actual role ID
-          type: Sequelize.QueryTypes.SELECT,
-        }
-      );
-    
-      console.log(rows);
-      res.json({
-        token,
-        user,
-        authentication: true,
-        permissions: rows,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
+      {
+        replacements: { roleId: user.user_role_id }, // Replace with the actual role ID
+        type: Sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    console.log(rows);
+    res.json({
+      token,
+      user,
+      authentication: true,
+      permissions: rows,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 };
 
 const index = async (req, res) => {
@@ -84,6 +84,15 @@ const index = async (req, res) => {
     //     u_type: 2
     //   }
     // });
+
+    userstatus.forEach((user) => {
+      user.bank_passbook_photo = `/user/${user.bank_passbook_photo}`; // Adjust field name if needed
+      user.pan_photo = `/user/${user.pan_photo}`; // Adjust field name if needed
+      user.aadhar_photo = `/user/${user.aadhar_photo}`; // Adjust field name if needed
+      user.profile_photo = `/user/${user.profile_photo}`; // Adjust field name if needed
+      // Modify the fields directly in each object
+    });
+
     res.json(userstatus);
   } catch (error) {
     console.log(error);
@@ -150,7 +159,7 @@ const store = async (req, res) => {
       path.join(
         rootPath,
         "public/images/user",
-        "crm" + "-" + (profile_photo ? profile_photo.name : null)
+        (profile_photo ? profile_photo.name : null)
       )
     );
 
@@ -159,7 +168,7 @@ const store = async (req, res) => {
       path.join(
         rootPath,
         "public/images/user",
-        "crm" + "-" + (adhaar_photo ? adhaar_photo.name : null)
+        (adhaar_photo ? adhaar_photo.name : null)
       )
     );
 
@@ -168,7 +177,7 @@ const store = async (req, res) => {
       path.join(
         rootPath,
         "public/images/user",
-        "crm" + "-" + (pan_photo ? pan_photo.name : null)
+        (pan_photo ? pan_photo.name : null)
       )
     );
 
@@ -177,7 +186,7 @@ const store = async (req, res) => {
       path.join(
         rootPath,
         "public/images/user",
-        "crm" + "-" + (bank_passbook_photo ? bank_passbook_photo.name : null)
+        (bank_passbook_photo ? bank_passbook_photo.name : null)
       )
     );
     // Create a new user in the database
@@ -325,9 +334,8 @@ const updated = async (req, res) => {
 
     if (req.files && req.files.bank_passbook_photo) {
       const uploadedFile = req.files.pan_photo;
-      const filePath = `public/images/user/${
-        "crm-" + user.bank_passbook_photo
-      }`;
+      const filePath = `public/images/user/${"crm-" + user.bank_passbook_photo
+        }`;
 
       // Remove the existing file
       fs.unlink(filePath, (err) => {

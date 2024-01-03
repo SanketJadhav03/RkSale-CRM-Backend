@@ -365,37 +365,43 @@ const filterData = async (req, res) => {
       INNER JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
       WHERE tbl_attendances.attendance_status = 1
     `;
-  
+
     const replacements = {};
-  
+
     if (start_date && end_date) {
       sql += ` AND tbl_attendances.attendance_date >= :startDate AND tbl_attendances.attendance_date <= :endDate`;
       replacements.startDate = start_date;
       replacements.endDate = end_date;
     }
-  
+
     if (user_id > 0) {
       sql += ` AND tbl_attendances.user_id = :user_id`;
       replacements.user_id = user_id;
     }
-  
+
     if (remark > 0) {
       sql += ` AND tbl_attendances.remark = :remark`;
       replacements.remark = remark;
     }
-  
+
     const data = await sequelize.query(sql, {
       replacements,
       type: QueryTypes.SELECT,
       model: Attendance, // Replace with the appropriate model
     });
-  
+
+    data.map((attendance) => {
+      attendance.in_photo = `/attendance/${attendance.in_photo}`; // Adjust field name if needed
+      attendance.out_photo = `/attendance/${attendance.out_photo}`; // Adjust field name if needed
+      return attendance; // Return the modified attendance object
+    });
+
     res.json(data);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
-  
+
 };
 const getPresentAbsent = async (req, res) => {
   try {
