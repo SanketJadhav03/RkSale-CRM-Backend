@@ -8,24 +8,18 @@ const Notifaction = sequelize.define('tbl_notification', {
     primaryKey: true,
     autoIncrement: true,
   },
-  customer_id: {
+  user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  lead_id: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    defaultValue:null
+  assigned_data_id:{
+type:DataTypes.INTEGER,
+allowNull:true
   },
-  task_id: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    defaultValue:null
-  },
- customer_notification:{
-    type:DataTypes.INTEGER,
-    defaultValue:1,
-    allowNull:false
+ notification_description:{
+ type:DataTypes.STRING,
+ defaultValue:"You Have New Notificaion",
+ allowNull:true
  },
  notification_type:{
 type:DataTypes.INTEGER,

@@ -3,6 +3,7 @@ const User = require("../Auth/User_model");
 const sequelize = require("../db/db_config");
 const Attendance = require("./attendance_model");
 const path = require("path");
+const Notifaction = require("../notification/notification_model");
 
 const store = async (req, res) => {
   try {
@@ -84,6 +85,29 @@ const store = async (req, res) => {
         remark: 1,
         in_photo: in_photo ? imageintime : null,
       });
+
+      const admins = await User.findAll({
+        where: { u_type: 1 }, // Assuming role 1 corresponds to the condition you mentioned
+        attributes: ['uid'], // Fetch only the 'id' attribute
+      });
+      
+      if (admins.length > 0) {
+        // If admins with role 1 are found, create a notification for each of them
+        const notificationPromises = admins.map(async (admin) => {
+          return await Notifaction.create({
+            user_id: admin.uid,
+            assigned_data_id: newAttendance.attendance_id,
+            notification_type:1,
+            notification_description: "New Attendance Stored",
+          });
+        });
+      
+        // Wait for all notifications to be created
+        await Promise.all(notificationPromises);
+      } else {
+        // Handle the case where no user with role 1 is found
+        console.error("No admins with role 1 found");
+      }
       return res.status(201).json({ message: 'Check in  successfully', status: 1 });
     }
     // return res.status(201).json({ message: 'czdcxcvvxdcv xcfully', status: 1 });
