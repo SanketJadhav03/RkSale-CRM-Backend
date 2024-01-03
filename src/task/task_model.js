@@ -34,7 +34,7 @@ const Task = sequelize.define('tbl_task', {
   },
   image:{
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   maximum_due_date: {
     type: DataTypes.DATE,
