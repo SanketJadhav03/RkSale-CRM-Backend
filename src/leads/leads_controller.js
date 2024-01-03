@@ -22,8 +22,8 @@ const store = async (req, res) => {
       tags,
       status,
     } = req.body;
-    if (req.files !== null) {
-      const leadsImage = req.files.image;
+    if (req.body.image !== undefined) {
+      const leadsImage = req.file && req.files && req.files.image;
 
       const validateAndMove = (file, uploadPath) => {
         if (!file) {
@@ -55,7 +55,7 @@ const store = async (req, res) => {
           path.join(
             rootPath,
             "public/images/leads",
-            leadsImage ? leadsImage.name : ""
+            "crm" + "-" + (leadsImage ? leadsImage.name : "")
           )
         );
       }
@@ -75,17 +75,16 @@ const store = async (req, res) => {
       assigned_by: assigned_by ? assigned_by : null,
       tags: tags ? tags : null,
       status: status ? status : null,
-      image: req.files === null ? null : req.files.image.name,
+      image: req.body.image !== undefined ? req.files.image.name : null,
     });
 
     await Promise.all(
       assignedByArray.map(async (assignedUserId) => {
         await Notifaction.create({
-          customer_id: assignedUserId,
-          lead_id: newLead.lead_id,
-          task_id: 0,
-          customer_notification: 1,
-          notification_type: 1,
+          user_id: assignedUserId,
+          assigned_data_id: newLead.lead_id,
+          notification_description: "New lead Stored",
+          notification_type: 2,
         });
       })
     );
@@ -113,11 +112,6 @@ const index = async (req, res) => {
         model: Leads, // Specify the model for Sequelize to map the result to
       }
     );
-    data.map((leads) => {
-      leads.image = `/leads/${leads.image}`; // Adjust field name if needed
-      return leads; // Return the modified attendance object
-    });
-
     res.json(data);
   } catch (error) {
     console.log(error);
@@ -177,111 +171,28 @@ const update = async (req, res) => {
 
     // res.json(existinglead)
     // Check if a new file is provided in the request
-    // if (req.files != null) {
-    //   const uploadedFile = req.files.image;
-    //   const filePath = `public/images/leads/${existinglead.image}`;
+    if (req.files && req.files.image) {
+      const uploadedFile = req.files.image;
+      const filePath = `public/images/leads/${"crm-" + existinglead.image}`;
 
-    //   // Remove the existing file
-    //   fs.unlink(filePath, (err) => {
-    //     if (err) {
-    //       console.error("Error deleting existing file:", err);
-    //     }
-    //   });
-
-    //   // Save the new file
-    //   uploadedFile.mv(`public/images/leads/${uploadedFile.name}`, (err) => {
-    //     if (err) {
-    //       console.error("Error saving new file:", err);
-    //     }
-    //   });
-    // }
-
-    // if (req.files !== null) {
-    //   const leadsImage = req.files.image;
-    //   const existingImagePath = path.join(
-    //     process.cwd(),
-    //     "public/images/leads",
-    //     existinglead.image
-    //   );
-
-    //   // Check if the file exists before attempting deletion
-    //   if (fs.existsSync(existingImagePath)) {
-    //     fs.unlinkSync(existingImagePath); // Delete the existing image file
-    //   }
-
-    //   const validateAndMove = (file, uploadPath) => {
-        
-
-    //     file.mv(uploadPath, (err) => {
-    //       if (err) {
-    //         console.error("Error moving file:", err);
-    //         return res.status(500).json({ error: "Error uploading file" });
-    //       }
-    //     });
-
-    //     return file.filename;
-    //   };
-
-    //   const rootPath = process.cwd();
-    //   if (req.files.image) {
-    //     validateAndMove(
-    //       leadsImage,
-    //       path.join(
-    //         rootPath,
-    //         "public/images/leads",
-    //         leadsImage ? leadsImage.name : ""
-    //       )
-    //     );
-    //   }
-    // }
-    if (req.files !== null) {
-      const leadsImage = req.files.image;
-      const existingImagePath = path.join(
-            process.cwd(),
-            "public/images/leads",
-            existinglead.image
-          );
-    
-          // Check if the file exists before attempting deletion
-          if (fs.existsSync(existingImagePath)) {
-            fs.unlinkSync(existingImagePath); // Delete the existing image file
-          }
-      const validateAndMove = (file, uploadPath) => {
-        if (!file) {
-          // Skip the file if it's null
-          console.log("File is null");
-          return null;
+      // Remove the existing file
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting existing file:", err);
         }
+      });
 
-        if (!file.name) {
-          return res.status(400).json({ error: "Invalid file object" });
-        }
-
-        file.mv(uploadPath, (err) => {
+      // Save the new file
+      uploadedFile.mv(
+        `public/images/leads/${"crm-" + uploadedFile.name}`,
+        (err) => {
           if (err) {
-            console.error("Error moving file:", err);
-            return res.status(500).json({ error: "Error uploading file" });
+            console.error("Error saving new file:", err);
           }
-          // Do something with the file path, for example, save it in the database
-          // ...
-        });
-
-        return file.filename; // Return the filename for use in the database
-      };
-
-      const rootPath = process.cwd();
-      if (req.files.image) {
-        validateAndMove(
-          leadsImage,
-          path.join(
-            rootPath,
-            "public/images/leads",
-            leadsImage ? leadsImage.name : ""
-          )
-        );
-      }
+        }
+      );
     }
-    const assignedByArray = JSON.parse(assigned_by);
+
     const updatedlead = await existinglead.update({
       customer: customer,
       product: product,
@@ -296,7 +207,10 @@ const update = async (req, res) => {
       assigned_by: assigned_by,
       tags: tags,
       status: status,
-      image: req.files === null ? existinglead.image:req.files.image.name,
+      file:
+        req.files && req.files.image
+          ? req.files.image.name
+          : existinglead.image,
     });
 
     if (updatedlead) {
