@@ -23,9 +23,8 @@ const store = async (req, res) => {
       repeat_every_day,
       status,
     } = req.body;
-    const rootPath = process.cwd();
 
-    if (req.body.image !== undefined) {
+    if (req.files !== null) {
       const leadsImage = req.file && req.files && req.files.image;
 
       const validateAndMove = (file, uploadPath) => {
@@ -57,8 +56,8 @@ const store = async (req, res) => {
           leadsImage,
           path.join(
             rootPath,
-            "public/images/leads",
-            "crm" + "-" + (leadsImage ? leadsImage.name : "")
+            "public/images/task",
+            (leadsImage ? leadsImage.name : "")
           )
         );
       }
@@ -79,7 +78,7 @@ const store = async (req, res) => {
       tags: tags,
       repeat_every_day: repeat_every_day,
       status: status,
-      image: req.body.image !== undefined ? req.files.image.name : null,
+      image: req.files === null ? null : req.files.image.name,
     });
 
     await Promise.all(
@@ -93,7 +92,6 @@ const store = async (req, res) => {
         });
       })
     );
-
 
     return res.json({ message: "Task added successfully!", status: 1 });
   } catch (error) {
@@ -210,9 +208,8 @@ const update = async (req, res) => {
       assigned_by: assigned_by,
       tags: tags,
       status: status,
-      file:
-        req.files && req.files.image
-          ? req.files.image.name
+      image:
+        req.files !==null? req.files.image.name
           : existingtask.image,
     });
 
