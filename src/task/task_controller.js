@@ -170,7 +170,7 @@ const update = async (req, res) => {
     } = req.body;
     const existingtask = await Task.findByPk(task_id);
     if (!existingtask) {
-      return res.status(404).json({ message: "Lead Not Found" });
+      return res.status(404).json({ message: "Task Not Found" });
     }
 
     // res.json(existinglead)
@@ -217,7 +217,7 @@ const update = async (req, res) => {
     });
 
     if (updatedtask) {
-      return res.json({ message: "Lead added successfully!", status: 1 });
+      return res.json({ message: "Task added successfully!", status: 1 });
     } else {
       res.json({ message: "Task Updated Failed", status: 0 });
     }
