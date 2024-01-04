@@ -131,14 +131,15 @@ const notification = require("./src/notification/notification_routes");
 expressApp.use("/back-end", notification);
 
 
-const notification = require('./src/notification/notification_routes')
-expressApp.use("/back-end", notification)
+
 
 const payment_mode = require('./src/payment_mode/payment_mode_routes')
 expressApp.use("/back-end", payment_mode)
 
-const payment_mode = require("./src/payment_mode/payment_mode_routes");
-expressApp.use("/back-end", payment_mode);
+
+const payment = require('./src/payment/payment_routes')
+expressApp.use("/back-end", payment)
+
 
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
