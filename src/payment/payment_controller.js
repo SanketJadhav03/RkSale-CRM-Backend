@@ -2,7 +2,7 @@ const { QueryTypes } = require("sequelize");
 const Payment = require("./payment_model");
 const sequelize = require("../db/db_config");
 
-const store = async(req,res) =>{
+const store = async (req, res) => {
     try {
         const {
             payment_send_user,
@@ -14,7 +14,7 @@ const store = async(req,res) =>{
             payment_amount,
             payment_remark
         } = req.body;
-        const payment =await Payment.create({
+        const payment = await Payment.create({
             payment_send_user,
             payment_date,
             user_type,
@@ -24,23 +24,23 @@ const store = async(req,res) =>{
             payment_amount,
             payment_remark
         })
-        if(payment){
-            res.json({message:"Payment Is Successful"})
-        }else {
-            res.json({message:"Payment Is Failed"})
+        if (payment) {
+            res.json({ message: "Payment Is Successful", status: 1 })
+        } else {
+            res.json({ message: "Payment Is Failed" })
         }
 
     } catch (error) {
         console.log(error);
-        res.json({error:"Failed To Store Payment"})
+        res.json({ error: "Failed To Store Payment" })
     }
 
 }
 
-const index = async(req,res)=>{
-try {
-    const data = await sequelize.query(
-        `SELECT * 
+const index = async (req, res) => {
+    try {
+        const data = await sequelize.query(
+            `SELECT * 
         FROM tbl_payments 
         INNER JOIN tbl_payment_modes ON tbl_payments.payment_mode = tbl_payment_modes.payment_mode_id
         INNER JOIN users AS sender ON tbl_payments.payment_send_user = sender.uid
@@ -48,64 +48,63 @@ try {
         INNER JOIN tbl_payment_types ON tbl_payments.payment_type = tbl_payment_types.payment_type_id 
    
         `,
-        {
-          type: QueryTypes.SELECT,
-          model: Payment, // Specify the model for Sequelize to map the result to
-        }
-      );
-      res.json(data);
-} catch (error) {
-    console.log(error);
-    res.json({error:"Failed To Get Payments"})
-}
-}
-
-const update = async(req,res) =>{
-try {
-    const {
-        payment_id,
-        payment_send_user,
-        payment_date,
-        user_type,
-        payment_receiver,
-        payment_mode,
-        payment_type,
-        payment_amount,
-        payment_remark
-    } = req.body
-
-    const existingPayment = await Payment.findByPk(payment_id);
-    if (existingPayment){
-
-      const status = await  existingPayment.update({
-            payment_send_user:payment_send_user,
-            payment_date:payment_date,
-            user_type:user_type,
-            payment_receiver:payment_receiver,
-            payment_mode:payment_mode,
-            payment_type:payment_type,
-            payment_amount:payment_amount,
-            payment_remark:payment_remark
-        })
-    if (status)
-    {
-        res.json("Payment Updated SuccessFully")
-    }else {
-        res.json("Payment Updation Failed")
-
+            {
+                type: QueryTypes.SELECT,
+                model: Payment, // Specify the model for Sequelize to map the result to
+            }
+        );
+        res.json(data);
+    } catch (error) {
+        console.log(error);
+        res.json({ error: "Failed To Get Payments" })
     }
-}else{
-    res.json({message:"Payment Not Found"})
-}
-} catch (error) {
-    console.log(error);
-    res.json({error:"Failed To Update  "})
-}
 }
 
-const show = async(req,res) =>{
+const update = async (req, res) => {
     try {
-        const {id} = req.params;
+        const {
+            payment_id,
+            payment_send_user,
+            payment_date,
+            user_type,
+            payment_receiver,
+            payment_mode,
+            payment_type,
+            payment_amount,
+            payment_remark
+        } = req.body
+
+        const existingPayment = await Payment.findByPk(payment_id);
+        if (existingPayment) {
+
+            const status = await existingPayment.update({
+                payment_send_user: payment_send_user,
+                payment_date: payment_date,
+                user_type: user_type,
+                payment_receiver: payment_receiver,
+                payment_mode: payment_mode,
+                payment_type: payment_type,
+                payment_amount: payment_amount,
+                payment_remark: payment_remark
+            })
+            if (status) {
+                res.json("Payment Updated SuccessFully")
+            } else {
+                res.json("Payment Updation Failed")
+
+            }
+        } else {
+            res.json({ message: "Payment Not Found" })
+        }
+    } catch (error) {
+        console.log(error);
+        res.json({ error: "Failed To Update  " })
+    }
+}
+
+const show = async (req, res) => {
+    try {
+        const { id } = req.params;
         const data = await sequelize.query(
             `SELECT * 
             FROM tbl_payments 
@@ -117,14 +116,14 @@ const show = async(req,res) =>{
        
             `,
             {
-              type: QueryTypes.SELECT,
-              replacements: { id },
+                type: QueryTypes.SELECT,
+                replacements: { id },
             }
-          );
-          res.json(data);
+        );
+        res.json(data);
     } catch (error) {
         console.log(error);
-        res.json({error:"Failed To Get Payments"})
+        res.json({ error: "Failed To Get Payments" })
     }
 }
 
