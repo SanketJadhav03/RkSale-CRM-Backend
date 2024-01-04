@@ -241,28 +241,24 @@ const filterData = async (req, res) => {
       INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
       INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
       INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
-      WHERE lead_status == 1`;
-     if(start_date > 0)
-     {
-    
-      sql += ` AND today_date >= :startDate AND today_date <= :endDate`;
+      WHERE today_date >= :startDate AND today_date <= :endDate`;
 
-replacements.startDate = start_date;
-replacements.endDate = end_date;
-     }
+    const replacements = {
+      startDate: start_date,
+      endDate: end_date,
+    };
 
     if (customer_name > 0) {
       sql += ` AND tbl_leads.customer = :customer_name`;
       replacements.customer_name = customer_name;
     }
+    if(lead_id > 0){
+      sql += ` AND tbl_leads.lead_id = :Lead_id`;
+      replacements.Lead_id = lead_id;
+    }
     if (assigned_by > 0) {
       sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
       replacements.assigned_by = assigned_by;
-    }
-    if(lead_id > 0)
-    {
-      sql += ` AND tbl_leads.lead_id = :Lead_id`;
-      replacements.Lead_id = lead_id;
     }
     sql += ` ORDER BY tbl_leads.createdAt DESC`;
     const data = await sequelize.query(sql, {
