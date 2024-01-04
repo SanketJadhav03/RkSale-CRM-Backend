@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router();
 
-const controller = require('./payment_controller')
+const controller = require('./payment_mode_controller')
 
 router.post('/payment_mode/store', controller.store)
 router.get('/payment_mode/list', controller.index)

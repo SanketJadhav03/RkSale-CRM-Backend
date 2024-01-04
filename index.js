@@ -27,14 +27,14 @@ checked
   });
 
 // checked
-// .sync({ force: true }) // if false then not drop created table else it will drop tables and every time gives new tables
-// .then(() => {
-//   require("./db/create_data");
-//   console.log("Database created!");
-// })
-// .catch((error) => {
-//   console.log(error);
-// });
+//   .sync({ force: true }) // if false then not drop created table else it will drop tables and every time gives new tables
+//   .then(() => {
+//     require("./db/create_data");
+//     console.log("Database created!");
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
 // user routes
 const user = require("./src/Auth/User_route");
 expressApp.use("/back-end", user);
@@ -83,6 +83,9 @@ expressApp.use("/back-end", industry);
 // business setting  routes
 const business_setting = require("./src/business_settings/business_routes");
 expressApp.use("/back-end", business_setting);
+// payment_type  routes
+const payment_type = require("./src/payment_type/payment_type_routes");
+expressApp.use("/back-end", payment_type);
 
 // roles routes
 
@@ -128,7 +131,7 @@ const notification = require('./src/notification/notification_routes')
 expressApp.use("/back-end", notification)
 
 const payment_mode = require('./src/payment_mode/payment_mode_routes')
-expressApp.use("/back-end",payment_mode)
+expressApp.use("/back-end", payment_mode)
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
 expressApp.listen(port, () => {
