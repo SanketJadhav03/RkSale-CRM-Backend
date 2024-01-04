@@ -87,7 +87,7 @@ const store = async (req, res) => {
         await Notifaction.create({
           user_id: assignedUserId,
           assigned_data_id: newLead.lead_id,
-          notification_description: "New lead Stored",
+          notification_description: "New lead Assigned",
           notification_type: 2,
         });
       })
