@@ -117,6 +117,17 @@ const store = async (req, res) => {
   }
 };
 
+const show = async(req,res) =>{
+  try {
+    const {id} = req.params;
+    const data = await Attendance.findByPk(id);
+    res.json(data)
+  } catch (error) {
+    console.log(error);
+    res.json({error:"Failed To Show Attendance"})
+  }
+}
+
 const index = async (req, res) => {
   try {
     const today = new Date();
@@ -457,4 +468,5 @@ module.exports = {
   adminindex,
   filterData,
   getPresentAbsent,
+  show
 };

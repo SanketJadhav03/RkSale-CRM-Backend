@@ -7,63 +7,12 @@ const index = async (req, res) => {
     const { id } = req.params;
     const notifications = await Notification.findAll({
       where: {
-        customer_id: id,
+        user_id: id,
+        status:1
       },
     });
   
-    if (notifications.length > 0) {
-      // Use Promise.all to concurrently execute queries for each notification
-      const data = await Promise.all(notifications.map(async (notification) => {
-        let notificationData;
-  
-        if (notification.lead_id !== null) {
-          notificationData = await sequelize.query(
-            `
-            SELECT *
-            FROM tbl_notifications
-            LEFT JOIN tbl_leads ON tbl_notifications.lead_id = tbl_leads.lead_id
-            WHERE tbl_notifications.customer_id = :id
-            AND tbl_notifications.lead_id = :leadId
-            AND tbl_notifications.status = 1
-            `,
-            {
-              replacements: { id, leadId: notification.lead_id },
-              type: QueryTypes.SELECT,
-            }
-          );
-        } else if (notification.task_id !== null) {
-          notificationData = await sequelize.query(
-            `
-            SELECT *
-            FROM tbl_notifications
-            LEFT JOIN tbl_tasks ON tbl_notifications.task_id = tbl_tasks.task_id
-            WHERE tbl_notifications.customer_id = :id
-            AND tbl_notifications.task_id = :taskId
-            AND tbl_notifications.status = 1
-            `,
-            {
-              replacements: { id, taskId: notification.task_id },
-              type: QueryTypes.SELECT,
-            }
-          );
-        }
-  
-        return notificationData;
-      }));
-  
-      // Flatten the nested arrays
-      const flattenedData = data.flat();
-  
-      console.log('Final Data:', flattenedData);
-  
-      if (flattenedData.length > 0) {
-        res.json(flattenedData);
-      } else {
-        res.json({ msg: "No data found" });
-      }
-    } else {
-      res.json({ msg: "No notifications found" });
-    }
+   res.json(notifications)
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -151,50 +100,53 @@ const showreaded = async(req,res) =>{
     
         const notifications = await Notification.findAll({
             where: {    
-                customer_id: id
+                user_id: id,
+                status:0
             }
         });
+
+        res.json(notifications)
     
-        if (notifications.length > 0) {
-            let data;
-            if (notifications[0].lead_id !== null) {
-                data = await sequelize.query(
-                    `
-                    SELECT *
-                    FROM tbl_notifications
-                    LEFT JOIN tbl_leads ON tbl_notifications.lead_id = tbl_leads.lead_id
-                    WHERE tbl_notifications.customer_id = :id
-                    AND tbl_notifications.status = 0
-                    `,
-                    {
-                        replacements: { id },
-                        type: QueryTypes.SELECT,
-                    }
-                );
-            } else if (notifications[0].task_id !== null) {
-                data = await sequelize.query(
-                    `
-                    SELECT *
-                    FROM tbl_notifications
-                    LEFT JOIN tbl_tasks ON tbl_notifications.task_id = tbl_tasks.task_id
-                    WHERE tbl_notifications.customer_id = :id
-                    AND tbl_notifications.status = 0
-                    `,
-                    {
-                        replacements: { id },
-                        type: QueryTypes.SELECT,
-                    }
-                );
-            }
+        // if (notifications.length > 0) {
+        //     let data;
+        //     if (notifications[0].lead_id !== null) {
+        //         data = await sequelize.query(
+        //             `
+        //             SELECT *
+        //             FROM tbl_notifications
+        //             LEFT JOIN tbl_leads ON tbl_notifications.lead_id = tbl_leads.lead_id
+        //             WHERE tbl_notifications.customer_id = :id
+        //             AND tbl_notifications.status = 0
+        //             `,
+        //             {
+        //                 replacements: { id },
+        //                 type: QueryTypes.SELECT,
+        //             }
+        //         );
+        //     } else if (notifications[0].task_id !== null) {
+        //         data = await sequelize.query(
+        //             `
+        //             SELECT *
+        //             FROM tbl_notifications
+        //             LEFT JOIN tbl_tasks ON tbl_notifications.task_id = tbl_tasks.task_id
+        //             WHERE tbl_notifications.customer_id = :id
+        //             AND tbl_notifications.status = 0
+        //             `,
+        //             {
+        //                 replacements: { id },
+        //                 type: QueryTypes.SELECT,
+        //             }
+        //         );
+        //     }
     
-            if (data) {
-                res.json(data);
-            } else {
-                res.json({ msg: "No data found" });
-            }
-        } else {
-            res.json({ msg: "No notifications found" });
-        }
+        //     if (data) {
+        //         res.json(data);
+        //     } else {
+        //         res.json({ msg: "No data found" });
+        //     }
+        // } else {
+        //     res.json({ msg: "No notifications found" });
+        // }
     } catch (error) {
         // Handle errors here
         console.error(error);

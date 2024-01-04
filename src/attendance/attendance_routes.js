@@ -10,4 +10,5 @@ router.get('/today/attendance/:id', controller.todayattendance)
 router.get('/attendence/user/:id', controller.attendancebyuser)
 router.post('/attendence/filter', controller.filterData)
 router.get('/attendence/present/:id', controller.getPresentAbsent)
+router.get('/attendance/show/:id',controller.show)
 module.exports = router;
