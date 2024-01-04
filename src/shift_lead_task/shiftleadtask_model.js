@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db/db_config'); // Your Sequelize connection
 
-const Shift = sequelize.define('tbl_slt', {
+const ShiftLeadTask = sequelize.define('tbl_slt', {
   slt_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -35,4 +35,4 @@ const Shift = sequelize.define('tbl_slt', {
   },
 });
 
-module.exports = Shift;
+module.exports = ShiftLeadTask;
