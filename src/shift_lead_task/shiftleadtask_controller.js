@@ -1,3 +1,5 @@
+const { QueryTypes } = require("sequelize");
+const sequelize = require("../db/db_config");
 const Leads = require("../leads/leads_model");
 const ShiftLeadTask = require("./shiftleadtask_model");
 
@@ -29,8 +31,6 @@ const transferLead = async (req, res) => {
       parsedTempEmployee[index] = slt_send_to;
     }
 
-    
-
     const updateLead = await findLeadbyId.update({
       assigned_by: `[${parsedTempEmployee}]`,
     });
@@ -41,7 +41,7 @@ const transferLead = async (req, res) => {
       slt_lead_id,
       slt_reason,
       slt_task_id,
-    })
+    });
     if (updateLead) {
       return res.json({ message: "Lead shifted succefully!", status: 1 });
     }
@@ -50,6 +50,28 @@ const transferLead = async (req, res) => {
     res.json({ error: "Failed To trasfer data" });
   }
 };
+
+const index = async (req, res) => {
+  try {
+    const data = await sequelize.query(
+      `SELECT *
+      FROM tbl_slts
+      INNER JOIN tbl_leads ON tbl_slts.slt_lead_id = tbl_leads.lead_id
+      LEFT JOIN tbl_tasks ON tbl_slts.slt_task_id = tbl_tasks.task_id  AND tbl_slts.slt_task_id IS NOT NULL
+      WHERE tbl_slts.slt_lead_id IS NOT NULL;
+      `,
+      {
+        type: QueryTypes.SELECT,
+        model: Leads, // Specify the model for Sequelize to map the result to
+      }
+    );
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+    res.json({ error: "Failed To Get Shift data" });
+  }
+};
 module.exports = {
   transferLead,
+  index,
 };
