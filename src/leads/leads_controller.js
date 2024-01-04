@@ -87,7 +87,7 @@ const store = async (req, res) => {
         await Notifaction.create({
           user_id: assignedUserId,
           assigned_data_id: newLead.lead_id,
-          notification_description: "New lead Stored",
+          notification_description: "New lead Assigned",
           notification_type: 2,
         });
       })
@@ -232,7 +232,7 @@ const update = async (req, res) => {
 };
 const filterData = async (req, res) => {
   try {
-    const { start_date, end_date, customer_name, assigned_by } = req.body;
+    const { start_date, end_date, customer_name, assigned_by,lead_id } = req.body;
     let sql = `SELECT * FROM tbl_leads 
       INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
       INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
@@ -251,6 +251,10 @@ const filterData = async (req, res) => {
     if (customer_name > 0) {
       sql += ` AND tbl_leads.customer = :customer_name`;
       replacements.customer_name = customer_name;
+    }
+    if(lead_id > 0){
+      sql += ` AND tbl_leads.lead_id = :Lead_id`;
+      replacements.Lead_id = lead_id;
     }
     if (assigned_by > 0) {
       sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;

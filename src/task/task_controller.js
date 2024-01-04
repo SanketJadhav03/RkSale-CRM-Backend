@@ -86,11 +86,10 @@ const store = async (req, res) => {
     await Promise.all(
       assignedByArray.map(async (assignedUserId) => {
         await Notifaction.create({
-          customer_id: assignedUserId,
-          lead_id: null,
-          task_id: newtask.task_id,
-          customer_notification: 1,
-          notification_type: 1,
+          user_id: assignedUserId,
+          assigned_data_id: newtask.task_id,
+          notification_description: "New Task Assigned",
+          notification_type: 3,
         });
       })
     );
@@ -228,7 +227,7 @@ const update = async (req, res) => {
 
 const filterData = async (req, res) => {
   try {
-    const { start_date, end_date, customer_name, assigned_by } = req.body;
+    const { start_date, end_date, customer_name, assigned_by,task_id } = req.body;
     let sql = `SELECT * 
     FROM tbl_tasks 
     INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
@@ -248,6 +247,10 @@ const filterData = async (req, res) => {
     if (assigned_by > 0) {
       sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
       replacements.assigned_by = assigned_by;
+    }
+    if(task_id > 0){
+      sql += ` AND tbl_tasks.task_id = :Task_id`;
+      replacements.Task_id = task_id;
     }
     sql += ` ORDER BY tbl_tasks.createdAt DESC`;
     const data = await sequelize.query(sql, {

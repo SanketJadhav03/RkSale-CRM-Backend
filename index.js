@@ -1,15 +1,14 @@
 const express = require("express");
 const expressApp = express();
 const cors = require("cors");
-const path = require('path')
+const path = require("path");
 const fileUpload = require("express-fileupload");
 const checked = require("./src/db/db_config");
-const checkPermissions = require('./src/Auth/permissionMiddleware');
+const checkPermissions = require("./src/Auth/permissionMiddleware");
 
 expressApp.use(express.json());
 expressApp.use(cors());
-expressApp.use(
-  express.static(path.join(__dirname, 'public/images')));
+expressApp.use(express.static(path.join(__dirname, "public/images")));
 expressApp.use(
   fileUpload({
     limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit, adjust as needed
@@ -42,7 +41,6 @@ expressApp.use("/back-end", user);
 const city = require("./src/city/city_route");
 expressApp.use("/back-end", city);
 
-
 // // source routes
 const source = require("./src/source/source_route");
 expressApp.use("/back-end", source);
@@ -53,6 +51,10 @@ expressApp.use("/back-end", leave);
 // category routes
 const category = require("./src/category/category_routes");
 expressApp.use("/back-end", category);
+
+// category routes
+const shiftLeadTask = require("./src/shift_lead_task/shiftleadtask_route");
+expressApp.use("/back-end", shiftLeadTask);
 
 // product routes
 const product = require("./src/product/product_routes");
@@ -110,21 +112,23 @@ expressApp.use("/back-end", SubCategory);
 const Leads = require("./src/leads/leads_routes");
 expressApp.use("/back-end", Leads);
 
-// Task Routes 
-const task = require('./src/task/task_routes')
-expressApp.use('/back-end', task)
+// Task Routes
+const task = require("./src/task/task_routes");
+expressApp.use("/back-end", task);
 
-// Shift Routes 
-const shift = require('./src/shift/shift_routes')
-expressApp.use('/back-end', shift)
-
+// Shift Routes
+const shift = require("./src/shift/shift_routes");
+expressApp.use("/back-end", shift);
 
 // Attendance Routes
-const attendance = require('./src/attendance/attendance_routes')
-expressApp.use("/back-end", attendance)
+const attendance = require("./src/attendance/attendance_routes");
+expressApp.use("/back-end", attendance);
 // todo Routes
-const todo = require('./src/todo/todo_route')
-expressApp.use("/back-end", todo)
+const todo = require("./src/todo/todo_route");
+expressApp.use("/back-end", todo);
+
+const notification = require("./src/notification/notification_routes");
+expressApp.use("/back-end", notification);
 
 
 const notification = require('./src/notification/notification_routes')
@@ -132,6 +136,10 @@ expressApp.use("/back-end", notification)
 
 const payment_mode = require('./src/payment_mode/payment_mode_routes')
 expressApp.use("/back-end", payment_mode)
+
+const payment_mode = require("./src/payment_mode/payment_mode_routes");
+expressApp.use("/back-end", payment_mode);
+
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
 expressApp.listen(port, () => {
