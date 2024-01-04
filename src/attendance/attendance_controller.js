@@ -388,7 +388,7 @@ const adminindex = async (req, res) => {
 const filterData = async (req, res) => {
 
   try {
-    const { start_date, end_date, remark, user_id } = req.body;
+    const { start_date, end_date, remark, user_id,attendance_id } = req.body;
     let sql = `
       SELECT 
         tbl_attendances.*,
@@ -407,6 +407,11 @@ const filterData = async (req, res) => {
       sql += ` AND tbl_attendances.attendance_date >= :startDate AND tbl_attendances.attendance_date <= :endDate`;
       replacements.startDate = start_date;
       replacements.endDate = end_date;
+    }
+
+    if(attendance_id > 0 ){
+      sql += ` AND tbl_attendances.attendance_id = :Attendance_id `;
+      replacements.Attendance_id = attendance_id;
     }
 
     if (user_id > 0) {
