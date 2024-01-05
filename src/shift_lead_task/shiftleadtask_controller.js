@@ -53,18 +53,28 @@ const transferLead = async (req, res) => {
 
 const index = async (req, res) => {
   try {
-    const data = await sequelize.query(
-      `SELECT *
-      FROM tbl_slts
-      INNER JOIN tbl_leads ON tbl_slts.slt_lead_id = tbl_leads.lead_id
-      LEFT JOIN tbl_tasks ON tbl_slts.slt_task_id = tbl_tasks.task_id  AND tbl_slts.slt_task_id IS NOT NULL
-      WHERE tbl_slts.slt_lead_id IS NOT NULL;
-      `,
-      {
-        type: QueryTypes.SELECT,
-        model: Leads, // Specify the model for Sequelize to map the result to
-      }
-    );
+    const { leadOrTask } = req.body;
+
+    let query = `SELECT tbl_slts.createdAt as created_date,tbl_leads.*,tbl_lead_statuses.*,tbl_sources.*,tbl_slts.*,tbl_customers.*,tbl_cities.*,tbl_customer_groups.*,tbl_references.*,tbl_products.*
+    FROM tbl_slts
+    `;
+    if (leadOrTask === 0) {
+      query += `INNER JOIN tbl_leads ON tbl_slts.slt_lead_id = tbl_leads.lead_id 
+      INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
+      INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
+      INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
+      INNER JOIN tbl_products ON tbl_leads.product = tbl_products.product_id
+      INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
+      INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
+      INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
+      WHERE tbl_slts.slt_lead_id IS NOT NULL;`;
+    } else {
+      query += `INNER JOIN tbl_tasks ON tbl_slts.slt_task_id = tbl_tasks.task_id WHERE tbl_slts.slt_task_id IS NOT NULL;`;
+    }
+    const data = await sequelize.query(query, {
+      type: QueryTypes.SELECT,
+      model: Leads, // Specify the model for Sequelize to map the result to
+    });
     res.json(data);
   } catch (error) {
     console.log(error);
