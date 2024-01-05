@@ -52,9 +52,15 @@ expressApp.use("/back-end", leave);
 const category = require("./src/category/category_routes");
 expressApp.use("/back-end", category);
 
-// category routes
+// shift lead and task routes
 const shiftLeadTask = require("./src/shift_lead_task/shiftleadtask_route");
 expressApp.use("/back-end", shiftLeadTask);
+
+
+// follow up routes
+const FollowUp = require("./src/follow_up/follow_up_route");
+expressApp.use("/back-end", FollowUp);
+
 
 // product routes
 const product = require("./src/product/product_routes");
