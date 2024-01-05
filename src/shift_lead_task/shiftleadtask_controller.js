@@ -55,11 +55,12 @@ const index = async (req, res) => {
   try {
     const { leadOrTask,slt_send_by } = req.body;
 
-    let query = `SELECT tbl_slts.createdAt as created_date,tbl_leads.*,tbl_lead_statuses.*,tbl_sources.*,tbl_slts.*,tbl_customers.*,tbl_cities.*,tbl_customer_groups.*,tbl_references.*,tbl_products.*
-    FROM tbl_slts
-    `;
+    let query = ``;
     if (leadOrTask === 0) {
-      query += `INNER JOIN tbl_leads ON tbl_slts.slt_lead_id = tbl_leads.lead_id 
+      query += `
+      SELECT tbl_slts.createdAt as created_date,tbl_leads.*,tbl_lead_statuses.*,tbl_sources.*,tbl_slts.*,tbl_customers.*,tbl_cities.*,tbl_customer_groups.*,tbl_references.*,tbl_products.*
+    FROM tbl_slts
+      INNER JOIN tbl_leads ON tbl_slts.slt_lead_id = tbl_leads.lead_id 
       INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
       INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
       INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
@@ -69,7 +70,16 @@ const index = async (req, res) => {
       INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
       WHERE tbl_slts.slt_send_by= ${slt_send_by};`;
     } else {
-      query += `INNER JOIN tbl_tasks ON tbl_slts.slt_task_id = tbl_tasks.task_id WHERE tbl_slts.slt_task_id IS NOT NULL;`;
+      query += `
+      SELECT tbl_slts.createdAt as created_date,tbl_tasks.*,tbl_slts.*,tbl_customers.*,tbl_products.*,tbl_references.*,tbl_lead_statuses.*,tbl_sources.*
+    FROM tbl_slts
+      INNER JOIN tbl_tasks ON tbl_slts.slt_task_id = tbl_tasks.task_id 
+      INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
+      INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
+      INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
+      INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
+      INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
+      WHERE tbl_slts.slt_send_by= ${slt_send_by};`;
     }
     const data = await sequelize.query(query, {
       type: QueryTypes.SELECT,
