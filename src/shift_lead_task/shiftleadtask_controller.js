@@ -2,6 +2,7 @@ const { QueryTypes } = require("sequelize");
 const sequelize = require("../db/db_config");
 const Leads = require("../leads/leads_model");
 const ShiftLeadTask = require("./shiftleadtask_model");
+const Task = require("../task/task_model");
 
 const transferLead = async (req, res) => {
   try {
@@ -13,10 +14,6 @@ const transferLead = async (req, res) => {
       slt_task_id,
       temp_employee,
     } = req.body;
-    const findLeadbyId = await Leads.findByPk(slt_lead_id);
-    if (!findLeadbyId) {
-      res.json({ message: "Lead not found!", status: 0 });
-    }
 
     let parsedTempEmployee;
     try {
@@ -31,10 +28,6 @@ const transferLead = async (req, res) => {
       parsedTempEmployee[index] = slt_send_to;
     }
 
-    const updateLead = await findLeadbyId.update({
-      assigned_by: `[${parsedTempEmployee}]`,
-    });
-
     await ShiftLeadTask.create({
       slt_send_to,
       slt_send_by,
@@ -42,8 +35,30 @@ const transferLead = async (req, res) => {
       slt_reason,
       slt_task_id,
     });
-    if (updateLead) {
-      return res.json({ message: "Lead shifted succefully!", status: 1 });
+    if (!req.body.slt_lead_id) {
+      const findTaskbyId = await Task.findByPk(slt_task_id);
+      if (!findTaskbyId) {
+        res.json({ message: "Task not found!", status: 0 });
+      }
+
+      const updateLead = await findTaskbyId.update({
+        assigned_by: `[${parsedTempEmployee}]`,
+      });
+      if (updateLead) {
+        return res.json({ message: "Task shifted succefully!", status: 1 });
+      }
+    } else {
+      const findLeadbyId = await Leads.findByPk(slt_lead_id);
+      if (!findLeadbyId) {
+        res.json({ message: "Lead not found!", status: 0 });
+      }
+
+      const updateLead = await findLeadbyId.update({
+        assigned_by: `[${parsedTempEmployee}]`,
+      });
+      if (updateLead) {
+        return res.json({ message: "Task shifted succefully!", status: 1 });
+      }
     }
   } catch (error) {
     console.log(error);
@@ -53,10 +68,9 @@ const transferLead = async (req, res) => {
 
 const index = async (req, res) => {
   try {
-    const { leadOrTask,slt_send_by } = req.body;
-
+    const { leadOrTask, slt_send_by } = req.body;
     let query = ``;
-    if (leadOrTask === 0) {
+    if (leadOrTask == 0) {
       query += `
       SELECT tbl_slts.createdAt as created_date,tbl_leads.*,tbl_lead_statuses.*,tbl_sources.*,tbl_slts.*,tbl_customers.*,tbl_cities.*,tbl_customer_groups.*,tbl_references.*,tbl_products.*
     FROM tbl_slts
