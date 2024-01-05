@@ -53,7 +53,7 @@ const transferLead = async (req, res) => {
 
 const index = async (req, res) => {
   try {
-    const { leadOrTask } = req.body;
+    const { leadOrTask,slt_send_by } = req.body;
 
     let query = `SELECT tbl_slts.createdAt as created_date,tbl_leads.*,tbl_lead_statuses.*,tbl_sources.*,tbl_slts.*,tbl_customers.*,tbl_cities.*,tbl_customer_groups.*,tbl_references.*,tbl_products.*
     FROM tbl_slts
@@ -67,7 +67,7 @@ const index = async (req, res) => {
       INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
       INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
       INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
-      WHERE tbl_slts.slt_lead_id IS NOT NULL;`;
+      WHERE tbl_slts.slt_send_by= ${slt_send_by};`;
     } else {
       query += `INNER JOIN tbl_tasks ON tbl_slts.slt_task_id = tbl_tasks.task_id WHERE tbl_slts.slt_task_id IS NOT NULL;`;
     }
