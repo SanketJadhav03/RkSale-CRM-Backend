@@ -5,35 +5,6 @@ const Leave = require("./leave_model");
 const path = require("path");
 const Notifaction = require("../notification/notification_model");
 
-// const store = async (req, res) => {
-//     try {
-//         const {
-//             leave_user_id,
-//             leave_reason,
-//             to_date,
-//             from_date,
-
-//         } = req.body;
-
-
-
-
-//         const newAttendance = await Leave.create({
-//             leave_user_id: leave_user_id ? leave_user_id : null,
-//             leave_reason: leave_reason ? leave_reason : null,
-//             to_date: to_date ? to_date : null,
-//             from_date: from_date ? from_date : null,
-//             leave_status: 1,
-
-//         });
-
-//         res.json(newAttendance);
-//     } catch (error) {
-//         console.log(error);
-//         res.json({ error: "Failed To Store Attendance" });
-//     }
-// };
-
 const store = async (req, res) => {
     try {
         const {
@@ -60,25 +31,25 @@ const store = async (req, res) => {
         const admins = await User.findAll({
             where: { u_type: 1 }, // Assuming role 1 corresponds to the condition you mentioned
             attributes: ['uid'], // Fetch only the 'id' attribute
-          });
-          
-          if (admins.length > 0) {
+        });
+
+        if (admins.length > 0) {
             // If admins with role 1 are found, create a notification for each of them
             const notificationPromises = admins.map(async (admin) => {
-              return await Notifaction.create({
-                user_id: admin.uid,
-                assigned_data_id: newleave.leave_id,
-                notification_type:4,
-                notification_description: "New Leave Stored",
-              });
+                return await Notifaction.create({
+                    user_id: admin.uid,
+                    assigned_data_id: newleave.leave_id,
+                    notification_type: 4,
+                    notification_description: "New Leave Stored",
+                });
             });
-          
+
             // Wait for all notifications to be created
             await Promise.all(notificationPromises);
-          } else {
+        } else {
             // Handle the case where no user with role 1 is found
             console.error("No admins with role 1 found");
-          }
+        }
         return res.status(201).json({ message: 'Leave Application Submitted successfully', status: 1 });
     } catch (error) {
         console.log(error);
@@ -121,7 +92,7 @@ const index = async (req, res) => {
         const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
         const limitPerPage = 30;
         const offset = (page - 1) * limitPerPage;
-const {type} = req.params;
+        const { type } = req.params;
         let sql = `
         SELECT 
                 leaves.*,
@@ -129,14 +100,13 @@ const {type} = req.params;
             FROM tbl_leaves AS leaves
             INNER JOIN users AS users_leave ON leaves.leave_user_id = users_leave.uid
       `;
-      const replacements = {};
-     
+        const replacements = {};
 
-      if (leave_id > 0 )
-      {
-      sql += ` AND tbl_leaves.leave_id = :Id`;
-replacements.Id = type;
-      }
+
+        if (leave_id > 0) {
+            sql += ` AND tbl_leaves.leave_id = :Id`;
+            replacements.Id = type;
+        }
 
 
         const approved_by = await sequelize.query(

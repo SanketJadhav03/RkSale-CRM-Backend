@@ -115,9 +115,11 @@ const show = async (req, res) => {
             WHERE tbl_payments.payment_id = :id
        
             `,
-            {
-                type: QueryTypes.SELECT,
-                replacements: { id },
+
+            {   
+              type: QueryTypes.SELECT,
+              replacements: { id },
+
             }
         );
         res.json(data);
@@ -132,4 +134,4 @@ module.exports = {
     index,
     update,
     show
-}
+}   
