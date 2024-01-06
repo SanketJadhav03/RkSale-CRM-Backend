@@ -2,6 +2,7 @@ const { QueryTypes } = require("sequelize");
 const sequelize = require("../db/db_config");
 const Leads = require("../leads/leads_model");
 const ShiftLeadTask = require("./shiftleadtask_model");
+const Task = require("../task/task_model");
 
 const transferLead = async (req, res) => {
   try {
@@ -13,10 +14,6 @@ const transferLead = async (req, res) => {
       slt_task_id,
       temp_employee,
     } = req.body;
-    const findLeadbyId = await Leads.findByPk(slt_lead_id);
-    if (!findLeadbyId) {
-      res.json({ message: "Lead not found!", status: 0 });
-    }
 
     let parsedTempEmployee;
     try {
@@ -31,10 +28,6 @@ const transferLead = async (req, res) => {
       parsedTempEmployee[index] = slt_send_to;
     }
 
-    const updateLead = await findLeadbyId.update({
-      assigned_by: `[${parsedTempEmployee}]`,
-    });
-
     await ShiftLeadTask.create({
       slt_send_to,
       slt_send_by,
@@ -42,8 +35,30 @@ const transferLead = async (req, res) => {
       slt_reason,
       slt_task_id,
     });
-    if (updateLead) {
-      return res.json({ message: "Lead shifted succefully!", status: 1 });
+    if (!req.body.slt_lead_id) {
+      const findTaskbyId = await Task.findByPk(slt_task_id);
+      if (!findTaskbyId) {
+        res.json({ message: "Task not found!", status: 0 });
+      }
+
+      const updateLead = await findTaskbyId.update({
+        assigned_by: `[${parsedTempEmployee}]`,
+      });
+      if (updateLead) {
+        return res.json({ message: "Task shifted succefully!", status: 1 });
+      }
+    } else {
+      const findLeadbyId = await Leads.findByPk(slt_lead_id);
+      if (!findLeadbyId) {
+        res.json({ message: "Lead not found!", status: 0 });
+      }
+
+      const updateLead = await findLeadbyId.update({
+        assigned_by: `[${parsedTempEmployee}]`,
+      });
+      if (updateLead) {
+        return res.json({ message: "Task shifted succefully!", status: 1 });
+      }
     }
   } catch (error) {
     console.log(error);
@@ -53,18 +68,37 @@ const transferLead = async (req, res) => {
 
 const index = async (req, res) => {
   try {
-    const data = await sequelize.query(
-      `SELECT *
-      FROM tbl_slts
-      INNER JOIN tbl_leads ON tbl_slts.slt_lead_id = tbl_leads.lead_id
-      LEFT JOIN tbl_tasks ON tbl_slts.slt_task_id = tbl_tasks.task_id  AND tbl_slts.slt_task_id IS NOT NULL
-      WHERE tbl_slts.slt_lead_id IS NOT NULL;
-      `,
-      {
-        type: QueryTypes.SELECT,
-        model: Leads, // Specify the model for Sequelize to map the result to
-      }
-    );
+    const { leadOrTask, slt_send_by } = req.body;
+    let query = ``;
+    if (leadOrTask == 0) {
+      query += `
+      SELECT tbl_slts.createdAt as created_date,tbl_leads.*,tbl_lead_statuses.*,tbl_sources.*,tbl_slts.*,tbl_customers.*,tbl_cities.*,tbl_customer_groups.*,tbl_references.*,tbl_products.*
+    FROM tbl_slts
+      INNER JOIN tbl_leads ON tbl_slts.slt_lead_id = tbl_leads.lead_id 
+      INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
+      INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
+      INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
+      INNER JOIN tbl_products ON tbl_leads.product = tbl_products.product_id
+      INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
+      INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
+      INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
+      WHERE tbl_slts.slt_send_by= ${slt_send_by};`;
+    } else {
+      query += `
+      SELECT tbl_slts.createdAt as created_date,tbl_tasks.*,tbl_slts.*,tbl_customers.*,tbl_products.*,tbl_references.*,tbl_lead_statuses.*,tbl_sources.*
+    FROM tbl_slts
+      INNER JOIN tbl_tasks ON tbl_slts.slt_task_id = tbl_tasks.task_id 
+      INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
+      INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
+      INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
+      INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
+      INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
+      WHERE tbl_slts.slt_send_by= ${slt_send_by};`;
+    }
+    const data = await sequelize.query(query, {
+      type: QueryTypes.SELECT,
+      model: Leads, // Specify the model for Sequelize to map the result to
+    });
     res.json(data);
   } catch (error) {
     console.log(error);
