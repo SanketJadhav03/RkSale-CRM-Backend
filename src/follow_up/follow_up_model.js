@@ -16,7 +16,7 @@ const FollowUp = sequelize.define("tbl_follow_up", {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
-  follow_up_reason: {
+  follow_up_description: {
     type: DataTypes.STRING,
     allowNull: true,
   },
