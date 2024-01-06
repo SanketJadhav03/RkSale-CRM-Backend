@@ -11,12 +11,12 @@ expressApp.use(cors());
 expressApp.use(express.static(path.join(__dirname, "public/images")));
 expressApp.use(
   fileUpload({
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit, adjust as needed
+    limits: { fileSize: 10 * 1024 * 1024 }, //10 MB limit, adjust as needed
   })
 );
 // create data
 checked
-  .sync({ alter: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+  .sync({ alter: false }) //if false then not drop created table else it will drop tables and every time gives new tables
   .then(() => {
     require("./db/create_data");
     console.log("Database created!");
@@ -52,9 +52,15 @@ expressApp.use("/back-end", leave);
 const category = require("./src/category/category_routes");
 expressApp.use("/back-end", category);
 
-// category routes
+// shift lead and task routes
 const shiftLeadTask = require("./src/shift_lead_task/shiftleadtask_route");
 expressApp.use("/back-end", shiftLeadTask);
+
+
+// follow up routes
+const FollowUp = require("./src/follow_up/follow_up_route");
+expressApp.use("/back-end", FollowUp);
+
 
 // product routes
 const product = require("./src/product/product_routes");
