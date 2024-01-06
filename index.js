@@ -11,12 +11,12 @@ expressApp.use(cors());
 expressApp.use(express.static(path.join(__dirname, "public/images")));
 expressApp.use(
   fileUpload({
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB limit, adjust as needed
+    limits: { fileSize: 10 * 1024 * 1024 }, //10 MB limit, adjust as needed
   })
 );
 // create data
 checked
-  .sync({ alter: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+  .sync({ alter: false }) //if false then not drop created table else it will drop tables and every time gives new tables
   .then(() => {
     require("./db/create_data");
     console.log("Database created!");
