@@ -8,6 +8,10 @@ const FollowUp = sequelize.define("tbl_follow_up", {
     primaryKey: true,
     autoIncrement: true,
   },
+  follow_up_send_by: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
   follow_up_lead_id: {
     type: DataTypes.INTEGER,
     allowNull: true,
