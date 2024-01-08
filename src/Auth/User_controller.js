@@ -71,6 +71,7 @@ const index = async (req, res) => {
       
       AND (roles.role_id IS NOT NULL OR users.user_role_id IS NULL) 
       AND (tbl_shifts.shift_id IS NOT NULL OR users.shift_id IS NULL)
+      WHERE u_type = 2
       
         `,
       {

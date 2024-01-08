@@ -446,23 +446,46 @@ const filterData = async (req, res) => {
 const getPresentAbsent = async (req, res) => {
   try {
     const { id } = req.params;
-    const userAttendance = await sequelize.query(
-      `
-      SELECT * FROM tbl_attendances
+  
+    // Query to get the count of present attendances
+    const presentAttendanceCountQuery = `
+      SELECT COUNT(*) AS presentAttendanceCount
+      FROM tbl_attendances
       WHERE tbl_attendances.user_id = :id
       AND tbl_attendances.remark = 1
-      `,
-      {
+    `;
+  
+    // Query to get the count of absent attendances
+    const absentAttendanceCountQuery = `
+      SELECT COUNT(*) AS absentAttendanceCount
+      FROM tbl_attendances
+      WHERE tbl_attendances.user_id = :id
+      AND tbl_attendances.remark = 2
+    `;
+  
+    // Execute both queries and await the results
+    const [presentAttendanceResult, absentAttendanceResult] = await Promise.all([
+      sequelize.query(presentAttendanceCountQuery, {
         type: QueryTypes.SELECT,
         replacements: { id },
-      }
-    );
-
-    res.json(userAttendance);
+      }),
+      sequelize.query(absentAttendanceCountQuery, {
+        type: QueryTypes.SELECT,
+        replacements: { id },
+      }),
+    ]);
+  
+    // Extract the count values from the results
+    const presentAttendanceCount = presentAttendanceResult[0]?.presentAttendanceCount || 0;
+    const absentAttendanceCount = absentAttendanceResult[0]?.absentAttendanceCount || 0;
+  
+    // Send the counts in JSON format as the response
+    res.json({ presentAttendanceCount, absentAttendanceCount });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Failed To Find Attendance By User" });
+    res.status(500).json({ error: "Failed To Retrieve Attendance Counts" });
   }
+  
 };
 module.exports = {
   store,
