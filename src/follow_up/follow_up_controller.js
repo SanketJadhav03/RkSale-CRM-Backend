@@ -17,7 +17,7 @@ const index = async (req, res) => {
       INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
       INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
       INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
-      WHERE tbl_follow_ups.follow_up_send_by= ${follow_up_send_by};`;
+      WHERE tbl_follow_ups.follow_up_lead_id= ${follow_up_send_by};`;
     } else {
       query += `
       SELECT tbl_follow_ups.createdAt as created_date,tbl_tasks.*,tbl_follow_ups.*,tbl_customers.*,tbl_products.*,tbl_references.*,tbl_lead_statuses.*,tbl_sources.*
