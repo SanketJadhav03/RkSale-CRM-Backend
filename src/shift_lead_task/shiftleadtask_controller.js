@@ -3,6 +3,7 @@ const sequelize = require("../db/db_config");
 const Leads = require("../leads/leads_model");
 const ShiftLeadTask = require("./shiftleadtask_model");
 const Task = require("../task/task_model");
+const Notifaction = require("../notification/notification_model");
 
 const transferLead = async (req, res) => {
   try {
@@ -44,6 +45,13 @@ const transferLead = async (req, res) => {
       const updateLead = await findTaskbyId.update({
         assigned_by: `[${parsedTempEmployee}]`,
       });
+
+      await Notifaction.create({
+        user_id: slt_send_to,
+        assigned_data_id: slt_task_id,
+        notification_type:3,
+        notification_description: "New Task Shifted To You ",
+      });
       if (updateLead) {
         return res.json({ message: "Task shifted succefully!", status: 1 });
       }
@@ -53,6 +61,12 @@ const transferLead = async (req, res) => {
         res.json({ message: "Lead not found!", status: 0 });
       }
 
+      await Notifaction.create({
+        user_id: slt_send_to,
+        assigned_data_id: slt_lead_id,
+        notification_type:2,
+        notification_description: "New Lead Shifted To You ",
+      });
       const updateLead = await findLeadbyId.update({
         assigned_by: `[${parsedTempEmployee}]`,
       });
