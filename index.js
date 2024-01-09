@@ -15,18 +15,10 @@ expressApp.use(
   })
 );
 // create data
-// checked
-//   .sync({ alter: false }) //if false then not drop created table else it will drop tables and every time gives new tables
-//   .then(() => {
-//     require("./db/create_data");
-//     console.log("Database created!");
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   });
-
 checked
   .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+
+
   .then(() => {
     require("./db/create_data");
     console.log("Database created!");
@@ -34,6 +26,16 @@ checked
   .catch((error) => {
     console.log(error);
   });
+
+// checked
+//   .sync({ force: true }) // if false then not drop created table else it will drop tables and every time gives new tables
+//   .then(() => {
+//     require("./db/create_data");
+//     console.log("Database created!");
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
 // user routes
 const user = require("./src/Auth/User_route");
 expressApp.use("/back-end", user);
@@ -56,11 +58,9 @@ expressApp.use("/back-end", category);
 const shiftLeadTask = require("./src/shift_lead_task/shiftleadtask_route");
 expressApp.use("/back-end", shiftLeadTask);
 
-
 // follow up routes
 const FollowUp = require("./src/follow_up/follow_up_route");
 expressApp.use("/back-end", FollowUp);
-
 
 // product routes
 const product = require("./src/product/product_routes");
@@ -136,17 +136,11 @@ expressApp.use("/back-end", todo);
 const notification = require("./src/notification/notification_routes");
 expressApp.use("/back-end", notification);
 
+const payment_mode = require("./src/payment_mode/payment_mode_routes");
+expressApp.use("/back-end", payment_mode);
 
-
-
-const payment_mode = require('./src/payment_mode/payment_mode_routes')
-expressApp.use("/back-end", payment_mode)
-
-
-const payment = require('./src/payment/payment_routes')
-expressApp.use("/back-end", payment)
-
-
+const payment = require("./src/payment/payment_routes");
+expressApp.use("/back-end", payment);
 
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
