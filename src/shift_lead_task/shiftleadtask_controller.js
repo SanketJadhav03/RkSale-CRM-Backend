@@ -49,7 +49,7 @@ const transferLead = async (req, res) => {
       await Notifaction.create({
         user_id: slt_send_to,
         assigned_data_id: slt_task_id,
-        notification_type:3,
+        notification_type: 3,
         notification_description: "New Task Shifted To You ",
       });
       if (updateLead) {
@@ -64,7 +64,7 @@ const transferLead = async (req, res) => {
       await Notifaction.create({
         user_id: slt_send_to,
         assigned_data_id: slt_lead_id,
-        notification_type:2,
+        notification_type: 2,
         notification_description: "New Lead Shifted To You ",
       });
       const updateLead = await findLeadbyId.update({
@@ -119,7 +119,43 @@ const index = async (req, res) => {
     res.json({ error: "Failed To Get Shift data" });
   }
 };
+
+const getDetails = async (req, res) => {
+  try {
+    let query1 = `SELECT slts.*,
+    send_to_user.name AS send_to_name,
+    send_by_user.name AS send_by_name
+FROM tbl_slts AS slts
+INNER JOIN users AS send_to_user ON slts.slt_send_to = send_to_user.uid
+INNER JOIN users AS send_by_user ON slts.slt_send_by = send_by_user.uid
+WHERE slts.slt_task_id = 0
+LIMIT 10`;
+    let query2 = `SELECT slts.*,
+    send_to_user.name AS send_to_name,
+    send_by_user.name AS send_by_name
+FROM tbl_slts AS slts
+INNER JOIN users AS send_to_user ON slts.slt_send_to = send_to_user.uid
+INNER JOIN users AS send_by_user ON slts.slt_send_by = send_by_user.uid
+WHERE slts.slt_lead_id = 0
+    LIMIT 10`;
+
+    const LeadsData = await sequelize.query(query1, {
+      type: QueryTypes.SELECT,
+      model: Leads, // Specify the model for Sequelize to map the result to
+    });
+    const TaskData = await sequelize.query(query2, {
+      type: QueryTypes.SELECT,
+      model: Task, // Specify the model for Sequelize to map the result to
+    });
+    res.json({ leads: LeadsData, task: TaskData });
+  } catch (error) {
+    console.log(error);
+    res.json({ error: "Failed To Get Shift data" });
+  }
+};
+
 module.exports = {
   transferLead,
   index,
+  getDetails,
 };
