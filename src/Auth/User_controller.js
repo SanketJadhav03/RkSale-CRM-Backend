@@ -36,24 +36,24 @@ const login = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    const rows = await DB.sequelize.query(
-      `
-        SELECT * FROM role_has_permissions
-        INNER JOIN permissions ON permissions.permission_id = role_has_permissions.rhp_permission_id
-        WHERE role_has_permissions.rhp_role_id = :roleId
-        `,
-      {
-        replacements: { roleId: user.user_role_id }, // Replace with the actual role ID
-        type: Sequelize.QueryTypes.SELECT,
-      }
-    );
+    // const rows = await DB.sequelize.query(
+    //   `
+    //     SELECT * FROM role_has_permissions
+    //     INNER JOIN permissions ON permissions.permission_id = role_has_permissions.rhp_permission_id
+    //     WHERE role_has_permissions.rhp_role_id = :roleId
+    //     `,
+    //   {
+    //     replacements: { roleId: user.user_role_id }, // Replace with the actual role ID
+    //     type: Sequelize.QueryTypes.SELECT,
+    //   }
+    // );
 
-    console.log(rows);
+    // console.log(rows);
     res.json({
       token,
       user,
       authentication: true,
-      permissions: rows,
+      // permissions: rows,
     });
   } catch (error) {
     console.error(error);

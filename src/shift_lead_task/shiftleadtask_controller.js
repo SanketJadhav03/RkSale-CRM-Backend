@@ -109,6 +109,10 @@ const index = async (req, res) => {
       INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
       WHERE tbl_slts.slt_send_by= ${slt_send_by};`;
     }
+    if (assigned_by > 0) {
+      sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
+      replacements.assigned_by = assigned_by;
+    }
     const data = await sequelize.query(query, {
       type: QueryTypes.SELECT,
       model: Leads, // Specify the model for Sequelize to map the result to
@@ -122,6 +126,8 @@ const index = async (req, res) => {
 
 const getDetails = async (req, res) => {
   try {
+    const { start_date, end_date, assigned_by } = req.body;
+    console.log(assigned_by);
     let query1 = `SELECT slts.*,
     send_to_user.name AS send_to_name,
     send_by_user.name AS send_by_name
@@ -129,7 +135,12 @@ FROM tbl_slts AS slts
 INNER JOIN users AS send_to_user ON slts.slt_send_to = send_to_user.uid
 INNER JOIN users AS send_by_user ON slts.slt_send_by = send_by_user.uid
 WHERE slts.slt_task_id = 0
-LIMIT 10`;
+AND slts.createdAt >= '${start_date}' AND slts.createdAt <= '${end_date}'`;
+    if (assigned_by > 0) {
+      query1 += ` AND (slts.slt_send_to = '${assigned_by}' OR slts.slt_send_by = '${assigned_by}')`;
+    }
+
+    query1 += ` LIMIT 10`;
     let query2 = `SELECT slts.*,
     send_to_user.name AS send_to_name,
     send_by_user.name AS send_by_name
@@ -137,8 +148,13 @@ FROM tbl_slts AS slts
 INNER JOIN users AS send_to_user ON slts.slt_send_to = send_to_user.uid
 INNER JOIN users AS send_by_user ON slts.slt_send_by = send_by_user.uid
 WHERE slts.slt_lead_id = 0
-    LIMIT 10`;
+AND slts.createdAt >= '${start_date}' AND slts.createdAt <= '${end_date}'`;
 
+    if (assigned_by > 0) {
+      query2 += ` AND (slts.slt_send_to = '${assigned_by}' OR slts.slt_send_by = '${assigned_by}')`;
+    }
+
+    query2 += ` LIMIT 10`;
     const LeadsData = await sequelize.query(query1, {
       type: QueryTypes.SELECT,
       model: Leads, // Specify the model for Sequelize to map the result to
