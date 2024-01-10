@@ -98,9 +98,10 @@ expressApp.use("/back-end", payment_type);
 // roles routes
 
 // point routes
+
 // ROLES & PERMISSIONS ROUTE
-const roles = require("./src/roles/role_routes");
-expressApp.use("/back-end", roles);
+
+
 const permissions = require("./src/permissions/permission_route");
 expressApp.use("/back-end", permissions);
 
@@ -141,6 +142,10 @@ expressApp.use("/back-end", payment_mode);
 
 const payment = require("./src/payment/payment_routes");
 expressApp.use("/back-end", payment);
+
+
+const dashboard = require("./src/dashboard/dashboard_route");
+expressApp.use("/back-end", dashboard);
 
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;

@@ -123,13 +123,8 @@ const store = async (req, res) => {
       user_upi,
     } = req.body;
     // Hash the password using bcrypt
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the number of salt rounds
-
+    const hashedPassword = await bcrypt.hash(password, 10);
     const rootPath = process.cwd();
-    const profile_photo = req.files.profile_photo;
-    const adhaar_photo = req.files.aadhar_photo;
-    const pan_photo = req.files.pan_photo;
-    const bank_passbook_photo = req.files.bank_passbook_photo;
 
     const validateAndMove = (file, uploadPath) => {
       if (!file) {
@@ -152,44 +147,97 @@ const store = async (req, res) => {
       });
 
       return file.filename; // Return the filename for use in the database
-    };
+    };// 10 is the number of salt rounds
 
-    // Use the validateAndMove function for each file, allowing null files
-    validateAndMove(
-      profile_photo,
-      path.join(
-        rootPath,
-        "public/images/user",
-        (profile_photo ? profile_photo.name : null)
-      )
-    );
 
-    validateAndMove(
-      adhaar_photo,
-      path.join(
-        rootPath,
-        "public/images/user",
-        (adhaar_photo ? adhaar_photo.name : null)
-      )
-    );
+    if (req.files && req.files.profile_photo) {
+      const profile_photo = req.files.profile_photo || null;
+      // Use the validateAndMove function for each file, allowing null files
+      validateAndMove(
+        profile_photo,
+        path.join(
+          rootPath,
+          "public/images/user",
+          (profile_photo ? profile_photo.name : null)
+        )
+      );
+    }
 
-    validateAndMove(
-      pan_photo,
-      path.join(
-        rootPath,
-        "public/images/user",
-        (pan_photo ? pan_photo.name : null)
-      )
-    );
+    if (req.files && req.files.adhaar_photo) {
+      const adhaar_photo = req.files.adhaar_photo || null;
+      // Use the validateAndMove function for each file, allowing null files
+      validateAndMove(
+        adhaar_photo,
+        path.join(
+          rootPath,
+          "public/images/user",
+          (adhaar_photo ? adhaar_photo.name : null)
+        )
+      );
+    }
 
-    validateAndMove(
-      bank_passbook_photo,
-      path.join(
-        rootPath,
-        "public/images/user",
-        (bank_passbook_photo ? bank_passbook_photo.name : null)
-      )
-    );
+    if (req.files && req.files.pan_photo) {
+      const pan_photo = req.files.pan_photo || null;
+      // Use the validateAndMove function for each file, allowing null files
+      validateAndMove(
+        pan_photo,
+        path.join(
+          rootPath,
+          "public/images/user",
+          (pan_photo ? pan_photo.name : null)
+        )
+      );
+    }
+    if (req.files && req.files.bank_passbook_photo) {
+      const bank_passbook_photo = req.files.bank_passbook_photo || null;
+      // Use the validateAndMove function for each file, allowing null files
+      validateAndMove(
+        bank_passbook_photo,
+        path.join(
+          rootPath,
+          "public/images/user",
+          (bank_passbook_photo ? bank_passbook_photo.name : null)
+        )
+      );
+    }
+    // const adhaar_photo = req.files.aadhar_photo || null;
+    // const pan_photo = req.files.pan_photo || null;
+    // const bank_passbook_photo = req.files.bank_passbook_photo || null;
+
+
+
+
+
+
+
+    // validateAndMove(
+    //   adhaar_photo,
+    //   path.join(
+    //     rootPath,
+    //     "public/images/user",
+    //     (adhaar_photo ? adhaar_photo.name : null)
+    //   )
+    // );
+
+    // validateAndMove(
+    //   pan_photo,
+    //   path.join(
+    //     rootPath,
+    //     "public/images/user",
+    //     (pan_photo ? pan_photo.name : null)
+    //   )
+    // );
+
+    // validateAndMove(
+    //   bank_passbook_photo,
+    //   path.join(
+    //     rootPath,
+    //     "public/images/user",
+    //     (bank_passbook_photo ? bank_passbook_photo.name : null)
+    //   )
+    // );
+
+
     // Create a new user in the database
     const newUser = await User.create({
       u_type: u_type,
@@ -209,14 +257,17 @@ const store = async (req, res) => {
       last_working_company: last_working_company,
       last_company_salary: last_company_salary,
       shift_id: shift_id,
-      profile_photo: req.files.profile_photo
+
+
+      profile_photo: req.files && req.files.profile_photo
         ? req.files.profile_photo.name
         : null,
-      aadhar_photo: req.files.aadhar_photo ? req.files.aadhar_photo.name : null,
-      pan_photo: req.files.pan_photo ? req.files.pan_photo.name : null,
-      bank_passbook_photo: req.files.bank_passbook_photo
+      aadhar_photo: req.files && req.files.aadhar_photo ? req.files.aadhar_photo.name : null,
+      pan_photo: req.files && req.files.pan_photo ? req.files.pan_photo.name : null,
+      bank_passbook_photo: req.files && req.files.bank_passbook_photo
         ? req.files.bank_passbook_photo.name
         : null,
+
     });
 
     // Send a success response with the created user data
@@ -249,18 +300,19 @@ const updated = async (req, res) => {
       uid,
       name,
       address,
-      salary,
-      mobile_no,
-      emergency_contact,
-      aadhar_no,
-      email,
+      user_role_id,
       date_of_joining,
       last_experience,
       last_working_company,
       last_company_salary,
       shift_id,
+      salary,
+      mobile_no,
+      emergency_contact,
+      email,
+      aadhar_no,
       pan_no,
-      user_upi,
+      user_upi
     } = req.body;
     const user = await User.findByPk(uid);
     if (!user) {
@@ -269,18 +321,19 @@ const updated = async (req, res) => {
 
     if (req.files && req.files.profile_photo) {
       const uploadedFile = req.files.profile_photo;
-      const filePath = `public/images/user/${"crm-" + user.profile_photo}`;
+      const filePath = `public/images/user/${user.profile_photo}`;
 
-      // Remove the existing file
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error("Error deleting existing file:", err);
-        }
-      });
-
+      if (user.profile_photo !== null) {
+        // Remove the existing file
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("Error deleting existing file:", err);
+          }
+        });
+      }
       // Save the new file
       uploadedFile.mv(
-        `public/images/user/${"crm-" + uploadedFile.name}`,
+        `public/images/user/${uploadedFile.name}`,
         (err) => {
           if (err) {
             console.error("Error saving new file:", err);
@@ -291,18 +344,19 @@ const updated = async (req, res) => {
 
     if (req.files && req.files.aadhar_photo) {
       const uploadedFile = req.files.aadhar_photo;
-      const filePath = `public/images/user/${"crm-" + user.aadhar_photo}`;
+      const filePath = `public/images/user/${user.aadhar_photo}`;
 
       // Remove the existing file
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error("Error deleting existing file:", err);
-        }
-      });
-
+      if (user.aadhar_photo !== null) {
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("Error deleting existing file:", err);
+          }
+        });
+      }
       // Save the new file
       uploadedFile.mv(
-        `public/images/user/${"crm-" + uploadedFile.name}`,
+        `public/images/user/${uploadedFile.name}`,
         (err) => {
           if (err) {
             console.error("Error saving new file:", err);
@@ -313,18 +367,19 @@ const updated = async (req, res) => {
 
     if (req.files && req.files.pan_photo) {
       const uploadedFile = req.files.pan_photo;
-      const filePath = `public/images/user/${"crm-" + user.pan_photo}`;
+      const filePath = `public/images/user/${user.pan_photo}`;
 
       // Remove the existing file
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error("Error deleting existing file:", err);
-        }
-      });
-
+      if (user.pan_photo !== null) {
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("Error deleting existing file:", err);
+          }
+        });
+      }
       // Save the new file
       uploadedFile.mv(
-        `public/images/user/${"crm-" + uploadedFile.name}`,
+        `public/images/user/${uploadedFile.name}`,
         (err) => {
           if (err) {
             console.error("Error saving new file:", err);
@@ -335,19 +390,20 @@ const updated = async (req, res) => {
 
     if (req.files && req.files.bank_passbook_photo) {
       const uploadedFile = req.files.pan_photo;
-      const filePath = `public/images/user/${"crm-" + user.bank_passbook_photo
+      const filePath = `public/images/user/${user.bank_passbook_photo
         }`;
 
       // Remove the existing file
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error("Error deleting existing file:", err);
-        }
-      });
-
+      if (user.bank_passbook_photo !== null) {
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("Error deleting existing file:", err);
+          }
+        });
+      }
       // Save the new file
       uploadedFile.mv(
-        `public/images/user/${"crm-" + uploadedFile.name}`,
+        `public/images/user/${uploadedFile.name}`,
         (err) => {
           if (err) {
             console.error("Error saving new file:", err);
@@ -355,9 +411,11 @@ const updated = async (req, res) => {
         }
       );
     }
+
     const updateduser = await user.update({
       name: name,
       address: address,
+      user_role_id: user_role_id,
       salary: salary,
       mobile_no: mobile_no,
       emergency_contact: emergency_contact,
@@ -370,15 +428,15 @@ const updated = async (req, res) => {
       last_working_company: last_working_company,
       last_company_salary: last_company_salary,
       shift_id: shift_id,
-      profile_photo: req.files.profile_photo
-        ? req.files.profile_photo
+      profile_photo: req.files && req.files.profile_photo
+        ? req.files.profile_photo.name
         : user.profile_photo,
-      aadhar_photo: req.files.aadhar_photo
-        ? req.files.aadhar_photo
+      aadhar_photo: req.files && req.files.aadhar_photo
+        ? req.files.aadhar_photo.name
         : user.aadhar_photo,
-      pan_photo: req.files.pan_photo ? req.files.pan_photo : user.pan_photo,
-      bank_passbook_photo: req.files.bank_passbook_photo
-        ? req.files.bank_passbook_photo
+      pan_photo: req.files && req.files.pan_photo ? req.files.pan_photo.name : user.pan_photo,
+      bank_passbook_photo: req.files && req.files.bank_passbook_photo
+        ? req.files.bank_passbook_photo.name
         : user.bank_passbook_photo,
     });
 
