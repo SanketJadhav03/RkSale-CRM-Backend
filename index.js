@@ -142,6 +142,10 @@ expressApp.use("/back-end", payment_mode);
 const payment = require("./src/payment/payment_routes");
 expressApp.use("/back-end", payment);
 
+
+const dashboard = require("./src/dashboard/dashboard_route");
+expressApp.use("/back-end", dashboard);
+
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
 expressApp.listen(port, () => {
