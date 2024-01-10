@@ -4,9 +4,8 @@ const controller = require("./shiftleadtask_controller");
 
 router.post("/transfer/lead", controller.transferLead);
 
-router.post("/shifted/lead",controller.index);
+router.post("/shifted/lead", controller.index);
 
-router.get("/slt/details",controller.getDetails)
-
+router.post("/slt/details", controller.getDetails);
 
 module.exports = router;
