@@ -9,6 +9,7 @@ async function initializeDatabase() {
   const hashedPassword = await bcrypt.hash("super@ajspire.com", 10);
   await User.create({
     name: "Super Admin",
+    u_type: 1,
     mobile_no: "9595775123",
     password: hashedPassword,
     email: "super@ajspire.com",
