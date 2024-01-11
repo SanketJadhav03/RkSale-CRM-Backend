@@ -143,6 +143,9 @@ expressApp.use("/back-end", payment_mode);
 const payment = require("./src/payment/payment_routes");
 expressApp.use("/back-end", payment);
 
+const salary = require("./src/salary/salary_routes");
+expressApp.use("/back-end", salary);
+
 
 const dashboard = require("./src/dashboard/dashboard_route");
 expressApp.use("/back-end", dashboard);

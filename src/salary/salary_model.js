@@ -16,19 +16,19 @@ const Salary = sequelize.define('tbl_salary', {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
+  salary:{
+    type:DataTypes.STRING,
+    allowNull:true
+  },
+  calculated_salary:{
+    type:DataTypes.STRING,
+    allowNull:true
+  },
   salary_date : {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  salary_start_date : {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  salary_end_date : {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  salary_amount : {
+  total_salary_amount : {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -48,9 +48,10 @@ const Salary = sequelize.define('tbl_salary', {
   salary_incentive : {
     type: DataTypes.STRING,
     allowNull: true,
-  },
+  },  
   salary_payment_id : {
     type: DataTypes.INTEGER,
+    defaultValue:1, 
     allowNull: true,
   },
   salary_status : {
