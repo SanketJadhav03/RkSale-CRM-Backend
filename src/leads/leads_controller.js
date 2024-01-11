@@ -10,6 +10,7 @@ const store = async (req, res) => {
     const {
       customer,
       lead_created_by,
+      total_cycles,
       product,
       value,
       today_date,
@@ -65,6 +66,7 @@ const store = async (req, res) => {
     const assignedByArray = JSON.parse(assigned_by);
     const newLead = await Leads.create({
       lead_created_by: lead_created_by,
+      total_cycles: total_cycles,
       customer: customer ? customer : null,
       product: product ? product : null,
       value: value ? value : null,
@@ -155,6 +157,7 @@ const update = async (req, res) => {
     const {
       lead_id,
       lead_created_by,
+      total_cycles,
       customer,
       product,
       value,
@@ -201,6 +204,7 @@ const update = async (req, res) => {
 
     const updatedlead = await existinglead.update({
       lead_created_by: lead_created_by,
+      total_cycles: total_cycles,
       customer: customer,
       product: product,
       value: value,
