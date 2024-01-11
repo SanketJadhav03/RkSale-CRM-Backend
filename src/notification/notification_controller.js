@@ -5,7 +5,7 @@ const sequelize = require('../db/db_config');
 const index = async (req, res) => {
   try {
     const { id } = req.params;
-    
+  
     // Find all notifications for a user with status 1, ordered by createdAt in descending order
     const notifications = await Notification.findAll({
       where: {
@@ -16,17 +16,18 @@ const index = async (req, res) => {
         ['createdAt', 'DESC']
       ],
     });
+  
 
-    res.json(notifications);
+      res.json(notifications);
+    
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
+  
 };
 
-module.exports = {
-  index
-};
+
 
   
   

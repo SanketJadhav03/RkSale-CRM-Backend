@@ -466,8 +466,8 @@ async function initializeDatabase() {
 
   await Permission.bulkCreate(staticPermissions);
   console.log("Static permissions inserted successfully.");
-
-  await Role.create({ role_name: "Admin" });
+  const role_name = "admin";
+  await Role.create({ role_name });
   const permissionsLists = await Permission.findAll();
   for (const permission of permissionsLists) {
     await RoleHasPermission.create({

@@ -100,8 +100,7 @@ expressApp.use("/back-end", payment_type);
 // point routes
 
 // ROLES & PERMISSIONS ROUTE
-const roles = require("./src/roles/role_routes");
-expressApp.use("/back-end", roles);
+
 
 const permissions = require("./src/permissions/permission_route");
 expressApp.use("/back-end", permissions);

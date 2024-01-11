@@ -61,6 +61,7 @@ const updated = async (req, res) => {
         const existingLeadStatus = await LeadStatus.findOne({
             where: {
                 lead_status_name: lead_status_name,
+
                 lead_status_id: { lead_status_id },
             },
         });

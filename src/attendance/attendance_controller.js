@@ -90,15 +90,16 @@ const store = async (req, res) => {
         where: { u_type: 1 }, // Assuming role 1 corresponds to the condition you mentioned
         attributes: ['uid'], // Fetch only the 'id' attribute
       });
-      
+      const user = await User.findByPk(user_id);
       if (admins.length > 0) {
         // If admins with role 1 are found, create a notification for each of them
+        
         const notificationPromises = admins.map(async (admin) => {
           return await Notifaction.create({
             user_id: admin.uid,
             assigned_data_id: newAttendance.attendance_id,
             notification_type:1,
-            notification_description: "New Attendance Stored",
+            notification_description: `${user.name}   Checked In`
           });
         });
       
@@ -445,33 +446,35 @@ const filterData = async (req, res) => {
 };
 const getPresentAbsent = async (req, res) => {
   try {
-    const { id } = req.params;
-  
-    // Query to get the count of present attendances
+    const { employeeId, month } = req.body;
+
+    // Query to get the count of present attendances for a specific month
     const presentAttendanceCountQuery = `
       SELECT COUNT(*) AS presentAttendanceCount
-      FROM tbl_attendances
-      WHERE tbl_attendances.user_id = :id
+      FROM tbl_attendances  
+      WHERE tbl_attendances.user_id = :employeeId
       AND tbl_attendances.remark = 1
+      AND MONTH(tbl_attendances.attendance_date) = :month
     `;
   
-    // Query to get the count of absent attendances
+    // Query to get the count of absent attendances for a specific month
     const absentAttendanceCountQuery = `
       SELECT COUNT(*) AS absentAttendanceCount
       FROM tbl_attendances
-      WHERE tbl_attendances.user_id = :id
+      WHERE tbl_attendances.user_id = :employeeId
       AND tbl_attendances.remark = 2
+      AND MONTH(tbl_attendances.attendance_date) = :month
     `;
   
     // Execute both queries and await the results
     const [presentAttendanceResult, absentAttendanceResult] = await Promise.all([
       sequelize.query(presentAttendanceCountQuery, {
         type: QueryTypes.SELECT,
-        replacements: { id },
+        replacements: { employeeId, month },
       }),
       sequelize.query(absentAttendanceCountQuery, {
         type: QueryTypes.SELECT,
-        replacements: { id },
+        replacements: { employeeId, month },
       }),
     ]);
   
@@ -479,14 +482,14 @@ const getPresentAbsent = async (req, res) => {
     const presentAttendanceCount = presentAttendanceResult[0]?.presentAttendanceCount || 0;
     const absentAttendanceCount = absentAttendanceResult[0]?.absentAttendanceCount || 0;
   
-    // Send the counts in JSON format as the response
-    res.json({ presentAttendanceCount, absentAttendanceCount });
+    // Send the counts along with user_id in JSON format as the response
+    res.json({ user_id: employeeId, presentAttendanceCount, absentAttendanceCount });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Failed To Retrieve Attendance Counts" });
   }
-  
 };
+
 module.exports = {
   store,
   index,

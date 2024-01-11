@@ -1,6 +1,8 @@
 const Role = require('./role_model');
 const RoleHasPermission = require('./role_has_permission_model');
-const DB = require('../db/db_connection');
+const DB = require('../db/db_config');
+
+
 
 // Create a new role
 async function createRole(req, res) {

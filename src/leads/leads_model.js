@@ -28,6 +28,10 @@ const Leads = sequelize.define("tbl_leads", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  total_cycles: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   today_date: {
     type: DataTypes.DATE,
     allowNull: false,
