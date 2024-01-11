@@ -9,7 +9,7 @@ async function initializeDatabase() {
   const hashedPassword = await bcrypt.hash("super@ajspire.com", 10);
   await User.create({
     name: "Super Admin",
-    u_type:1,
+    u_type: 1,
     mobile_no: "9595775123",
     password: hashedPassword,
     email: "super@ajspire.com",
@@ -466,8 +466,8 @@ async function initializeDatabase() {
 
   await Permission.bulkCreate(staticPermissions);
   console.log("Static permissions inserted successfully.");
-const role_name = "admin";
-  await Role.create({ role_name});
+  const role_name = "admin";
+  await Role.create({ role_name });
   const permissionsLists = await Permission.findAll();
   for (const permission of permissionsLists) {
     await RoleHasPermission.create({

@@ -14,7 +14,14 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     // Find the user by email in the database
-    const user = await User.findOne({ where: { email: email } });
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [
+          { email: email },
+          { mobile_no: email }
+        ]
+      }
+    });
 
     if (!user) {
       return res.status(401).json({ error: "Invalid Email" });
