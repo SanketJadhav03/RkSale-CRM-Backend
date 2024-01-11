@@ -15,7 +15,7 @@ const store = async (req, res) => {
             newSalaries.push(newSalary);
         }
     
-        if (newSalaries.length > 0) {
+        if (newSalaries) {
             res.json({ message: "Salaries Generated Successfully" });
         } else {
             res.json({ message: "Failed To Generate Salaries" });
