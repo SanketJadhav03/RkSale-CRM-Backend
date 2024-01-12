@@ -96,7 +96,7 @@ const transferLead = async (req, res) => {
 
 const index = async (req, res) => {
   try {
-    const { leadOrTask, slt_send_by } = req.body;
+    const { leadOrTask, slt_send_by,assigned_by } = req.body;
     let query = ``;
     if (leadOrTask == 0) {
       query += `
@@ -141,7 +141,6 @@ const index = async (req, res) => {
 const getDetails = async (req, res) => {
   try {
     const { start_date, end_date, assigned_by } = req.body;
-    console.log(assigned_by);
     let query1 = `SELECT slts.*,
     send_to_user.name AS send_to_name,
     send_by_user.name AS send_by_name
