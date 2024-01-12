@@ -22,6 +22,7 @@ const store = async (req, res) => {
       assigned_by,
       tags,
       repeat_every_day,
+      total_cycles,
       status,
     } = req.body;
 
@@ -79,6 +80,7 @@ const store = async (req, res) => {
       assigned_by: assigned_by,
       tags: tags,
       repeat_every_day: repeat_every_day,
+      total_cycles:total_cycles,
       status: status,
       image: req.files === null ? null : req.files.image.name,
     });
@@ -165,6 +167,7 @@ const update = async (req, res) => {
       assigned_by,
       tags,
       repeat_every_day,
+      total_cycles,
       status,
     } = req.body;
     const existingtask = await Task.findByPk(task_id);
@@ -208,6 +211,7 @@ const update = async (req, res) => {
       source: source,
       priority: priority,
       repeat_every_day: repeat_every_day,
+      total_cycles:total_cycles,
       description: description,
       assigned_by: assigned_by,
       tags: tags,

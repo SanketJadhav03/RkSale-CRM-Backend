@@ -69,6 +69,10 @@ const Task = sequelize.define('tbl_task', {
 type:DataTypes.STRING,
 allowNull:true
   },
+  total_cycles:{
+type:DataTypes.STRING,
+allowNull:true
+  },
   status:{
     type:DataTypes.INTEGER,
     allowNull:false
