@@ -1,5 +1,7 @@
 const Message = require("./message_model");
 const path = require('path')
+const fs = require("fs");
+
 
 const store = async(req,res) =>{
     try {
@@ -78,10 +80,88 @@ const list = async(req,res) =>{
     }
 }
 
-const update = async(req,res) =>{
+const update = async (req, res) => {
+    try {
+      const {
+        message_id,
+        message_title,
+        message_description,
+      } = req.body;
+  
+      const existingMessage = await Message.findByPk(message_id);
+  
+      if (req.files !== null) {
+        const uploadedFile = req.files.image;
+        const filePath = `public/images/message/${existingMessage.message_image}`;
+  
+        // Remove the existing file
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("Error deleting existing file:", err);
+          }
+        });
+  
+        // Save the new file
+        uploadedFile.mv(`public/images/message/${uploadedFile.name}`, (err) => {
+          if (err) {
+            console.error("Error saving new file:", err);
+          }
+        });
+      }
+  
+      const status = await existingMessage.update({
+        message_title: message_title,
+        message_description: message_description,
+        message_image: req.files !== null ? req.files.image.name : null,
+      });
+  
+      if (status) {
+        res.json({ message: "Updated Successfully" });
+      }
+    } catch (error) {
+      console.log(error);
+      res.json({ error: "Failed To Update" });
+    }
+  };
 
-}
+  const deleted = async(req,res) =>{
+    try {
+        const {id} = req.params;
+        const existingMessage = await Message.findByPk(id);
+if(existingMessage)
+{
+        const filePath = `public/images/message/${existingMessage.message_image}`;
+  
+        // Remove the existing file
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("Error deleting existing file:", err);
+          }
+        });
+  
+        // Save the new file
+
+      }
+
+      if (existingMessage)
+      {
+        await existingMessage.destroy();
+
+        res.json({message:"Deleted SuccessFully"})
+      }else {
+        res.json({message:"Message Not Found 404 "})
+      }
+  
+
+
+    } catch (error) {
+        console.log(error);
+        res.json({error:"Failed To Delete Message"})
+    }
+  }
 module.exports = {
     store,
-    list
+    list,
+    update,
+    deleted
 }
