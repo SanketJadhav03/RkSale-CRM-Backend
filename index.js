@@ -151,6 +151,10 @@ expressApp.use("/back-end", salary);
 const dashboard = require("./src/dashboard/dashboard_route");
 expressApp.use("/back-end", dashboard);
 
+
+const message = require('./src/message/message_routes')
+expressApp.use("/back-end",message)
+
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
 expressApp.listen(port, () => {

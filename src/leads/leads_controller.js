@@ -9,8 +9,6 @@ const store = async (req, res) => {
   try {
     const {
       customer,
-      lead_created_by,
-      total_cycles,
       product,
       value,
       today_date,
@@ -20,13 +18,12 @@ const store = async (req, res) => {
       source,
       priority,
       description,
-      repeat_every_day,
       assigned_by,
       tags,
       status,
     } = req.body;
-    if (req.body.image !== undefined) {
-      const leadsImage = req.file && req.files && req.files.image;
+    if (req.files !== null) {
+      const leadsImage = req.files.image;
 
       const validateAndMove = (file, uploadPath) => {
         if (!file) {
@@ -34,11 +31,9 @@ const store = async (req, res) => {
           console.log("File is null");
           return null;
         }
-
         if (!file.name) {
           return res.status(400).json({ error: "Invalid file object" });
         }
-
         file.mv(uploadPath, (err) => {
           if (err) {
             console.error("Error moving file:", err);
@@ -47,10 +42,8 @@ const store = async (req, res) => {
           // Do something with the file path, for example, save it in the database
           // ...
         });
-
         return file.filename; // Return the filename for use in the database
       };
-
       const rootPath = process.cwd();
       if (req.files.image) {
         validateAndMove(
@@ -58,38 +51,34 @@ const store = async (req, res) => {
           path.join(
             rootPath,
             "public/images/leads",
-            "crm" + "-" + (leadsImage ? leadsImage.name : "")
-          )
-        );
-      }
-    }
-    const assignedByArray = JSON.parse(assigned_by);
-    const newLead = await Leads.create({
-      lead_created_by: lead_created_by,
-      total_cycles: total_cycles,
-      customer: customer ? customer : null,
-      product: product ? product : null,
-      value: value ? value : null,
-      today_date: today_date ? today_date : null,
-      minimum_due_date: minimum_due_date ? minimum_due_date : null,
-      ref_by: ref_by ? ref_by : null,
-      maximum_due_date: maximum_due_date ? maximum_due_date : null,
-      source: source ? source : null,
-      priority: priority ? priority : null,
-      description: description ? description : null,
-      assigned_by: assigned_by ? assigned_by : null,
-      tags: tags ? tags : null,
-      repeat_every_day: repeat_every_day,
-      status: status ? status : null,
-      image: req.body.image !== undefined ? req.files.image.name : null,
-    });
-
-    await Promise.all(
-      assignedByArray.map(async (assignedUserId) => {
-        await Notifaction.create({
-          user_id: assignedUserId,
+            leadsImage ? leadsImage.name : ""
+            )
+            );
+          }
+        }
+        const assignedByArray = JSON.parse(assigned_by);
+        const newLead = await Leads.create({
+          customer: customer ? customer : null,
+          product: product ? product : null,
+          value: value ? value : null,
+          today_date: today_date ? today_date : null,
+          minimum_due_date: minimum_due_date ? minimum_due_date : null,
+          ref_by: ref_by ? ref_by : null,
+          maximum_due_date: maximum_due_date ? maximum_due_date : null,
+          source: source ? source : null,
+          priority: priority ? priority : null,
+          description: description ? description : null,
+          assigned_by: assigned_by ? assigned_by : null,
+          tags: tags ? tags : null,
+          status: status ? status : null,
+          image: req.files === null ? null : req.files.image.name,
+        });
+        await Promise.all(
+          assignedByArray.map(async (assignedUserId) => {
+            await Notifaction.create({
+              user_id: assignedUserId,
           assigned_data_id: newLead.lead_id,
-          notification_description: "New lead Assigned",
+          notification_description: "New lead Stored",
           notification_type: 2,
         });
       })
@@ -100,6 +89,9 @@ const store = async (req, res) => {
     return res.json({ error: "Failed To Create Lead !!" });
   }
 };
+
+     
+
 
 const index = async (req, res) => {
   try {
