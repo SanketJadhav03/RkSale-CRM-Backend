@@ -9,6 +9,8 @@ const store = async (req, res) => {
   try {
     const {
       customer,
+      lead_created_by,
+      total_cycles,
       product,
       value,
       today_date,
@@ -18,6 +20,7 @@ const store = async (req, res) => {
       source,
       priority,
       description,
+      repeat_every_day,
       assigned_by,
       tags,
       status,
@@ -31,9 +34,11 @@ const store = async (req, res) => {
           console.log("File is null");
           return null;
         }
+
         if (!file.name) {
           return res.status(400).json({ error: "Invalid file object" });
         }
+
         file.mv(uploadPath, (err) => {
           if (err) {
             console.error("Error moving file:", err);
@@ -42,8 +47,10 @@ const store = async (req, res) => {
           // Do something with the file path, for example, save it in the database
           // ...
         });
+
         return file.filename; // Return the filename for use in the database
       };
+
       const rootPath = process.cwd();
       if (req.files.image) {
         validateAndMove(
@@ -52,33 +59,37 @@ const store = async (req, res) => {
             rootPath,
             "public/images/leads",
             leadsImage ? leadsImage.name : ""
-            )
-            );
-          }
-        }
-        const assignedByArray = JSON.parse(assigned_by);
-        const newLead = await Leads.create({
-          customer: customer ? customer : null,
-          product: product ? product : null,
-          value: value ? value : null,
-          today_date: today_date ? today_date : null,
-          minimum_due_date: minimum_due_date ? minimum_due_date : null,
-          ref_by: ref_by ? ref_by : null,
-          maximum_due_date: maximum_due_date ? maximum_due_date : null,
-          source: source ? source : null,
-          priority: priority ? priority : null,
-          description: description ? description : null,
-          assigned_by: assigned_by ? assigned_by : null,
-          tags: tags ? tags : null,
-          status: status ? status : null,
-          image: req.files === null ? null : req.files.image.name,
-        });
-        await Promise.all(
-          assignedByArray.map(async (assignedUserId) => {
-            await Notifaction.create({
-              user_id: assignedUserId,
+          )
+        );
+      }
+    }
+    const assignedByArray = JSON.parse(assigned_by);
+    const newLead = await Leads.create({
+      lead_created_by: lead_created_by,
+      total_cycles: total_cycles,
+      customer: customer ? customer : null,
+      product: product ? product : null,
+      value: value ? value : null,
+      today_date: today_date ? today_date : null,
+      minimum_due_date: minimum_due_date ? minimum_due_date : null,
+      ref_by: ref_by ? ref_by : null,
+      maximum_due_date: maximum_due_date ? maximum_due_date : null,
+      source: source ? source : null,
+      priority: priority ? priority : null,
+      description: description ? description : null,
+      assigned_by: assigned_by ? assigned_by : null,
+      tags: tags ? tags : null,
+      repeat_every_day: repeat_every_day,
+      status: status ? status : null,
+      image: req.files !== null ? req.files.image.name : null,
+    });
+
+    await Promise.all(
+      assignedByArray.map(async (assignedUserId) => {
+        await Notifaction.create({
+          user_id: assignedUserId,
           assigned_data_id: newLead.lead_id,
-          notification_description: "New lead Stored",
+          notification_description: "New lead Assigned",
           notification_type: 2,
         });
       })
@@ -89,9 +100,6 @@ const store = async (req, res) => {
     return res.json({ error: "Failed To Create Lead !!" });
   }
 };
-
-     
-
 
 const index = async (req, res) => {
   try {
@@ -170,28 +178,51 @@ const update = async (req, res) => {
       return res.status(404).json({ message: "Lead Not Found" });
     }
 
-    // res.json(existinglead)
-    // Check if a new file is provided in the request
-    if (req.files && req.files.image) {
-      const uploadedFile = req.files.image;
-      const filePath = `public/images/leads/${"crm-" + existinglead.image}`;
+    if (req.files !== null) {
+      const leadsImage = req.files.image;
 
-      // Remove the existing file
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error("Error deleting existing file:", err);
-        }
-      });
+      const validateAndMove = (file, uploadPath) => {
+        const filePath = `public/images/leads/${existinglead.image}`;
 
-      // Save the new file
-      uploadedFile.mv(
-        `public/images/leads/${"crm-" + uploadedFile.name}`,
-        (err) => {
+        // Remove the existing file
+        fs.unlink(filePath, (err) => {
           if (err) {
-            console.error("Error saving new file:", err);
+            console.error("Error deleting existing file:", err);
           }
+        });
+        if (!file) {
+          // Skip the file if it's null
+          console.log("File is null");
+          return null;
         }
-      );
+
+        if (!file.name) {
+          return res.status(400).json({ error: "Invalid file object" });
+        }
+
+        file.mv(uploadPath, (err) => {
+          if (err) {
+            console.error("Error moving file:", err);
+            return res.status(500).json({ error: "Error uploading file" });
+          }
+          // Do something with the file path, for example, save it in the database
+          // ...
+        });
+
+        return file.filename; // Return the filename for use in the database
+      };
+
+      const rootPath = process.cwd();
+      if (req.files.image) {
+        validateAndMove(
+          leadsImage,
+          path.join(
+            rootPath,
+            "public/images/leads",
+            leadsImage ? leadsImage.name : ""
+          )
+        );
+      }
     }
 
     const updatedlead = await existinglead.update({
@@ -211,10 +242,7 @@ const update = async (req, res) => {
       assigned_by: assigned_by,
       tags: tags,
       status: status,
-      file:
-        req.files && req.files.image
-          ? req.files.image.name
-          : existinglead.image,
+      image: req.files.image ? req.files.image.name : existinglead.image,
     });
 
     if (updatedlead) {
@@ -228,7 +256,8 @@ const update = async (req, res) => {
 };
 const filterData = async (req, res) => {
   try {
-    const { start_date, end_date, customer_name, assigned_by,lead_id } = req.body;
+    const { start_date, end_date, customer_name, assigned_by, lead_id } =
+      req.body;
     let sql = `SELECT * FROM tbl_leads 
       INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
       INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
@@ -248,7 +277,7 @@ const filterData = async (req, res) => {
       sql += ` AND tbl_leads.customer = :customer_name`;
       replacements.customer_name = customer_name;
     }
-    if(lead_id > 0){
+    if (lead_id > 0) {
       sql += ` AND tbl_leads.lead_id = :Lead_id`;
       replacements.Lead_id = lead_id;
     }
