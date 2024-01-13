@@ -242,7 +242,7 @@ const update = async (req, res) => {
       assigned_by: assigned_by,
       tags: tags,
       status: status,
-      image: req.files.image ? req.files.image.name : existinglead.image,
+      image: req.files!=null ? req.files.image.name : existinglead.image,
     });
 
     if (updatedlead) {
