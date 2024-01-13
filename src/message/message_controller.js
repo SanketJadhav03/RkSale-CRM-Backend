@@ -7,10 +7,10 @@ const store = async(req,res) =>{
 
 
 
-if (req.file )
+if (req.files)
 {
 
-    const messageImage =  req.file;
+    const messageImage =  req.files.image;
 
     const validateAndMove = (file, uploadPath) => {
       if (!file) {
@@ -42,7 +42,7 @@ if (req.file )
         path.join(
           rootPath,
           "public/images/message",
-           (messageImage ? messageImage.filename : "")
+           (messageImage ? messageImage.name : "")
         )
       );
     }
