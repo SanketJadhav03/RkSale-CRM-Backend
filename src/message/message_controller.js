@@ -116,7 +116,7 @@ const update = async (req, res) => {
       });
   
       if (status) {
-        res.json({ message: "Updated Successfully" });
+        res.json({ message: "Updated Successfully" ,status:1});
       }
     } catch (error) {
       console.log(error);
