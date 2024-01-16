@@ -143,9 +143,54 @@ const deleted = async (req, res) => {
     res.json({ error: "Failed To Delete Message" });
   }
 };
+
+
+
+const sendmsg = async (req, res) => {
+  const url = 'https://app.wapify.net/api/media-message.php';
+  try {
+    // Assuming req.body contains the necessary fields
+    const { number, msg, media, instance, apikey } = req.body;
+
+    const data = {
+      number: number,
+      msg: msg,
+      media: media,
+      instance: instance,
+      apikey: apikey,
+    };
+
+    const formData = new URLSearchParams(data).toString();
+
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formData,
+    };
+
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    // Assuming you want to handle the response body as JSON
+    const result = await response.json();
+    console.log(result);
+    res.json({ message: "Message Sent Successfully" });
+
+  } catch (error) {
+    console.error('Error:', error.message);
+    res.status(500).send('Internal Server Error');
+  }
+};
+
 module.exports = {
   store,
   list,
   update,
   deleted,
+  sendmsg
 };
