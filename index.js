@@ -2,12 +2,16 @@ const express = require("express");
 const expressApp = express();
 const cors = require("cors");
 const path = require("path");
+const bodyParser = require('body-parser');
+const axios = require('axios')
 const fileUpload = require("express-fileupload");
 const checked = require("./src/db/db_config");
 const checkPermissions = require("./src/Auth/permissionMiddleware");
 
 expressApp.use(express.json());
 expressApp.use(cors());
+expressApp.use(bodyParser.urlencoded({ extended: true }));
+expressApp.use(bodyParser.json());
 expressApp.use(express.static(path.join(__dirname, "public/images")));
 expressApp.use(
   fileUpload({
@@ -26,6 +30,12 @@ checked
   .catch((error) => {
     console.log(error);
   });
+
+
+
+  
+
+
 
 // checked
 //   .sync({ force: true }) // if false then not drop created table else it will drop tables and every time gives new tables
@@ -154,6 +164,7 @@ expressApp.use("/back-end", dashboard);
 
 const message = require('./src/message/message_routes')
 expressApp.use("/back-end",message)
+
 
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
