@@ -28,7 +28,7 @@ const index = async (req, res) => {
       INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
       INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
       INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
-      WHERE tbl_follow_ups.follow_up_send_by= ${follow_up_send_by};`;
+      WHERE tbl_follow_ups.follow_up_task_id= ${follow_up_send_by};`;
     }
     const data = await sequelize.query(query, {
       type: QueryTypes.SELECT,
