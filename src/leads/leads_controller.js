@@ -256,7 +256,7 @@ const update = async (req, res) => {
 };
 const filterData = async (req, res) => {
   try {
-    const { start_date, end_date, customer_name, assigned_by, lead_id } =
+    const { start_date, end_date, customer_name, assigned_by, lead_id, status_name } =
       req.body;
     let sql = `SELECT * FROM tbl_leads 
       INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
@@ -276,6 +276,10 @@ const filterData = async (req, res) => {
     if (customer_name > 0) {
       sql += ` AND tbl_leads.customer = :customer_name`;
       replacements.customer_name = customer_name;
+    }
+    if (status_name > 0) {
+      sql += ` AND tbl_leads.status = :status_name`;
+      replacements.status_name = status_name;
     }
     if (lead_id > 0) {
       sql += ` AND tbl_leads.lead_id = :Lead_id`;
