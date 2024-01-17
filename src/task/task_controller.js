@@ -80,7 +80,7 @@ const store = async (req, res) => {
       assigned_by: assigned_by,
       tags: tags,
       repeat_every_day: repeat_every_day,
-      total_cycles:total_cycles,
+      total_cycles: total_cycles,
       status: status,
       image: req.files === null ? null : req.files.image.name,
     });
@@ -211,7 +211,7 @@ const update = async (req, res) => {
       source: source,
       priority: priority,
       repeat_every_day: repeat_every_day,
-      total_cycles:total_cycles,
+      total_cycles: total_cycles,
       description: description,
       assigned_by: assigned_by,
       tags: tags,
@@ -231,7 +231,14 @@ const update = async (req, res) => {
 
 const filterData = async (req, res) => {
   try {
-    const { start_date, end_date, customer_name, assigned_by,task_id } = req.body;
+    const {
+      start_date,
+      end_date,
+      customer_name,
+      assigned_by,
+      task_id,
+      status_name,
+    } = req.body;
     let sql = `SELECT * 
     FROM tbl_tasks 
     INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
@@ -248,11 +255,15 @@ const filterData = async (req, res) => {
       sql += ` AND tbl_tasks.customer = :customer_name`;
       replacements.customer_name = customer_name;
     }
+    if (status_name > 0) {
+      sql += ` AND tbl_tasks.status = :status_name`;
+      replacements.status_name = status_name;
+    }
     if (assigned_by > 0) {
       sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
       replacements.assigned_by = assigned_by;
     }
-    if(task_id > 0){
+    if (task_id > 0) {
       sql += ` AND tbl_tasks.task_id = :Task_id`;
       replacements.Task_id = task_id;
     }
