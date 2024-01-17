@@ -157,7 +157,7 @@ const sendmsg = async (req, res) => {
       msg: msg,
       media: media,
       instance: instance,
-      apikey: apikey,
+      apikey: "1e02603b909287d419e289997344ca8769fc00cb",
     };
 
     const formData = new URLSearchParams(data).toString();
@@ -177,7 +177,7 @@ const sendmsg = async (req, res) => {
     }
 
     // Assuming you want to handle the response body as JSON
-    const result = await response.json();
+    const result = await response.text();
     console.log(result);
     res.json({ message: "Message Sent Successfully" });
 
