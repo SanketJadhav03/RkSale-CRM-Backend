@@ -106,6 +106,7 @@ const index = async (req, res) => {
     const data = await sequelize.query(
       `SELECT * FROM tbl_leads 
       INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
+      INNER JOIN users ON tbl_leads.lead_created_by = users.uid
       INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
       INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
       INNER JOIN tbl_products ON tbl_leads.product = tbl_products.product_id
@@ -242,7 +243,7 @@ const update = async (req, res) => {
       assigned_by: assigned_by,
       tags: tags,
       status: status,
-      image: req.files!=null ? req.files.image.name : existinglead.image,
+      image: req.files != null ? req.files.image.name : existinglead.image,
     });
 
     if (updatedlead) {
@@ -256,8 +257,14 @@ const update = async (req, res) => {
 };
 const filterData = async (req, res) => {
   try {
-    const { start_date, end_date, customer_name, assigned_by, lead_id, status_name } =
-      req.body;
+    const {
+      start_date,
+      end_date,
+      customer_name,
+      assigned_by,
+      lead_id,
+      status_name,
+    } = req.body;
     let sql = `SELECT * FROM tbl_leads 
       INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
       INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
