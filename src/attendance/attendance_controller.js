@@ -254,6 +254,7 @@ const todayattendance = async (req, res) => {
       return {
         ...attendance,
         in_photo: `/attendance/${attendance.in_photo}`, // Adjust field name if needed
+        out_photo: `/attendance/${attendance.out_photo}`, // Adjust field name if needed
       };
     });
 
