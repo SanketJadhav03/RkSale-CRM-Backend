@@ -25,7 +25,7 @@ const store = async (req, res) => {
       tags,
       status,
     } = req.body;
-    if (req.files !== null) {
+    if (req.files !== undefined) {
       const leadsImage = req.files.image;
 
       const validateAndMove = (file, uploadPath) => {
