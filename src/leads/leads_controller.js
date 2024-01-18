@@ -179,7 +179,7 @@ const update = async (req, res) => {
       return res.status(404).json({ message: "Lead Not Found" });
     }
 
-    if (req.files !== null) {
+    if (req.files !== undefined) {
       const leadsImage = req.files.image;
 
       const validateAndMove = (file, uploadPath) => {
@@ -243,7 +243,7 @@ const update = async (req, res) => {
       assigned_by: assigned_by,
       tags: tags,
       status: status,
-      image: req.files != null ? req.files.image.name : existinglead.image,
+      image: req.files != null ? req.files.image.name : null,
     });
 
     if (updatedlead) {
