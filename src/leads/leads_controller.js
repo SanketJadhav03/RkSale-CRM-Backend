@@ -25,7 +25,8 @@ const store = async (req, res) => {
       tags,
       status,
     } = req.body;
-    if (req.files !== undefined) {
+
+    if (req.files !== null) {
       const leadsImage = req.files.image;
 
       const validateAndMove = (file, uploadPath) => {
@@ -179,7 +180,7 @@ const update = async (req, res) => {
       return res.status(404).json({ message: "Lead Not Found" });
     }
 
-    if (req.files !== undefined) {
+    if (req.files !== null) {
       const leadsImage = req.files.image;
 
       const validateAndMove = (file, uploadPath) => {
