@@ -27,7 +27,7 @@ const store = async (req, res) => {
     } = req.body;
 
     if (req.files !== null) {
-      const leadsImage = req.file && req.files && req.files.image;
+      const leadsImage = req.files.image;
 
       const validateAndMove = (file, uploadPath) => {
         if (!file) {
@@ -180,7 +180,7 @@ const update = async (req, res) => {
     // Check if a new file is provided in the request
     if (req.files && req.files.image) {
       const uploadedFile = req.files.image;
-      const filePath = `public/images/task/${"crm-" + existingtask.image}`;
+      const filePath = `public/images/task/${existingtask.image}`;
 
       // Remove the existing file
       fs.unlink(filePath, (err) => {
@@ -191,7 +191,7 @@ const update = async (req, res) => {
 
       // Save the new file
       uploadedFile.mv(
-        `public/images/task/${"crm-" + uploadedFile.name}`,
+        `public/images/task/${uploadedFile.name}`,
         (err) => {
           if (err) {
             console.error("Error saving new file:", err);
@@ -221,7 +221,7 @@ const update = async (req, res) => {
     });
 
     if (updatedtask) {
-      return res.json({ message: "Task added successfully!", status: 1 });
+      return res.json({ message: "Task updated successfully!", status: 1 });
     } else {
       res.json({ message: "Task Updated Failed", status: 0 });
     }
