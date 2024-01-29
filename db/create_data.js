@@ -1,4 +1,5 @@
 const User = require("../src/Auth/User_model");
+const Shift = require("../src/shift/shift_model");
 const Permission = require("../src/permissions/permission_model");
 const RoleHasPermission = require("../src/roles/role_has_permission_model");
 const bcrypt = require("bcrypt");
@@ -15,6 +16,14 @@ async function initializeDatabase() {
     email: "super@ajspire.com",
     id: 1,
   });
+  await Shift.create({
+    shift_name: "FIRST",
+    shift_intime: "10:39:00",
+    shift_outime: "17:39:00",
+    shift_status: 1,
+  });
+
+  
   await IndustryType.bulkCreate([
     {
       industry_type_name: "Food industry",
