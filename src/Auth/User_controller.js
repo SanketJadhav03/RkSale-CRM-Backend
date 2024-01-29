@@ -1,4 +1,4 @@
-const { Op, Sequelize } = require("sequelize");
+const { Op, Sequelize, QueryTypes } = require("sequelize");
 
 const User = require("./User_model");
 const bcrypt = require("bcrypt");
@@ -14,21 +14,22 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     // Find the user by email in the database
-    const user = await User.findOne({
-      where: {
-        [Op.or]: [
-          { email: email },
-          { mobile_no: email }
-        ]
+    const data = await sequelize.query(
+      `SELECT * FROM users 
+      INNER JOIN roles ON users.user_role_id = roles.role_id 
+      WHERE email = :email OR mobile_no = :mobileNo
+      `,
+      {
+        replacements: { email, mobileNo: email },
+        type: QueryTypes.SELECT,
       }
-    });
-
-    if (!user) {
+    );
+    if (!data) {
       return res.status(401).json({ error: "Invalid Email" });
     }
 
     // Compare the provided password with the hashed password in the database
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, data[0].password);
 
     if (!passwordMatch) {
       return res.status(401).json({ error: "Invalid Password" });
@@ -38,7 +39,7 @@ const login = async (req, res) => {
 
     // Generate a different token depending on whether the user is an admin or a regular user
     const token = jwt.sign(
-      { userId: user.uid, email: user.email },
+      { userId: data[0].uid, email: data[0].email },
       "replace-with-a-strong-secret-key",
       { expiresIn: "1h" }
     );
@@ -56,6 +57,7 @@ const login = async (req, res) => {
     // );
 
     // console.log(rows);
+    const user = data[0];
     res.json({
       token,
       user,
@@ -64,7 +66,7 @@ const login = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -154,8 +156,7 @@ const store = async (req, res) => {
       });
 
       return file.filename; // Return the filename for use in the database
-    };// 10 is the number of salt rounds
-
+    }; // 10 is the number of salt rounds
 
     if (req.files && req.files.profile_photo) {
       const profile_photo = req.files.profile_photo || null;
@@ -165,7 +166,7 @@ const store = async (req, res) => {
         path.join(
           rootPath,
           "public/images/user",
-          (profile_photo ? profile_photo.name : null)
+          profile_photo ? profile_photo.name : null
         )
       );
     }
@@ -178,7 +179,7 @@ const store = async (req, res) => {
         path.join(
           rootPath,
           "public/images/user",
-          (adhaar_photo ? adhaar_photo.name : null)
+          adhaar_photo ? adhaar_photo.name : null
         )
       );
     }
@@ -191,7 +192,7 @@ const store = async (req, res) => {
         path.join(
           rootPath,
           "public/images/user",
-          (pan_photo ? pan_photo.name : null)
+          pan_photo ? pan_photo.name : null
         )
       );
     }
@@ -203,19 +204,13 @@ const store = async (req, res) => {
         path.join(
           rootPath,
           "public/images/user",
-          (bank_passbook_photo ? bank_passbook_photo.name : null)
+          bank_passbook_photo ? bank_passbook_photo.name : null
         )
       );
     }
     // const adhaar_photo = req.files.aadhar_photo || null;
     // const pan_photo = req.files.pan_photo || null;
     // const bank_passbook_photo = req.files.bank_passbook_photo || null;
-
-
-
-
-
-
 
     // validateAndMove(
     //   adhaar_photo,
@@ -244,7 +239,6 @@ const store = async (req, res) => {
     //   )
     // );
 
-
     // Create a new user in the database
     const newUser = await User.create({
       u_type: u_type,
@@ -265,16 +259,20 @@ const store = async (req, res) => {
       last_company_salary: last_company_salary,
       shift_id: shift_id,
 
-
-      profile_photo: req.files && req.files.profile_photo
-        ? req.files.profile_photo.name
-        : null,
-      aadhar_photo: req.files && req.files.aadhar_photo ? req.files.aadhar_photo.name : null,
-      pan_photo: req.files && req.files.pan_photo ? req.files.pan_photo.name : null,
-      bank_passbook_photo: req.files && req.files.bank_passbook_photo
-        ? req.files.bank_passbook_photo.name
-        : null,
-
+      profile_photo:
+        req.files && req.files.profile_photo
+          ? req.files.profile_photo.name
+          : null,
+      aadhar_photo:
+        req.files && req.files.aadhar_photo
+          ? req.files.aadhar_photo.name
+          : null,
+      pan_photo:
+        req.files && req.files.pan_photo ? req.files.pan_photo.name : null,
+      bank_passbook_photo:
+        req.files && req.files.bank_passbook_photo
+          ? req.files.bank_passbook_photo.name
+          : null,
     });
 
     // Send a success response with the created user data
@@ -319,7 +317,7 @@ const updated = async (req, res) => {
       email,
       aadhar_no,
       pan_no,
-      user_upi
+      user_upi,
     } = req.body;
     const user = await User.findByPk(uid);
     if (!user) {
@@ -339,14 +337,11 @@ const updated = async (req, res) => {
         });
       }
       // Save the new file
-      uploadedFile.mv(
-        `public/images/user/${uploadedFile.name}`,
-        (err) => {
-          if (err) {
-            console.error("Error saving new file:", err);
-          }
+      uploadedFile.mv(`public/images/user/${uploadedFile.name}`, (err) => {
+        if (err) {
+          console.error("Error saving new file:", err);
         }
-      );
+      });
     }
 
     if (req.files && req.files.aadhar_photo) {
@@ -362,14 +357,11 @@ const updated = async (req, res) => {
         });
       }
       // Save the new file
-      uploadedFile.mv(
-        `public/images/user/${uploadedFile.name}`,
-        (err) => {
-          if (err) {
-            console.error("Error saving new file:", err);
-          }
+      uploadedFile.mv(`public/images/user/${uploadedFile.name}`, (err) => {
+        if (err) {
+          console.error("Error saving new file:", err);
         }
-      );
+      });
     }
 
     if (req.files && req.files.pan_photo) {
@@ -385,20 +377,16 @@ const updated = async (req, res) => {
         });
       }
       // Save the new file
-      uploadedFile.mv(
-        `public/images/user/${uploadedFile.name}`,
-        (err) => {
-          if (err) {
-            console.error("Error saving new file:", err);
-          }
+      uploadedFile.mv(`public/images/user/${uploadedFile.name}`, (err) => {
+        if (err) {
+          console.error("Error saving new file:", err);
         }
-      );
+      });
     }
 
     if (req.files && req.files.bank_passbook_photo) {
       const uploadedFile = req.files.pan_photo;
-      const filePath = `public/images/user/${user.bank_passbook_photo
-        }`;
+      const filePath = `public/images/user/${user.bank_passbook_photo}`;
 
       // Remove the existing file
       if (user.bank_passbook_photo !== null) {
@@ -409,14 +397,11 @@ const updated = async (req, res) => {
         });
       }
       // Save the new file
-      uploadedFile.mv(
-        `public/images/user/${uploadedFile.name}`,
-        (err) => {
-          if (err) {
-            console.error("Error saving new file:", err);
-          }
+      uploadedFile.mv(`public/images/user/${uploadedFile.name}`, (err) => {
+        if (err) {
+          console.error("Error saving new file:", err);
         }
-      );
+      });
     }
 
     const updateduser = await user.update({
@@ -435,16 +420,22 @@ const updated = async (req, res) => {
       last_working_company: last_working_company,
       last_company_salary: last_company_salary,
       shift_id: shift_id,
-      profile_photo: req.files && req.files.profile_photo
-        ? req.files.profile_photo.name
-        : user.profile_photo,
-      aadhar_photo: req.files && req.files.aadhar_photo
-        ? req.files.aadhar_photo.name
-        : user.aadhar_photo,
-      pan_photo: req.files && req.files.pan_photo ? req.files.pan_photo.name : user.pan_photo,
-      bank_passbook_photo: req.files && req.files.bank_passbook_photo
-        ? req.files.bank_passbook_photo.name
-        : user.bank_passbook_photo,
+      profile_photo:
+        req.files && req.files.profile_photo
+          ? req.files.profile_photo.name
+          : user.profile_photo,
+      aadhar_photo:
+        req.files && req.files.aadhar_photo
+          ? req.files.aadhar_photo.name
+          : user.aadhar_photo,
+      pan_photo:
+        req.files && req.files.pan_photo
+          ? req.files.pan_photo.name
+          : user.pan_photo,
+      bank_passbook_photo:
+        req.files && req.files.bank_passbook_photo
+          ? req.files.bank_passbook_photo.name
+          : user.bank_passbook_photo,
     });
 
     res.status(200).json({ message: "User updated successfully", user });
