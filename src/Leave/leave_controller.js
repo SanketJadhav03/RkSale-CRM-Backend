@@ -197,6 +197,7 @@ const index = async (req, res) => {
 
         let sql = `
             SELECT 
+            leaves.createdAt AS leaveCreatedAt,
                 leaves.*,
                 users_leave.*
             FROM tbl_leaves AS leaves
