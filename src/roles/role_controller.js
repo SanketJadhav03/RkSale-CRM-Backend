@@ -1,6 +1,7 @@
 const Role = require("./role_model");
 const RoleHasPermission = require("./role_has_permission_model");
-const DB = require("../db/db_config");
+const sequelize = require("../db/db_config");
+const { QueryTypes } = require("sequelize");
 
 // Create a new role
 async function createRole(req, res) {
@@ -78,25 +79,27 @@ async function getAllRoles(req, res) {
 }
 
 // Get a single role by ID
-async function getRoleById(req, res) {
+const getRoleById = async (req, res) => {
   try {
     const roleId = req.params.id;
-    const role = await Role.findByPk(roleId);
-    DB.serialize(() => {
-      DB.all(
-        `SELECT * FROM role_has_permissions
-            INNER JOIN permissions ON role_has_permissions.rhp_permission_id = permissions.permission_id
-            WHERE rhp_role_id=${roleId}`,
-        (err, rows) => {
-          res.json({ rolesAndPermissionsData: rows, roless: role });
-        }
-      );
-    });
+    console.log(roleId);
+
+    const rolesAndPermissionsData = await sequelize.query(
+      "SELECT * FROM role_has_permissions " +
+        "INNER JOIN permissions ON role_has_permissions.rhp_permission_id = permissions.permission_id " +
+        "WHERE rhp_role_id = :roleId",
+      {
+        replacements: { roleId },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    res.json({ rolesAndPermissionsData });
   } catch (error) {
     console.error(error);
     res.json({ error });
   }
-}
+};
 
 // Delete a role by ID
 async function deleteRole(req, res) {
