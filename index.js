@@ -33,19 +33,19 @@ checked
 
 
 
-  
 
 
 
-// checked
-//   .sync({ force: true }) // if false then not drop created table else it will drop tables and every time gives new tables
-//   .then(() => {
-//     require("./db/create_data");
-//     console.log("Database created!");
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   });
+
+checked
+  .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+  .then(() => {
+    require("./db/create_data");
+    console.log("Database created!");
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 // user routes
 const user = require("./src/Auth/User_route");
 expressApp.use("/back-end", user);
@@ -163,7 +163,7 @@ expressApp.use("/back-end", dashboard);
 
 
 const message = require('./src/message/message_routes')
-expressApp.use("/back-end",message)
+expressApp.use("/back-end", message)
 
 
 // ################################ END #####################################################
