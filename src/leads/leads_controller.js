@@ -26,10 +26,13 @@ const store = async (req, res) => {
       status,
     } = req.body;
 
-    if (req.files !== null) {
-      const leadsImage = req.files.image;
+    let imageFilenames = [];
 
-      const validateAndMove = (file, uploadPath) => {
+    if (req.files !== null && Array.isArray(req.files["image[]"])) {
+      const rootPath = process.cwd();
+
+      // Function to validate and move each image
+      const validateAndMove = (file) => {
         if (!file) {
           // Skip the file if it's null
           console.log("File is null");
@@ -40,6 +43,12 @@ const store = async (req, res) => {
           return res.status(400).json({ error: "Invalid file object" });
         }
 
+        const uploadPath = path.join(
+          rootPath,
+          "public/images/leads",
+          file.name
+        );
+
         file.mv(uploadPath, (err) => {
           if (err) {
             console.error("Error moving file:", err);
@@ -49,22 +58,17 @@ const store = async (req, res) => {
           // ...
         });
 
-        return file.filename; // Return the filename for use in the database
+        return file.name; // Return the filename for use in the database
       };
 
-      const rootPath = process.cwd();
-      if (req.files.image) {
-        validateAndMove(
-          leadsImage,
-          path.join(
-            rootPath,
-            "public/images/leads",
-            leadsImage ? leadsImage.name : ""
-          )
-        );
-      }
+      // Validate and move each image
+      imageFilenames = req.files["image[]"].map((image) =>
+        validateAndMove(image)
+      );
     }
+
     const assignedByArray = JSON.parse(assigned_by);
+
     const newLead = await Leads.create({
       lead_created_by: lead_created_by,
       total_cycles: total_cycles,
@@ -82,7 +86,7 @@ const store = async (req, res) => {
       tags: tags ? tags : null,
       repeat_every_day: repeat_every_day,
       status: status ? status : null,
-      image: req.files !== null ? req.files.image.name : null,
+      image: `[${imageFilenames}]`, // Use array of image filenames
     });
 
     await Promise.all(
