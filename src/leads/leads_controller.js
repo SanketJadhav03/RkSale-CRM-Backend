@@ -184,18 +184,13 @@ const update = async (req, res) => {
       return res.status(404).json({ message: "Lead Not Found" });
     }
 
-    if (req.files !== null) {
-      const leadsImage = req.files.image;
+    let imageFilenames = [];
 
-      const validateAndMove = (file, uploadPath) => {
-        const filePath = `public/images/leads/${existinglead.image}`;
+    if (req.files !== null && Array.isArray(req.files["image[]"])) {
+      const rootPath = process.cwd();
 
-        // Remove the existing file
-        fs.unlink(filePath, (err) => {
-          if (err) {
-            console.error("Error deleting existing file:", err);
-          }
-        });
+      // Function to validate and move each image
+      const validateAndMove = (file) => {
         if (!file) {
           // Skip the file if it's null
           console.log("File is null");
@@ -206,6 +201,12 @@ const update = async (req, res) => {
           return res.status(400).json({ error: "Invalid file object" });
         }
 
+        const uploadPath = path.join(
+          rootPath,
+          "public/images/leads",
+          file.name
+        );
+
         file.mv(uploadPath, (err) => {
           if (err) {
             console.error("Error moving file:", err);
@@ -215,21 +216,15 @@ const update = async (req, res) => {
           // ...
         });
 
-        return file.filename; // Return the filename for use in the database
+        return file.name; // Return the filename for use in the database
       };
 
-      const rootPath = process.cwd();
-      if (req.files.image) {
-        validateAndMove(
-          leadsImage,
-          path.join(
-            rootPath,
-            "public/images/leads",
-            leadsImage ? leadsImage.name : ""
-          )
-        );
-      }
+      // Validate and move each image
+      imageFilenames = req.files["image[]"].map((image) =>
+        validateAndMove(image)
+      );
     }
+    return console.log(imageFilenames);
 
     const updatedlead = await existinglead.update({
       lead_created_by: lead_created_by,
@@ -248,7 +243,7 @@ const update = async (req, res) => {
       assigned_by: assigned_by,
       tags: tags,
       status: status,
-      image: req.files != null ? req.files.image.name : null,
+      image: req.files != null ? `[${imageFilenames}]` : existinglead.image,
     });
 
     if (updatedlead) {
