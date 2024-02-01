@@ -28,7 +28,7 @@ const store = async (req, res) => {
 
     let imageFilenames = [];
 
-    if (req.files !== null && Array.isArray(req.files["image[]"])) {
+    if (req.files !== null) {
       const rootPath = process.cwd();
 
       // Function to validate and move each image
@@ -62,9 +62,16 @@ const store = async (req, res) => {
       };
 
       // Validate and move each image
-      imageFilenames = req.files["image[]"].map((image) =>
-        validateAndMove(image)
-      );
+      if (Array.isArray(req.files["image[]"])) {
+        // Validate and move each image
+        imageFilenames = req.files["image[]"].map((image) =>
+          validateAndMove(image)
+        );
+      } else {
+        // Only one image is coming
+        const singleImage = req.files["image[]"];
+        imageFilenames.push(validateAndMove(singleImage));
+      }
     }
 
     const assignedByArray = JSON.parse(assigned_by);
@@ -185,7 +192,7 @@ const update = async (req, res) => {
     }
 
     let imageFilenames = [];
-    if (req.files !== null && Array.isArray(req.files["image[]"])) {
+    if (req.files != null) {
       const rootPath = process.cwd();
 
       // Function to validate and move each image
@@ -211,17 +218,31 @@ const update = async (req, res) => {
             console.error("Error moving file:", err);
             return res.status(500).json({ error: "Error uploading file" });
           }
-          // Do something with the file path, for example, save it in the database
-          // ...
         });
 
         return file.name; // Return the filename for use in the database
       };
 
       // Validate and move each image
-      imageFilenames = req.files["image[]"].map((image) =>
-        validateAndMove(image)
-      );
+      if (Array.isArray(req.files["image[]"])) {
+        // Validate and move each image
+        imageFilenames = req.files["image[]"].map((image) =>
+          validateAndMove(image)
+        );
+      } else {
+        // Only one image is coming
+        const singleImage = req.files["image[]"];
+        imageFilenames.push(validateAndMove(singleImage));
+      }
+    }
+    if (Array.isArray(existinglead.image)) {
+      // If existinglead.image is an array of strings
+      existinglead.image.forEach((imageName) => {
+        imageFilenames.push(imageName.replace(/[\[\]]/g, ""));
+      });
+    } else {
+      // If existinglead.image is a single string
+      imageFilenames.push(existinglead.image.replace(/[\[\]]/g, ""));
     }
 
     const updatedlead = await existinglead.update({
@@ -241,9 +262,7 @@ const update = async (req, res) => {
       assigned_by: assigned_by,
       tags: tags,
       status: status,
-      image: Array.isArray(req.files["image[]"])
-        ? `[${imageFilenames}]`
-        : existinglead.image,
+      image: req.files != null ? `[${imageFilenames}]` : existinglead.image,
     });
 
     if (updatedlead) {
