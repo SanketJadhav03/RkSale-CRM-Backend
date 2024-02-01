@@ -185,7 +185,6 @@ const update = async (req, res) => {
     }
 
     let imageFilenames = [];
-
     if (req.files !== null && Array.isArray(req.files["image[]"])) {
       const rootPath = process.cwd();
 
@@ -224,7 +223,6 @@ const update = async (req, res) => {
         validateAndMove(image)
       );
     }
-    return console.log(imageFilenames);
 
     const updatedlead = await existinglead.update({
       lead_created_by: lead_created_by,
@@ -243,7 +241,9 @@ const update = async (req, res) => {
       assigned_by: assigned_by,
       tags: tags,
       status: status,
-      image: req.files != null ? `[${imageFilenames}]` : existinglead.image,
+      image: Array.isArray(req.files["image[]"])
+        ? `[${imageFilenames}]`
+        : existinglead.image,
     });
 
     if (updatedlead) {
