@@ -241,8 +241,9 @@ const update = async (req, res) => {
         imageFilenames.push(imageName.replace(/[\[\]]/g, ""));
       });
     } else {
-      // If existinglead.image is a single string
-      imageFilenames.push(existinglead.image.replace(/[\[\]]/g, ""));
+      if (existinglead.image !== "[]") {
+        imageFilenames.push(existinglead.image.replace(/[\[\]]/g, ""));
+      }
     }
 
     const updatedlead = await existinglead.update({
