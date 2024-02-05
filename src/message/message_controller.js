@@ -82,7 +82,7 @@ const update = async (req, res) => {
       const filePath = `public/images/message/${existingMessage.message_image}`;
 
       // Remove the existing file
-      fs.unlink(filePath, (err) => {
+      fs.unlink(filePath,   (err) => {
         if (err) {
           console.error("Error deleting existing file:", err);
         }

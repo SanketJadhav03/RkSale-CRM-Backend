@@ -129,9 +129,35 @@ const show = async (req, res) => {
     }
 }
 
+const advance = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      const $data = await sequelize.query(
+        `
+        SELECT * 
+        FROM tbl_payments 
+        WHERE tbl_payments.payment_type = 1
+        AND tbl_payments.some_other_column = :id
+        `,
+        {
+          replacements: { id },
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
+  
+      res.json({ data: $data });
+    } catch (error) {
+      console.error(error);
+      res.json({ message: "Failed To Get Advance" });
+    }
+  };
+
+
 module.exports = {
     store,
     index,
     update,
-    show
+    show,
+    advance
 }   
