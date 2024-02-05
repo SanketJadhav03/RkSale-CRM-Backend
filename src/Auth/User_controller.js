@@ -25,7 +25,7 @@ const login = async (req, res) => {
     if (!data) {
       return res.status(401).json({ error: "Invalid Email" });
     }
-
+    console.log(data);
     // Compare the provided password with the hashed password in the database
     const passwordMatch = await bcrypt.compare(password, data[0].password);
 

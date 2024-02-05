@@ -51,7 +51,7 @@ const store = async (req, res) => {
       message_image: req.files ? req.files.image.name : null,
     });
 
-    res.json({ message: "Message Created SuccessFully",status:1 });
+    res.json({ message: "Message Created SuccessFully", status: 1 });
   } catch (error) {
     res.json({ error: "Failed To Store Message" });
     console.log(error);
