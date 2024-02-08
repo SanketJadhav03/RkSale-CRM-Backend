@@ -6,8 +6,6 @@ const jwt = require("jsonwebtoken");
 const path = require("path");
 const fs = require("fs");
 const sequelize = require("../db/db_config");
-const DB = require("../../src/roles/role_has_permission_model");
-const Permissions = require("../../src/permissions/permission_model");
 
 const login = async (req, res) => {
   try {
@@ -110,8 +108,6 @@ const index = async (req, res) => {
 };
 const store = async (req, res) => {
   try {
-    // return res.json(req);
-    // Extract data from the request body
     const {
       u_type,
       name,

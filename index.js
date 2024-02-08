@@ -35,8 +35,6 @@ checked
 
 
 
-
-
 checked
   .sync({ alter: false }) // if false then not drop created table else it will drop tables and every time gives new tables
   .then(() => {
@@ -46,6 +44,7 @@ checked
   .catch((error) => {
     console.log(error);
   });
+
 // user routes
 const user = require("./src/Auth/User_route");
 expressApp.use("/back-end", user);

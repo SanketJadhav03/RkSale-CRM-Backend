@@ -45,10 +45,12 @@ const filterTranscation = async (req, res) => {
         });
 
         res.json(filteredSalaries);
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
+
 }
 const singleview = async (req, res) => {
     try {
@@ -77,4 +79,7 @@ const singleview = async (req, res) => {
 module.exports = {
     store,
     filterTranscation, singleview
-}
+
+};
+
+

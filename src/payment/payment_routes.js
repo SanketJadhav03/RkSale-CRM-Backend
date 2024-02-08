@@ -6,6 +6,7 @@ router.post('/payment/store',controller.store);
 router.get('/payment/list',controller.index);
 router.put('/payment/update',controller.update);
 router.get('/payment/show/:id',controller.show);
+router.get('/payment/show/advance/:id',controller.advance);
 
 
 module.exports = router;
