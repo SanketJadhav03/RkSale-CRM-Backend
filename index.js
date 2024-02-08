@@ -33,6 +33,18 @@ checked
 
 
 
+
+
+checked
+  .sync({ alter: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+  .then(() => {
+    require("./db/create_data");
+    console.log("Database created!");
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+
 // user routes
 const user = require("./src/Auth/User_route");
 expressApp.use("/back-end", user);
