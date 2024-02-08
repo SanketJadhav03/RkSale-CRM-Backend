@@ -6,7 +6,7 @@ router.post('/leave/store', controller.store)
 router.put('/leave/update', controller.updated)
 
 router.post('/leave/list', controller.index);
-// router.get('/leave/list/:type?', controller.index);
+router.get('/leave/show/:id', controller.singleview);
 
 router.get('/leave/user/:id', controller.userleave);
 

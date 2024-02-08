@@ -4,6 +4,7 @@ const userController = require("./User_controller")
 
 // get for all cities
 router.get("/user/list", userController.index)
+router.get("/user/show/:id", userController.show)
 // get for all cities
 router.post("/user/login", userController.login)
 

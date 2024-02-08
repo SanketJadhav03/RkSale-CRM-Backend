@@ -298,9 +298,47 @@ const userleave = async (req, res) => {
     }
 };
 
+const singleview = async (req, res) => {
+    const { id } = req.params; // Get the page number from the query parameters or default to page 1
+    try {
+        const user_leave = await sequelize.query(
+            `SELECT 
+                leaves.*,
+                users_leave.*
+            FROM tbl_leaves AS leaves
+            INNER JOIN users AS users_leave ON leaves.leave_user_id = users_leave.uid
+            WHERE leaves.leave_id =:id
+            `,
+            {
+                type: QueryTypes.SELECT,
+                replacements: { id },
+            }
+        );
+
+
+        // Remove all HTML tags from leave_reason if it's not null or undefined
+        if (user_leave[0].leave_reason !== null) {
+            user_leave[0].leave_reason = user_leave[0].leave_reason.replace(/<[^>]+>/g, '');
+        }
+
+        // Remove all HTML tags from leave_reject_reason if it's not null or undefined
+        if (user_leave[0].leave_reject_reason !== null) {
+            user_leave[0].leave_reject_reason = user_leave[0].leave_reject_reason.replace(/<[^>]+>/g, '');
+        }
+
+
+        res.json(user_leave[0]);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Failed to get leaves' });
+    }
+};
+
+
 module.exports = {
     store,
     index,
     userleave,
+    singleview,
     updated,
 };
