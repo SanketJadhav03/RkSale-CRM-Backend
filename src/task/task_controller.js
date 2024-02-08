@@ -4,6 +4,8 @@ const Task = require("./task_model");
 const fs = require("fs");
 const path = require("path");
 const Notifaction = require("../notification/notification_model");
+const Customer = require("../customer/customer_model");
+const Product = require("../product/product_model");
 
 const store = async (req, res) => {
   try {
@@ -95,12 +97,25 @@ const store = async (req, res) => {
       image: `[${imageFilenames}]`,
     });
 
+    const productdata = await Product.findOne({
+      where:{
+        product_id : product
+      }
+    })
+    
+    
+    const customerData = await Customer.findOne({
+      where : {
+        customer_id : customer
+      }
+    })
+
     await Promise.all(
       assignedByArray.map(async (assignedUserId) => {
         await Notifaction.create({
           user_id: assignedUserId,
           assigned_data_id: newtask.task_id,
-          notification_description: "New Task Assigned",
+          notification_description: `Task Assigned Of ${productdata.product_name},${customerData.customer_name}`,
           notification_type: 3,
         });
       })

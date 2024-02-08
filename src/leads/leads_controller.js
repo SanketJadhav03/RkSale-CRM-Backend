@@ -4,6 +4,8 @@ const Leads = require("./leads_model");
 const path = require("path");
 const fs = require("fs");
 const Notifaction = require("../notification/notification_model");
+const Product = require("../product/product_model");
+const Customer = require("../customer/customer_model");
 
 const store = async (req, res) => {
   try {
@@ -96,12 +98,24 @@ const store = async (req, res) => {
       image: `[${imageFilenames}]`, // Use array of image filenames
     });
 
+const productdata = await Product.findOne({
+  where:{
+    product_id : product
+  }
+})
+
+
+const customerData = await Customer.findOne({
+  where : {
+    customer_id : customer
+  }
+})
     await Promise.all(
       assignedByArray.map(async (assignedUserId) => {
         await Notifaction.create({
           user_id: assignedUserId,
           assigned_data_id: newLead.lead_id,
-          notification_description: "New lead Assigned",
+          notification_description: `lead Assigned of ${productdata.product_name}, ${customerData.customer_name}`,
           notification_type: 2,
         });
       })

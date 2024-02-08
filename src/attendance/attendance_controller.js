@@ -99,7 +99,7 @@ const store = async (req, res) => {
             user_id: admin.uid,
             assigned_data_id: newAttendance.attendance_id,
             notification_type:1,
-            notification_description: `${user.name}   Checked In`
+            notification_description: `${user.name} Checked In ${newAttendance.in_location}`
           });
         });
       
