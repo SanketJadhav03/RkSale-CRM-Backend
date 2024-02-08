@@ -5,6 +5,7 @@ const router = express.Router();
 router.post('/message/store',controller.store)
 router.get('/message/list',controller.list)
 router.put('/message/update',controller.update)
+router.get('/message/lead',controller.leadmsg)
 router.delete('/message/delete/:id',controller.deleted)
 router.post('/send-msg',controller.sendmsg)
 

@@ -20,6 +20,10 @@ const Message = sequelize.define('tbl_message', {
 type:DataTypes.STRING,
 allowNull:true
   },
+  message_category:{
+type:DataTypes.INTEGER,
+allowNull:true
+  },
   message_status:{
     type:DataTypes.INTEGER,
     defaultValue:1,
