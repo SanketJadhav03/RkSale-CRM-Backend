@@ -1,6 +1,7 @@
 const { QueryTypes } = require("sequelize");
 const sequelize = require("../db/db_config");
 const FollowUp = require("./follow_up_model");
+const path = require("path");
 const index = async (req, res) => {
   try {
     const { leadOrTask, follow_up_send_by } = req.body;
@@ -48,20 +49,62 @@ const addFollowUp = async (req, res) => {
       follow_up_send_by,
       follow_up_task_id,
     } = req.body;
+
+    let followUpImageFilename = "";
+
+    // Check if file is uploaded
+    if (req.files && req.files.follow_up_image) {
+      const rootPath = process.cwd();
+
+      const file = req.files.follow_up_image;
+
+      const validateAndMove = (file) => {
+        if (!file) {
+          console.log("File is null");
+          return null;
+        }
+
+        if (!file.name) {
+          throw new Error("Invalid file object");
+        }
+
+        return new Promise((resolve, reject) => {
+          const uploadPath = path.join(
+            rootPath,
+            "public/images/follow-ups",
+            file.name
+          );
+          file.mv(uploadPath, (err) => {
+            if (err) {
+              console.error("Error moving file:", err);
+              reject(err);
+            }
+            resolve(file.name);
+          });
+        });
+      };
+
+      // Validate and move the image
+      followUpImageFilename = await validateAndMove(file);
+    }
+
+    // Create the follow-up entry
     const insertData = await FollowUp.create({
       follow_up_description,
       follow_up_lead_id,
       follow_up_send_by,
       follow_up_task_id,
+      follow_up_image: followUpImageFilename,
     });
+
     if (insertData) {
       return res.json({ message: "Follow Up added Successfully!", status: 1 });
     } else {
       return res.json({ message: "Something went wrong!", status: 0 });
     }
   } catch (error) {
-    console.log("Error creating follow up!");
-    return resizeBy.json({ error: "Error creating followup" });
+    console.log("Error creating follow up:", error);
+    return res.status(500).json({ error: "Error creating followup" });
   }
 };
 
