@@ -24,6 +24,10 @@ const FollowUp = sequelize.define("tbl_follow_up", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  follow_up_image: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   follow_up_status: {
     type: DataTypes.INTEGER,
     defaultValue: 1,
