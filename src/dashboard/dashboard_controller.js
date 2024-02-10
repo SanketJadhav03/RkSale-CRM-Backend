@@ -9,8 +9,19 @@ const index = async (req, res) => {
   try {
     const userId = req.body.user_id; // Change this based on your request structure
 
-    const startDate = req.body.start_date;
-    const endDate = req.body.end_date;
+    // const startDate = req.body.start_date;
+    // const endDate = req.body.end_date;
+
+    const startDateString = req.body.start_date;
+    const endDateString = req.body.end_date;
+
+    // Parse the datetime strings into Date objects
+    const startDateOnly = new Date(startDateString);
+    const endDateOnly = new Date(endDateString);
+
+    // Extract only the date part
+    const startDate = startDateOnly.toISOString().split('T')[0];
+    const endDate = endDateOnly.toISOString().split('T')[0];
 
     // Count tasks for the specified user within the date range
     const taskCount = await Task.count({
@@ -22,7 +33,7 @@ const index = async (req, res) => {
             : {},
           {
             createdAt: {
-              [Op.between]: [new Date(startDate), new Date(endDate + 'T23:59:59.999Z')],
+              [Op.between]: [new Date(startDate + 'T00:00:00.000Z'), new Date(endDate + 'T23:59:59.999Z')],
             },
           },
         ],
@@ -42,7 +53,7 @@ const index = async (req, res) => {
             : {},
           {
             createdAt: {
-              [Op.between]: [new Date(startDate), new Date(endDate + 'T23:59:59.999Z')],
+              [Op.between]: [new Date(startDate + 'T00:00:00.000Z'), new Date(endDate + 'T23:59:59.999Z')],
             },
           },
         ],
