@@ -53,11 +53,25 @@ const transferLead = async (req, res) => {
         }
       })
       await notificationn.destroy();
+      const user2 = await User.findByPk(slt_send_to);
+      const admins = await User.findAll({where:{
+        u_type:1
+      }})
+
+      admins.forEach(async (admin) => {
+        await Notifaction.create({
+          user_id: admin.uid, // Assuming admin has an 'id' property
+          assigned_data_id: slt_lead_id,
+          notification_type: 2,
+          notification_description: `Task Shifted from ${user.name} to ${user2.name}`,
+        });
+      });
+      
       await Notifaction.create({
         user_id: slt_send_to,
         assigned_data_id: slt_task_id,
         notification_type: 3,
-        notification_description: `New Task Shifted By ${user.name}`,
+        notification_description: `Task Shifted from ${user.name} to ${user2.name}`,
       });
       if (updateLead) {
         return res.json({ message: "Task shifted succefully!", status: 1 });
@@ -74,12 +88,27 @@ const transferLead = async (req, res) => {
           user_id:slt_send_by
         }
       })
+      const user2 = await User.findByPk(slt_send_to);
       await notificationn.destroy();
+
+      const admins = await User.findAll({where:{
+        u_type:1
+      }})
+
+      admins.forEach(async (admin) => {
+        await Notifaction.create({
+          user_id: admin.uid, // Assuming admin has an 'id' property
+          assigned_data_id: slt_lead_id,
+          notification_type: 2,
+          notification_description: `Lead Shifted from ${user.name} to ${user2.name}`,
+        });
+      });
+      
       await Notifaction.create({
         user_id: slt_send_to,
         assigned_data_id: slt_lead_id,
         notification_type: 2,
-        notification_description: `New Lead Shifted By ${user.name}`,
+        notification_description: ` Lead Shifted By ${user.name}`,
       });
       const updateLead = await findLeadbyId.update({
         assigned_by: `[${parsedTempEmployee}]`,
