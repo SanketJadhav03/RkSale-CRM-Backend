@@ -98,18 +98,18 @@ const store = async (req, res) => {
       image: `[${imageFilenames}]`, // Use array of image filenames
     });
 
-const productdata = await Product.findOne({
-  where:{
-    product_id : product
-  }
-})
+    const productdata = await Product.findOne({
+      where: {
+        product_id: product
+      }
+    })
 
 
-const customerData = await Customer.findOne({
-  where : {
-    customer_id : customer
-  }
-})
+    const customerData = await Customer.findOne({
+      where: {
+        customer_id: customer
+      }
+    })
     await Promise.all(
       assignedByArray.map(async (assignedUserId) => {
         await Notifaction.create({
@@ -300,6 +300,7 @@ const filterData = async (req, res) => {
       status_name,
     } = req.body;
     let sql = `SELECT * FROM tbl_leads 
+    INNER JOIN users ON tbl_leads.lead_created_by = users.uid
       INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
       INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
       INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id

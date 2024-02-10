@@ -98,15 +98,15 @@ const store = async (req, res) => {
     });
 
     const productdata = await Product.findOne({
-      where:{
-        product_id : product
+      where: {
+        product_id: product
       }
     })
-    
-    
+
+
     const customerData = await Customer.findOne({
-      where : {
-        customer_id : customer
+      where: {
+        customer_id: customer
       }
     })
 
@@ -294,6 +294,7 @@ const filterData = async (req, res) => {
     } = req.body;
     let sql = `SELECT * 
     FROM tbl_tasks 
+    INNER JOIN users ON tbl_tasks.task_created_by = users.uid
     INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
     INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
     INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
