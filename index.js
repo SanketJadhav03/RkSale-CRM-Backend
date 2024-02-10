@@ -20,7 +20,7 @@ expressApp.use(
 );
 // create data
 checked
-  .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+  .sync({ alter: false }) // if false then not drop created table else it will drop tables and every time gives new tables
 
 
   .then(() => {
@@ -36,7 +36,7 @@ checked
 
 
 checked
-  .sync({ alter: false }) // if false then not drop created table else it will drop tables and every time gives new tables
+  .sync({ force: false }) // if false then not drop created table else it will drop tables and every time gives new tables
   .then(() => {
     require("./db/create_data");
     console.log("Database created!");
