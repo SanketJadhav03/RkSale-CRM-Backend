@@ -122,11 +122,11 @@ async function initializeDatabase() {
       permission_path: "/",
       permission_category: "DASHBOARD",
     },
-    {
-      permission_name: "user-dashboard",
-      permission_path: "/user-dashboard",
-      permission_category: "DASHBOARD",
-    },
+    // {
+    //   permission_name: "user-dashboard",
+    //   permission_path: "/user-dashboard",
+    //   permission_category: "DASHBOARD",
+    // },
     {
       permission_name: "lead list",
       permission_path: "/leads-list/:type?/:status?",
@@ -138,60 +138,75 @@ async function initializeDatabase() {
       permission_category: "TASK",
     },
     {
-      permission_name: "category list",
-      permission_path: "/category-list",
-      permission_category: "CATEGORY",
+      permission_name: "Settings",
+      permission_path: "/settings",
+      permission_category: "SETTINGS",
     },
     {
-      permission_name: "city list",
-      permission_path: "/city-list",
-      permission_category: "CITY",
+      permission_name: "Reports",
+      permission_path: "/reports",
+      permission_category: "REPORTS",
     },
     {
-      permission_name: "source list",
-      permission_path: "/source-list",
-      permission_category: "SOURCE",
+      permission_name: "Accounts",
+      permission_path: "/account",
+      permission_category: "ACCOUNTS",
     },
-    {
-      permission_name: "reference list",
-      permission_path: "/References-list",
-      permission_category: "REFERENCE",
-    },
-    {
-      permission_name: "product list",
-      permission_path: "/product-list",
-      permission_category: "PRODUCT",
-    },
-    {
-      permission_name: "paymenttype-list ",
-      permission_path: "/paymenttype-list",
-      permission_category: "PAYMENT_TYPE",
-    },
-    {
-      permission_name: "paymentmode-list ",
-      permission_path: "/paymentmode-list",
-      permission_category: "PAYMENT_MODE",
-    },
-    {
-      permission_name: "shift-list",
-      permission_path: "/shift-list",
-      permission_category: "SHIFT",
-    },
-    {
-      permission_name: "leads_status-list",
-      permission_path: "/leads_status-list",
-      permission_category: "LEADS_STATUS",
-    },
-    {
-      permission_name: "related list",
-      permission_path: "/related_to-list",
-      permission_category: "RELATED_TO",
-    },
-    {
-      permission_name: "tags list",
-      permission_path: "/tags-list",
-      permission_category: "TAGS",
-    },
+    // {
+    //   permission_name: "category list",
+    //   permission_path: "/category-list",
+    //   permission_category: "CATEGORY",
+    // },
+    // {
+    //   permission_name: "city list",
+    //   permission_path: "/city-list",
+    //   permission_category: "CITY",
+    // },
+    // {
+    //   permission_name: "source list",
+    //   permission_path: "/source-list",
+    //   permission_category: "SOURCE",
+    // },
+    // {
+    //   permission_name: "reference list",
+    //   permission_path: "/References-list",
+    //   permission_category: "REFERENCE",
+    // },
+    // {
+    //   permission_name: "product list",
+    //   permission_path: "/product-list",
+    //   permission_category: "PRODUCT",
+    // },
+    // {
+    //   permission_name: "paymenttype-list ",
+    //   permission_path: "/paymenttype-list",
+    //   permission_category: "PAYMENT_TYPE",
+    // },
+    // {
+    //   permission_name: "paymentmode-list ",
+    //   permission_path: "/paymentmode-list",
+    //   permission_category: "PAYMENT_MODE",
+    // },
+    // {
+    //   permission_name: "shift-list",
+    //   permission_path: "/shift-list",
+    //   permission_category: "SHIFT",
+    // },
+    // {
+    //   permission_name: "leads_status-list",
+    //   permission_path: "/leads_status-list",
+    //   permission_category: "LEADS_STATUS",
+    // },
+    // {
+    //   permission_name: "related list",
+    //   permission_path: "/related_to-list",
+    //   permission_category: "RELATED_TO",
+    // },
+    // {
+    //   permission_name: "tags list",
+    //   permission_path: "/tags-list",
+    //   permission_category: "TAGS",
+    // },
     {
       permission_name: "customer-list",
       permission_path: "/customer-list",
@@ -207,37 +222,41 @@ async function initializeDatabase() {
       permission_path: "/attendence",
       permission_category: "ATTENDENCE",
     },
-    {
-      permission_name: "attendence admin list",
-      permission_path: "/attendence-lists/:type?",
-      permission_category: "ATTENDENCE",
-    },
-    {
-      permission_name: "attendence-list",
-      permission_path: "/attendence-list",
-      permission_category: "ATTENDENCE",
-    },
+    // {
+    //   permission_name: "attendence admin list",
+    //   permission_path: "/attendence-lists/:type?",
+    //   permission_category: "ATTENDENCE",
+    // },
+    // {
+    //   permission_name: "attendence-list",
+    //   permission_path: "/attendence-list",
+    //   permission_category: "ATTENDENCE",
+    // },
     {
       permission_name: "Leave-list",
       permission_path: "/leave/:type?",
       permission_category: "LEAVE",
     },
+
     {
       permission_name: "Roles list",
       permission_path: "/roles-list",
       permission_category: "ROLES",
     },
+
     {
       permission_name: "SalaryGeneration",
       permission_path: "/salary-generation",
       permission_category: "SALARYGENERATION",
     },
 
+
     {
       permission_name: "Payment list",
       permission_path: "/payment",
       permission_category: "PAYMENT",
     },
+
     {
       permission_name: "TODO list",
       permission_path: "/todo",
