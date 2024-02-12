@@ -46,10 +46,10 @@ const transferLead = async (req, res) => {
       const updateLead = await findTaskbyId.update({
         assigned_by: `[${parsedTempEmployee}]`,
       });
-      const user = await User.findByPk(slt_send_by);
+      const user = await User.findByPk(parseInt(slt_send_by));
       const notificationn = await Notifaction.findOne({
         where:{
-          user_id:slt_send_by
+          user_id:parseInt(slt_send_by)
         }
       })
       await notificationn.destroy();
@@ -68,7 +68,7 @@ const transferLead = async (req, res) => {
       });
       
       await Notifaction.create({
-        user_id: slt_send_to,
+        user_id: parseInt(slt_send_to),
         assigned_data_id: slt_task_id,
         notification_type: 3,
         notification_description: `Task Shifted from ${user.name} to ${user2.name}`,
@@ -82,10 +82,10 @@ const transferLead = async (req, res) => {
         res.json({ message: "Lead not found!", status: 0 });
       }
       
-      const user = await User.findByPk(slt_send_by);
+      const user = await User.findByPk(parseInt(slt_send_by));
       const notificationn = await Notifaction.findOne({
         where:{
-          user_id:slt_send_by
+          user_id:parseInt(slt_send_by)
         }
       })
       const user2 = await User.findByPk(slt_send_to);
@@ -105,7 +105,7 @@ const transferLead = async (req, res) => {
       });
       
       await Notifaction.create({
-        user_id: slt_send_to,
+        user_id: parseInt(slt_send_to),
         assigned_data_id: slt_lead_id,
         notification_type: 2,
         notification_description: ` Lead Shifted By ${user.name}`,
