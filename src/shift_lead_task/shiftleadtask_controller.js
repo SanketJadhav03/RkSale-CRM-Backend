@@ -25,7 +25,7 @@ const transferLead = async (req, res) => {
       return res.json({ error: "Invalid temp_employee format" });
     }
 
-    const index = parsedTempEmployee.indexOf(slt_send_by);
+    const index = parsedTempEmployee.indexOf(parseInt(slt_send_by));
     if (index !== -1) {
       parsedTempEmployee[index] = slt_send_to;
     }
