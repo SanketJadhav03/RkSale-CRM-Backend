@@ -47,7 +47,7 @@ const store = async (req, res) => {
 
         const uploadPath = path.join(
           rootPath,
-          "public/images/leads",
+          "public/images/task",
           file.name
         );
 
