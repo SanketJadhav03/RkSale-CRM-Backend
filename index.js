@@ -165,6 +165,10 @@ const message = require('./src/message/message_routes')
 expressApp.use("/back-end", message)
 
 
+const SalaryPay = require('./src/salary/pay_routes')
+expressApp.use("/back-end", SalaryPay)
+
+
 // ################################ END #####################################################
 const port = process.env.PORT || 8880;
 expressApp.listen(port, () => {

@@ -58,11 +58,10 @@ const singleview = async (req, res) => {
         const { id } = req.params;
 
         const query = `
-            SELECT s.*, u.name, u.salary,p.*
+            SELECT s.*, u.name,u.uid, u.salary,p.*
             FROM tbl_salaries s     
             JOIN users u ON u.uid = s.salary_receiver_id
-            JOIN tbl_payments p ON p.payment_receiver = s.salary_receiver_id
-            WHERE s.salary_id = :id
+            LEFT JOIN tbl_payments p ON p.payment_receiver = s.salary_receiver_id            WHERE s.salary_id = :id
         `;
 
         const filteredSalaries = await sequelize.query(query, {
