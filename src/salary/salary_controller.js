@@ -14,11 +14,12 @@ const store = async (req, res) => {
             const newSalary = await Salary.create(salaryItem);
             newSalaries.push(newSalary);
         }
+        
 
         if (newSalaries) {
-            res.json({ message: "Salaries Generated Successfully" });
+            res.json({ message: "Salaries Generated Successfully" , status:1});
         } else {
-            res.json({ message: "Failed To Generate Salaries" });
+            res.json({ message: "Failed To Generate Salaries",status:0 });
         }
     } catch (error) {
         console.error(error);
@@ -29,18 +30,18 @@ const store = async (req, res) => {
 const filterTranscation = async (req, res) => {
     try {
         const selectedMonth = req.body.month; // Assuming 'month' is sent in the request body
-        const startOfMonth = new Date(new Date().getFullYear(), selectedMonth - 1, 1);
-        const endOfMonth = new Date(new Date().getFullYear(), selectedMonth, 0);
+        // const startOfMonth = new Date(new Date().getFullYear(), selectedMonth - 1, 1);
+        // const endOfMonth = new Date(new Date().getFullYear(), selectedMonth, 0);
 
         const query = `
             SELECT s.*, u.name,u.salary
             FROM tbl_salaries s
             JOIN users u ON u.uid = s.salary_receiver_id
-            WHERE s.createdAt >= :startOfMonth AND s.createdAt <= :endOfMonth
+            WHERE s.salary_month = :selectedMonth
         `;
 
         const filteredSalaries = await sequelize.query(query, {
-            replacements: { startOfMonth, endOfMonth },
+            replacements: { selectedMonth },
             type: sequelize.QueryTypes.SELECT,
         });
 
