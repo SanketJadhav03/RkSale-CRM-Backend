@@ -1,6 +1,7 @@
 const { QueryTypes } = require('sequelize');
 const SalaryPay = require('./pay_model');
 const sequelize = require('../db/db_config');
+const Payment = require('../payment/payment_model');
 
 // Controller methods
 const calculationSalary = async (req, res) => {
@@ -45,6 +46,17 @@ const store = async (req, res) => {
         pay_payment_id,
         pay_month
       });
+
+      const payment = await Payment.findOne({where:{
+        payment_id:pay_payment_id
+      }})
+
+      if (payment){
+        await payment.update({
+          payment_amount: pay_remaining_paid
+        })
+      }
+      console.log(newSalaryPay);
       if(newSalaryPay){
         return res.json({message:"Salary paid successfully !",status:1})
     }else{

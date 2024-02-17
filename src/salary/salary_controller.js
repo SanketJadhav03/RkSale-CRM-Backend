@@ -54,26 +54,46 @@ const filterTranscation = async (req, res) => {
 
 }
 const singleview = async (req, res) => {
+    const { id, month } = req.body;
     try {
-        const { id } = req.params;
-
-        const query = `
-            SELECT s.*, u.name,u.uid, u.salary,p.*
-            FROM tbl_salaries s     
-            JOIN users u ON u.uid = s.salary_receiver_id
-            LEFT JOIN tbl_payments p ON p.payment_receiver = s.salary_receiver_id            WHERE s.salary_id = :id
-        `;
-
+        let query = `
+            SELECT s.*, u.name, u.uid, u.salary`;
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth() + 1;
+        if (parseInt(month) >= currentMonth) {
+            query += `, p.*`;
+        }
+    
+        query += `
+            FROM tbl_salaries s
+            JOIN users u ON u.uid = s.salary_receiver_id`;
+    
+      // JavaScript months are zero-based
+    
+        if (parseInt(month) >= currentMonth) {
+            query += `
+            LEFT JOIN tbl_payments p ON p.payment_receiver = s.salary_receiver_id `;
+        }
+    
+        query += `
+            WHERE s.salary_id = :id`;
+    
         const filteredSalaries = await sequelize.query(query, {
-            replacements: { id },
+            replacements: { id, month },
             type: sequelize.QueryTypes.SELECT,
         });
-
+    
         res.json(filteredSalaries[0]);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
+    
+    
+    
+    
+    
+    
 }
 
 module.exports = {
