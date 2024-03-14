@@ -20,13 +20,23 @@ const store = async (req, res) => {
 }
 
 const index = async (req, res) => {
+
     try {
-        const Payment_Types = await Payment_Type.findAll();
-        res.json(Payment_Types)
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+
+        const paymet_type = await Payment_Type.findAll({
+            limit: limitPerPage,
+            offset: offset,
+        });
+
+        res.json(paymet_type);
     } catch (error) {
-        console.log(error);
-        res.json({ error: "Failed To Show Payment Type " })
+        console.error("Error getting paymet_type:", error);
+        res.status(500).json({ error: "Error getting paymet_type" });
     }
+
 }
 
 const update = async (req, res) => {

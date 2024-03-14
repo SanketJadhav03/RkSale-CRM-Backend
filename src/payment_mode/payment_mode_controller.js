@@ -21,11 +21,19 @@ const store = async (req, res) => {
 
 const index = async (req, res) => {
     try {
-        const payment_modes = await Payment_Mode.findAll();
-        res.json(payment_modes)
+        const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+        const limitPerPage = 30;
+        const offset = (page - 1) * limitPerPage;
+
+        const payment_type = await Payment_Mode.findAll({
+            limit: limitPerPage,
+            offset: offset,
+        });
+
+        res.json(payment_type);
     } catch (error) {
-        console.log(error);
-        res.json({ error: "Failed To Show Payment Mode " })
+        console.error("Error getting payment_type:", error);
+        res.status(500).json({ error: "Error getting payment_type" });
     }
 }
 
