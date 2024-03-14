@@ -14,7 +14,7 @@ const store = async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        res.json({ error: "Failed To Store Payment Mode " })
+        res.json({ error: "Failed To Store Payment Type " })
     }
 
 }
@@ -25,7 +25,7 @@ const index = async (req, res) => {
         res.json(Payment_Types)
     } catch (error) {
         console.log(error);
-        res.json({ error: "Failed To Show Payment Mode " })
+        res.json({ error: "Failed To Show Payment Type " })
     }
 }
 
@@ -41,7 +41,7 @@ const update = async (req, res) => {
                 res.json({ message: "Updated SuccessFully", status: 1 })
             }
         } else {
-            res.json({ message: "Payment Mode Not Found" })
+            res.json({ message: "Payment Type Not Found" })
         }
     } catch (error) {
         console.log("Error For Updating The Updation Of Payment");
@@ -50,15 +50,15 @@ const update = async (req, res) => {
 
 const deleted = async (req, res) => {
     try {
-        const { payment_type_id } = req.params;
-        const existin_Payment_Type = await Payment_Type.findByPk(payment_type_id);
+        const { id } = req.params;
+        const existin_Payment_Type = await Payment_Type.findByPk(id);
         if (existin_Payment_Type) {
             const status = await existin_Payment_Type.destroy();
             if (status) {
-                res.json({ message: "Deleted SuccessFully" })
+                res.json({ message: "Payment Type Deleted SuccessFully", status: 1 })
             }
         } else {
-            res.json({ message: "Payment Mode Not Found" })
+            res.json({ message: "Payment Type Not Found", status: 0 })
         }
     } catch (error) {
 
@@ -72,7 +72,7 @@ const show = async (req, res) => {
         if (payement_mode) {
             res.json(payement_mode)
         } else {
-            res.json({ message: "Payment Mode Not Found" })
+            res.json({ message: "Payment Type Not Found" })
         }
     } catch (error) {
 

@@ -116,9 +116,9 @@ const show = async (req, res) => {
        
             `,
 
-            {   
-              type: QueryTypes.SELECT,
-              replacements: { id },
+            {
+                type: QueryTypes.SELECT,
+                replacements: { id },
 
             }
         );
@@ -131,33 +131,52 @@ const show = async (req, res) => {
 
 const advance = async (req, res) => {
     try {
-      const { id } = req.params;
-  
-      const $data = await sequelize.query(
-        `
+        const { id } = req.params;
+
+        const $data = await sequelize.query(
+            `
         SELECT * 
         FROM tbl_payments 
         WHERE tbl_payments.payment_type = 1
         AND tbl_payments.some_other_column = :id
         `,
-        {
-          replacements: { id },
-          type: sequelize.QueryTypes.SELECT,
-        }
-      );
-  
-      res.json({ data: $data });
-    } catch (error) {
-      console.error(error);
-      res.json({ message: "Failed To Get Advance" });
-    }
-  };
+            {
+                replacements: { id },
+                type: sequelize.QueryTypes.SELECT,
+            }
+        );
 
+        res.json({ data: $data });
+    } catch (error) {
+        console.error(error);
+        res.json({ message: "Failed To Get Advance" });
+    }
+};
+
+
+const deleted = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const findData = await Payment.findByPk(id);
+        if (findData) {
+            const check = await findData.destroy();
+            if (check) {
+                res.json({ message: "Payment deleted successfully!", status: 1 });
+            }
+        } else {
+            res.json({ message: "Payment not found!", status: 0 });
+        }
+    } catch (error) {
+        console.error(error);
+        res.json({ message: "Failed To Get Advance" });
+    }
+}
 
 module.exports = {
     store,
     index,
     update,
     show,
-    advance
+    advance,
+    deleted
 }   

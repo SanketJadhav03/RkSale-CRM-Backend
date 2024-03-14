@@ -132,6 +132,7 @@ const index = async (req, res) => {
     const data = await sequelize.query(
       `SELECT * FROM tbl_tasks 
         INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
+        INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
         INNER JOIN users ON tbl_tasks.task_created_by = users.uid
         INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
         INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
@@ -296,6 +297,7 @@ const filterData = async (req, res) => {
     FROM tbl_tasks 
     INNER JOIN users ON tbl_tasks.task_created_by = users.uid
     INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
+    INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
     INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
     INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
     INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
