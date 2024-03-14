@@ -50,15 +50,15 @@ const update = async (req, res) => {
 
 const deleted = async (req, res) => {
     try {
-        const { payment_mode_id } = req.params;
-        const existin_payment_mode = await Payment_Mode.findByPk(payment_mode_id);
+        const { id } = req.params;
+        const existin_payment_mode = await Payment_Mode.findByPk(id);
         if (existin_payment_mode) {
             const status = await existin_payment_mode.destroy();
             if (status) {
-                res.json({ message: "Deleted SuccessFully" })
+                res.json({ message: "Payment Mode Deleted Successfully !", status: 1 })
             }
         } else {
-            res.json({ message: "Payment Mode Not Found" })
+            res.json({ message: "Payment Mode Not Found", status: 0 })
         }
     } catch (error) {
 
