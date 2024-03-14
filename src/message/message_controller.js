@@ -4,7 +4,7 @@ const fs = require("fs");
 
 const store = async (req, res) => {
   try {
-    const { message_title, message_description,message_category } = req.body;
+    const { message_title, message_description, message_category } = req.body;
 
     if (req.files) {
       const messageImage = req.files.image;
@@ -48,7 +48,7 @@ const store = async (req, res) => {
     const newMessage = await Message.create({
       message_title: message_title,
       message_description: message_description,
-      message_category:message_category,
+      message_category: message_category,
       message_image: req.files ? req.files.image.name : null,
     });
 
@@ -60,21 +60,25 @@ const store = async (req, res) => {
 };
 const list = async (req, res) => {
   try {
-    const messages = await Message.findAll({
-      where: {
-        message_status: 1,
-      },
+    const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
+    const limitPerPage = 30;
+    const offset = (page - 1) * limitPerPage;
+
+    const message = await Message.findAll({
+      limit: limitPerPage,
+      offset: offset,
     });
-    res.json(messages);
+
+    res.json(message);
   } catch (error) {
-    console.log(error);
-    res.json({ error: "Failed To Show Messages" });
+    console.error("Error getting message:", error);
+    res.status(500).json({ error: "Error getting message" });
   }
 };
 
 const update = async (req, res) => {
   try {
-    const { message_id, message_title, message_description,message_category } = req.body;
+    const { message_id, message_title, message_description, message_category } = req.body;
 
     const existingMessage = await Message.findByPk(message_id);
 
@@ -83,7 +87,7 @@ const update = async (req, res) => {
       const filePath = `public/images/message/${existingMessage.message_image}`;
 
       // Remove the existing file
-      fs.unlink(filePath,   (err) => {
+      fs.unlink(filePath, (err) => {
         if (err) {
           console.error("Error deleting existing file:", err);
         }
@@ -104,7 +108,7 @@ const update = async (req, res) => {
         req.files !== null
           ? req.files.image.name
           : existingMessage.message_image,
-          message_category:message_category
+      message_category: message_category
     });
 
     if (status) {
@@ -112,7 +116,7 @@ const update = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.json({ error: "Failed To Update" });
+    res.json({ error: "Failed To Update", status: 0 });
   }
 };
 
@@ -136,9 +140,9 @@ const deleted = async (req, res) => {
     if (existingMessage) {
       await existingMessage.destroy();
 
-      res.json({ message: "Deleted SuccessFully" });
+      res.json({ message: "Message Deleted SuccessFully !", status: 1 });
     } else {
-      res.json({ message: "Message Not Found 404 " });
+      res.json({ message: "Message Not Found 404 ", status: 0 });
     }
   } catch (error) {
     console.log(error);
@@ -146,17 +150,17 @@ const deleted = async (req, res) => {
   }
 };
 
-const leadmsg = async(req,res)=>{
-try {
-  const msg = Message.findAll({
-    where:{message_category:2}
-  })
+const leadmsg = async (req, res) => {
+  try {
+    const msg = Message.findAll({
+      where: { message_category: 2 }
+    })
 
-  res.json(msg);
-} catch (error) {
-  console.log(error);
-  res.json({message:"Failed To Get Messages",status:1})
-}
+    res.json(msg);
+  } catch (error) {
+    console.log(error);
+    res.json({ message: "Failed To Get Messages", status: 1 })
+  }
 }
 
 
@@ -170,27 +174,27 @@ const sendmsg = async (req, res) => {
     const formData = new URLSearchParams(data).toString();
 
     const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formData,
     };
 
     const response = await fetch(url, options);
 
     if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     const result = await response.text();
     console.log(result);
     res.json({ message: "Message Sent Successfully" });
 
-} catch (error) {
+  } catch (error) {
     console.error('Error:', error.message);
     res.status(500).send('Internal Server Error');
-}
+  }
 
 };
 
