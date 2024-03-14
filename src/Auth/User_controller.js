@@ -434,7 +434,7 @@ const updated = async (req, res) => {
           : user.bank_passbook_photo,
     });
 
-    res.status(200).json({ message: "User updated successfully", user });
+    res.status(200).json({ message: "User updated successfully", user, status: 1 });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
