@@ -311,13 +311,24 @@ const updated = async (req, res) => {
       mobile_no,
       emergency_contact,
       email,
+      password,
       aadhar_no,
       pan_no,
       user_upi,
     } = req.body;
+
     const user = await User.findByPk(uid);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
+    }
+    if (password) {
+      const passwordMatch = password === user.password;
+      if (!passwordMatch) {
+        const hashedNewPassword = await bcrypt.hash(password, 10);
+        await user.update({
+          password: hashedNewPassword
+        });
+      }
     }
 
     if (req.files && req.files.profile_photo) {
