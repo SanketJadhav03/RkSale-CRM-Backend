@@ -11,7 +11,7 @@ async function initializeDatabase() {
   await User.create({
     name: "Super Admin",
     u_type: 1,
-    // user_role_id: 1,
+    user_role_id: 1,
     mobile_no: "9595775123",
     password: hashedPassword,
     email: "super@ajspire.com",
