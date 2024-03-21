@@ -32,7 +32,7 @@ const store = async (req, res) => {
             where: { u_type: 1 }, // Assuming role 1 corresponds to the condition you mentioned
             attributes: ['uid'], // Fetch only the 'id' attribute
         });
-
+        const user = await User.findByPk(leave_user_id);
         if (admins.length > 0) {
             // If admins with role 1 are found, create a notification for each of them
             const notificationPromises = admins.map(async (admin) => {
@@ -40,7 +40,7 @@ const store = async (req, res) => {
                     user_id: admin.uid,
                     assigned_data_id: newleave.leave_id,
                     notification_type: 4,
-                    notification_description: "New Leave Stored",
+                    notification_description: `${user.name} New Leave Stored`,
                 });
             });
 
@@ -81,6 +81,19 @@ const updated = async (req, res) => {
 
         });
 
+        const user = await User.findByPk(updatedleave.leave_user_id);
+        if (user) {
+            await Notifaction.create({
+                user_id: user.uid,
+                assigned_data_id: updatedleave.leave_id,
+                notification_type: 4,
+                notification_description: `Your Leave Application Is  
+                ${updatedleave.leave_status == 1 ? 'Pending' : updatedleave.leave_status == 2 ? 'Approved' : updatedleave.leave_status == 3 ? 'Rejected' : ''}`,
+            });
+        } else {
+            // Handle the case where the user is not found
+            console.log('User not found');
+        }
         return res.status(201).json({ message: 'Leave Updated successfully', status: 2 });
     } catch (error) {
         console.log(error);

@@ -21,48 +21,43 @@ async function createRole(req, res) {
   }
 }
 
-// Update an existing role
 async function updateRole(req, res) {
   try {
     const { role_name, permissionList, role_id } = req.body;
     const role = await Role.findByPk(role_id);
+
+    // Update role name
     role.role_name = role_name;
     await role.save();
-    // foo
-    const oldPermissionsList = await RoleHasPermission.findAll({
+
+    // Delete old permissions
+    await RoleHasPermission.destroy({
       where: {
-        rhp_role_id: role_id,
-      },
+        rhp_role_id: role_id
+      }
     });
 
-    // DELETE THE OLD DATA
-    for (const permissionId of oldPermissionsList) {
+
+    // Create new permissions
+    for (const permissionId of permissionList) {
+
+      // console.log(permissionId);
+
       try {
-        await RoleHasPermission.destroy({
-          where: {
-            rhp_id: permissionId.rhp_id,
-          },
+        await RoleHasPermission.create({
+          rhp_role_id: role_id,
+          rhp_permission_id: permissionId
         });
-      } catch (error) {
-        console.error("Error deleting record:", error);
+      } catch (err) {
+        console.error("Error creating permission:", err);
       }
+
     }
 
-    // CREATE NEW DATA
-    for (const permissionId of permissionList) {
-      if (permissionId.checked == true) {
-        try {
-          await RoleHasPermission.create({
-            rhp_role_id: role.role_id,
-            rhp_permission_id: permissionId.permission_id,
-          });
-        } catch (err) {
-          console.log(err);
-        }
-      }
-    }
-    console.log("data created");
+
+    res.json({ message: "Role Updated Successfully !!", status: 1 });
   } catch (error) {
+    console.error("Error updating role:", error);
     res.status(500).json({ error });
   }
 }
@@ -86,8 +81,8 @@ const getRoleById = async (req, res) => {
 
     const rolesAndPermissionsData = await sequelize.query(
       "SELECT * FROM role_has_permissions " +
-        "INNER JOIN permissions ON role_has_permissions.rhp_permission_id = permissions.permission_id " +
-        "WHERE rhp_role_id = :roleId",
+      "INNER JOIN permissions ON role_has_permissions.rhp_permission_id = permissions.permission_id " +
+      "WHERE rhp_role_id = :roleId",
       {
         replacements: { roleId },
         type: QueryTypes.SELECT,
