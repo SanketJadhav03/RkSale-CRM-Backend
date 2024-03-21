@@ -19,7 +19,8 @@ router.post("/user/store", userController.store)
 router.put("/user/update", userController.updated)
 // put to update data
 router.get("/user/delete/:id/:status", userController.deleted)
-
+// for updating pass
+router.post("/user/update/pass", userController.updatePass)
 
 
 

@@ -454,6 +454,44 @@ const deleted = async (req, res) => {
     res.status(500).json({ error: "Error deleting User:" });
   }
 };
+
+const updatePass = async (req, res) => {
+  try {
+    const {
+      old_pass, new_pass, confirm_pass, uid
+    } = req.body;
+
+    const existingUser = await User.findOne({
+      where: {
+        uid: uid,
+      }
+    });
+
+    if (existingUser) {
+      const passwordMatch = await bcrypt.compare(old_pass, existingUser.password);
+
+      if (passwordMatch) {
+        // Hash the new password before updating
+        const hashedNewPassword = await bcrypt.hash(confirm_pass, 10);
+
+        // Update the user's password in the database
+        await existingUser.update({
+          password: hashedNewPassword
+        });
+        res.status(200).json({ message: "Password Updated Successfully!", status: 1 });
+      } else {
+        res.status(200).json({ message: "Old Password Not Matched", status: 2 });
+      }
+    } else {
+      res.status(404).json({ message: "User not found", status: 404 });
+    }
+
+  } catch (error) {
+    console.log(error);
+    res.json({ error: "Failed To Update Password" })
+  }
+}
+
 module.exports = {
   index,
   login,
@@ -461,4 +499,5 @@ module.exports = {
   store,
   updated,
   deleted,
+  updatePass
 };
