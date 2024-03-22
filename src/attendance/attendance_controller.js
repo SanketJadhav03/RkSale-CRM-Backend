@@ -93,16 +93,16 @@ const store = async (req, res) => {
       const user = await User.findByPk(user_id);
       if (admins.length > 0) {
         // If admins with role 1 are found, create a notification for each of them
-        
+
         const notificationPromises = admins.map(async (admin) => {
           return await Notifaction.create({
             user_id: admin.uid,
             assigned_data_id: newAttendance.attendance_id,
-            notification_type:1,
+            notification_type: 1,
             notification_description: `${user.name} Checked In ${newAttendance.in_location}`
           });
         });
-      
+
         // Wait for all notifications to be created
         await Promise.all(notificationPromises);
       } else {
@@ -118,14 +118,14 @@ const store = async (req, res) => {
   }
 };
 
-const show = async(req,res) =>{
+const show = async (req, res) => {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const data = await Attendance.findByPk(id);
     res.json(data)
   } catch (error) {
     console.log(error);
-    res.json({error:"Failed To Show Attendance"})
+    res.json({ error: "Failed To Show Attendance" })
   }
 }
 
@@ -141,7 +141,7 @@ const index = async (req, res) => {
     const usersWithNoAttendance = await sequelize.query(
       `SELECT u.uid AS user_id
             FROM users u
-            INNER JOIN tbl_shifts s ON u.shift_id = s.shift_id
+            LEFT JOIN tbl_shifts s ON u.shift_id = s.shift_id
             WHERE NOT EXISTS (
                 SELECT 1
                 FROM tbl_attendances a
@@ -199,7 +199,7 @@ const index = async (req, res) => {
                 tbl_shifts.shift_outime
             FROM tbl_attendances
             INNER JOIN users ON tbl_attendances.user_id = users.uid
-            INNER JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
+            LEFT JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
             WHERE tbl_attendances.attendance_date = :todaysss`,
       {
         type: QueryTypes.SELECT,
@@ -371,7 +371,7 @@ const adminindex = async (req, res) => {
                 tbl_shifts.shift_outime
             FROM tbl_attendances
             INNER JOIN users ON tbl_attendances.user_id = users.uid
-            INNER JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
+            LEFT JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
             `,
       {
         type: QueryTypes.SELECT,
@@ -390,7 +390,7 @@ const adminindex = async (req, res) => {
 const filterData = async (req, res) => {
 
   try {
-    const { start_date, end_date, remark, user_id,attendance_id } = req.body;
+    const { start_date, end_date, remark, user_id, attendance_id } = req.body;
     let sql = `
       SELECT 
         tbl_attendances.*,
@@ -399,7 +399,7 @@ const filterData = async (req, res) => {
         tbl_shifts.shift_outime
       FROM tbl_attendances
       INNER JOIN users ON tbl_attendances.user_id = users.uid
-      INNER JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
+      LEFT JOIN tbl_shifts ON users.shift_id = tbl_shifts.shift_id
       WHERE tbl_attendances.attendance_status = 1
     `;
 
@@ -411,7 +411,7 @@ const filterData = async (req, res) => {
       replacements.endDate = end_date;
     }
 
-    if(attendance_id > 0 ){
+    if (attendance_id > 0) {
       sql += ` AND tbl_attendances.attendance_id = :Attendance_id `;
       replacements.Attendance_id = attendance_id;
     }
@@ -457,7 +457,7 @@ const getPresentAbsent = async (req, res) => {
       AND tbl_attendances.remark = 1
       AND MONTH(tbl_attendances.attendance_date) = :month
     `;
-  
+
     // Query to get the count of absent attendances for a specific month
     const absentAttendanceCountQuery = `
       SELECT COUNT(*) AS absentAttendanceCount
@@ -466,7 +466,7 @@ const getPresentAbsent = async (req, res) => {
       AND tbl_attendances.remark = 2
       AND MONTH(tbl_attendances.attendance_date) = :month
     `;
-  
+
     // Execute both queries and await the results
     const [presentAttendanceResult, absentAttendanceResult] = await Promise.all([
       sequelize.query(presentAttendanceCountQuery, {
@@ -478,11 +478,11 @@ const getPresentAbsent = async (req, res) => {
         replacements: { employeeId, month },
       }),
     ]);
-  
+
     // Extract the count values from the results
     const presentAttendanceCount = presentAttendanceResult[0]?.presentAttendanceCount || 0;
     const absentAttendanceCount = absentAttendanceResult[0]?.absentAttendanceCount || 0;
-  
+
     // Send the counts along with user_id in JSON format as the response
     res.json({ user_id: employeeId, presentAttendanceCount, absentAttendanceCount });
   } catch (error) {
