@@ -9,19 +9,6 @@ const index = async (req, res) => {
   try {
     const userId = req.body.user_id; // Change this based on your request structure
 
-    // const startDate = req.body.start_date;
-    // const endDate = req.body.end_date;
-
-    const startDateString = req.body.start_date;
-    const endDateString = req.body.end_date;
-
-    // Parse the datetime strings into Date objects
-    const startDateOnly = new Date(startDateString);
-    const endDateOnly = new Date(endDateString);
-
-    // Extract only the date part
-    const startDate = startDateOnly.toISOString().split('T')[0];
-    const endDate = endDateOnly.toISOString().split('T')[0];
 
     // Count tasks for the specified user within the date range
     const taskCount = await Task.count({
@@ -31,11 +18,7 @@ const index = async (req, res) => {
           userId > 0
             ? Sequelize.literal(`FIND_IN_SET(${userId}, REPLACE(REPLACE(assigned_by, '[', ''), ']', '')) > 0`)
             : {},
-          {
-            createdAt: {
-              [Op.between]: [new Date(startDate + 'T00:00:00.000Z'), new Date(endDate + 'T23:59:59.999Z')],
-            },
-          },
+
         ],
       },
     });
@@ -51,23 +34,14 @@ const index = async (req, res) => {
           userId > 0
             ? Sequelize.literal(`FIND_IN_SET(${userId}, REPLACE(REPLACE(assigned_by, '[', ''), ']', '')) > 0`)
             : {},
-          {
-            createdAt: {
-              [Op.between]: [new Date(startDate + 'T00:00:00.000Z'), new Date(endDate + 'T23:59:59.999Z')],
-            },
-          },
+
         ],
       },
     });
 
     // Count customers for the specified user within the date range
     const customerCount = await Customer.count({
-      where: {
-        // userId: userId,
-        createdAt: {
-          [Op.between]: [new Date(startDate), new Date(endDate + 'T23:59:59.999Z')],
-        },
-      },
+
     });
 
     // Count attendance for the specified user within the date range
@@ -77,11 +51,7 @@ const index = async (req, res) => {
           userId > 0
             ? { user_id: userId }
             : {},
-          {
-            createdAt: {
-              [Op.between]: [new Date(startDate), new Date(endDate + 'T23:59:59.999Z')],
-            },
-          },
+
         ],
       },
     });
@@ -99,9 +69,7 @@ const index = async (req, res) => {
               : {},
             {
               status,
-              createdAt: {
-                [Op.between]: [new Date(startDate), new Date(endDate + 'T23:59:59.999Z')],
-              },
+
             },
           ],
         },
@@ -119,9 +87,7 @@ const index = async (req, res) => {
               : {},
             {
               status,
-              createdAt: {
-                [Op.between]: [new Date(startDate), new Date(endDate + 'T23:59:59.999Z')],
-              },
+
             },
           ],
         },
@@ -141,8 +107,115 @@ const index = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch counts" });
   }
 };
+const leave = async (req, res) => {
+  try {
+    const page = req.query.page || 1;
+    const limitPerPage = 30;
+    const offset = (page - 1) * limitPerPage;
 
+    const { type, start_date, end_date, leave_status, user_id } = req.body;
+
+    let sql = `
+          SELECT 
+          leaves.createdAt AS leaveCreatedAt,
+              leaves.*,
+              users_leave.*
+          FROM tbl_leaves AS leaves
+          INNER JOIN users AS users_leave ON leaves.leave_user_id = users_leave.uid
+          WHERE 1=1`;
+
+    const replacements = {};
+
+    if (type > 0) {
+      sql += ` AND leaves.leave_id = :Id`;
+      replacements.Id = type;
+    }
+
+    if (leave_status > 0) {
+      sql += ` AND leaves.leave_status = :leave_status`;
+      replacements.leave_status = leave_status;
+    }
+
+    if (user_id) {
+      sql += ` AND leaves.leave_user_id = :user_id`;
+      replacements.user_id = user_id;
+    }
+
+    const user_leave = await sequelize.query(sql, {
+      replacements: replacements,
+      type: QueryTypes.SELECT,
+    });
+
+    // Fetching approved_by data
+    const approved_by = await sequelize.query(
+      `SELECT 
+              leaves.*,
+              users_approve.*
+          FROM tbl_leaves AS leaves
+          INNER JOIN users AS users_approve ON leaves.leave_approved_by = users_approve.uid
+          LIMIT :limit OFFSET :offset`,
+      {
+        replacements: { limit: limitPerPage, offset: offset },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    // Merging data based on leave_id using an INNER JOIN
+    const mergedData = user_leave.map(leave => {
+      const approvedByData = approved_by.find(approved => approved.leave_id === leave.leave_id);
+      return { ...leave, approved_by: approvedByData };
+    });
+
+    // Handling the case where a join may return null for some columns
+    const result = mergedData.map(row => {
+      if (row.approved_by === null) {
+        row.approved_by = {
+          // Default values for joined data columns
+          "leave_id": null,
+          "leave_user_id": null,
+          "leave_reason": null,
+          "to_date": null,
+          "from_date": null,
+          "leave_approved_by": null,
+          "leave_reject_reason": null,
+          "leave_status": null,
+          "createdAt": null,
+          "updatedAt": null,
+          "uid": null,
+          "u_type": null,
+          "name": null,
+          "address": null,
+          "user_role_id": null,
+          "salary": null,
+          "mobile_no": null,
+          "emergency_contact": null,
+          "profile_photo": null,
+          "email": null,
+          "password": null,
+          "aadhar_no": null,
+          "aadhar_photo": null,
+          "pan_no": null,
+          "pan_photo": null,
+          "bank_passbook_photo": null,
+          "date_of_joining": null,
+          "last_experience": null,
+          "last_working_company": null,
+          "last_company_salary": null,
+          "shift_id": null,
+          "user_upi": null,
+          "status": null
+        };
+      }
+      return row;
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Failed to get leaves' });
+  }
+};
 
 module.exports = {
-  index,
+  index, leave
 };
