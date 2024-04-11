@@ -48,7 +48,6 @@ const index = async (req, res) => {
     }
 
     // Log fetched customer groups
-    console.log('Fetched Customer Groups:', customerGroups);
 
     // Return customer groups in the response
     res.json(customerGroups);
@@ -149,13 +148,13 @@ const deleted = async (req, res) => {
     });
 
     if (customersInGroup) {
-      return res.json({ message: "This record is in use!", status: 1 });
+      return res.json({ message: "This record is in use!", status: 0 });
     }
 
     await customerGroup.destroy();
     return res.json({
       message: "Customer Group deleted successfully",
-      status: 0,
+      status: 1,
     });
   } catch (error) {
     console.error("Error deleting Customer Group:", error);
