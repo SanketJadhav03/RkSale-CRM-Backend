@@ -6,6 +6,8 @@ const jwt = require("jsonwebtoken");
 const path = require("path");
 const fs = require("fs");
 const sequelize = require("../db/db_config");
+const Leads = require("../leads/leads_model");
+const Task = require("../task/task_model");
 
 const login = async (req, res) => {
   try {
@@ -456,6 +458,25 @@ const deleted = async (req, res) => {
   try {
     const { id } = req.params;
     const branch = await User.findByPk(id);
+
+    const lead = await Leads.findOne({
+      where: {
+        assigned_by: {
+          [Op.like]: `%[${id}]%`
+        }
+      }
+    });
+    const task = await Task.findOne({
+      where: {
+        assigned_by: {
+          [Op.like]: `%[${id}]%`
+        }
+      }
+    });
+
+    if (lead || task) {
+      return res.json({ message: "User already in use!", status: 0 });
+    }
     if (!branch) {
       return res.status(404).json({ error: "User not found" });
     }
