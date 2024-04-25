@@ -93,7 +93,7 @@ const addFollowUp = async (req, res) => {
       follow_up_description,
       follow_up_lead_id,
       follow_up_send_by,
-      follow_up_task_id,
+      follow_up_task_id: Number(follow_up_task_id),
       follow_up_image: followUpImageFilename,
     });
 

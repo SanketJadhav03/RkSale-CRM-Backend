@@ -43,19 +43,28 @@ const index = async (req, res) => {
     const customerCount = await Customer.count({
 
     });
-
+    const today = new Date().toISOString().split('T')[0];
     // Count attendance for the specified user within the date range
     const attendanceCount = await Attendance.count({
       where: {
         [Op.and]: [
-          userId > 0
-            ? { user_id: userId }
-            : {},
-
+          userId > 0 ? { user_id: userId } : {}, // Include user_id condition if userId > 0
+          sequelize.literal(`attendance_date = '${today}'`),
+          sequelize.literal(`in_time != ''`),
+          sequelize.where(sequelize.literal('out_time'), '=', null), // Filter by today's date and null out_time
         ],
       },
     });
-
+    const attendanceCountout = await Attendance.count({
+      where: {
+        [Op.and]: [
+          userId > 0 ? { user_id: userId } : {}, // Include user_id condition if userId > 0
+          sequelize.literal(`attendance_date = '${today}'`),
+          sequelize.literal(`in_time != ''`),
+          sequelize.literal(`out_time != ''`), // Filter by today's date
+        ],
+      },
+    });
     // Count leads for each status value for the specified user
 
     const leadStatusValues = [1, 2, 3, 4, 5];
@@ -101,6 +110,7 @@ const index = async (req, res) => {
       leadCount,
       customerCount,
       attendanceCount,
+      attendanceCountout,
     });
   } catch (error) {
     console.error(error);

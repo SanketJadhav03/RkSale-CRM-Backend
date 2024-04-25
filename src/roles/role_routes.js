@@ -15,7 +15,7 @@ router.get('/role/show/:id', roleController.getRoleById);
 router.put('/role/update', roleController.updateRole);
 
 // GET PERMISSIONS LIST BY ROLE ID
-router.get("/get/permissions/:role_id", roleController.getPermissionsList)
+// router.get("/get/permissions/:role_id", roleController.getPermissionsList)
 
 
 // Delete a role by ID

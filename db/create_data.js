@@ -119,27 +119,125 @@ async function initializeDatabase() {
   const staticPermissions = [
     {
       permission_name: "dashboard",
-      permission_path: "/",
+      permission_path: 1,
       permission_category: "DASHBOARD",
     },
-    // {
-    //   permission_name: "user-dashboard",
-    //   permission_path: "/user-dashboard",
-    //   permission_category: "DASHBOARD",
-    // },
     {
-      permission_name: "lead list",
-      permission_path: "/leads-list/:type?/:status?",
+      permission_name: "user-dashboard",
+      permission_path: 2,
+      permission_category: "DASHBOARD",
+    },
+    {
+      permission_name: "List",
+      permission_path: 1,
       permission_category: "LEAD",
     },
     {
-      permission_name: "task list",
-      permission_path: "/task-list/:type?/:status?",
+      permission_name: "Create",
+      permission_path: 2,
+      permission_category: "LEAD",
+    },
+    {
+      permission_name: "Update",
+      permission_path: 3,
+      permission_category: "LEAD",
+    },
+    {
+      permission_name: "Delete",
+      permission_path: 4,
+      permission_category: "LEAD",
+    },
+
+
+    {
+      permission_name: "List",
+      permission_path: 1,
       permission_category: "TASK",
     },
     {
+      permission_name: "Create",
+      permission_path: 2,
+      permission_category: "TASK",
+    },
+    {
+      permission_name: "Update",
+      permission_path: 3,
+      permission_category: "TASK",
+    },
+    {
+      permission_name: "Delete",
+      permission_path: 4,
+      permission_category: "TASK",
+    },
+
+
+    {
       permission_name: "Settings",
-      permission_path: "/settings",
+      permission_path: 0,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "Category",
+      permission_path: 1,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "City ",
+      permission_path: 2,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "Source ",
+      permission_path: 3,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "Reference ",
+      permission_path: 4,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "Product ",
+      permission_path: 5,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "Paymenttype  ",
+      permission_path: 6,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "Paymentmode  ",
+      permission_path: 7,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "Shift ",
+      permission_path: 8,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "Leads Status",
+      permission_path: 9,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "Expencess Type ",
+      permission_path: 10,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "Tags",
+      permission_path: 11,
+      permission_category: "SETTINGS",
+    },
+    {
+      permission_name: "Message",
+      permission_path: 12,
+      permission_category: "SETTINGS",
+    }, {
+      permission_name: "Customer Group",
+      permission_path: 13,
       permission_category: "SETTINGS",
     },
     {
@@ -147,76 +245,56 @@ async function initializeDatabase() {
       permission_path: "/reports",
       permission_category: "REPORTS",
     },
+
     {
       permission_name: "Accounts",
       permission_path: "/account",
       permission_category: "ACCOUNTS",
     },
-    // {
-    //   permission_name: "category list",
-    //   permission_path: "/category-list",
-    //   permission_category: "CATEGORY",
-    // },
-    // {
-    //   permission_name: "city list",
-    //   permission_path: "/city-list",
-    //   permission_category: "CITY",
-    // },
-    // {
-    //   permission_name: "source list",
-    //   permission_path: "/source-list",
-    //   permission_category: "SOURCE",
-    // },
-    // {
-    //   permission_name: "reference list",
-    //   permission_path: "/References-list",
-    //   permission_category: "REFERENCE",
-    // },
-    // {
-    //   permission_name: "product list",
-    //   permission_path: "/product-list",
-    //   permission_category: "PRODUCT",
-    // },
-    // {
-    //   permission_name: "paymenttype-list ",
-    //   permission_path: "/paymenttype-list",
-    //   permission_category: "PAYMENT_TYPE",
-    // },
-    // {
-    //   permission_name: "paymentmode-list ",
-    //   permission_path: "/paymentmode-list",
-    //   permission_category: "PAYMENT_MODE",
-    // },
-    // {
-    //   permission_name: "shift-list",
-    //   permission_path: "/shift-list",
-    //   permission_category: "SHIFT",
-    // },
-    // {
-    //   permission_name: "leads_status-list",
-    //   permission_path: "/leads_status-list",
-    //   permission_category: "LEADS_STATUS",
-    // },
-    // {
-    //   permission_name: "related list",
-    //   permission_path: "/related_to-list",
-    //   permission_category: "RELATED_TO",
-    // },
-    // {
-    //   permission_name: "tags list",
-    //   permission_path: "/tags-list",
-    //   permission_category: "TAGS",
-    // },
+
+
     {
-      permission_name: "customer-list",
-      permission_path: "/customer-list",
+      permission_name: "List",
+      permission_path: 1,
       permission_category: "CUSTOMER",
     },
     {
-      permission_name: "employee list",
-      permission_path: "/users-list",
+      permission_name: "Create",
+      permission_path: 2,
+      permission_category: "CUSTOMER",
+    },
+    {
+      permission_name: "Update",
+      permission_path: 3,
+      permission_category: "CUSTOMER",
+    },
+    {
+      permission_name: "Delete",
+      permission_path: 4,
+      permission_category: "CUSTOMER",
+    },
+
+    {
+      permission_name: "List",
+      permission_path: 1,
       permission_category: "EMPLOYEE",
     },
+    {
+      permission_name: "Create",
+      permission_path: 2,
+      permission_category: "EMPLOYEE",
+    },
+    {
+      permission_name: "Update",
+      permission_path: 3,
+      permission_category: "EMPLOYEE",
+    },
+    {
+      permission_name: "Delete",
+      permission_path: 4,
+      permission_category: "EMPLOYEE",
+    },
+
     {
       permission_name: "attendence",
       permission_path: "/attendence",
@@ -233,17 +311,46 @@ async function initializeDatabase() {
     //   permission_category: "ATTENDENCE",
     // },
     {
-      permission_name: "Leave-list",
-      permission_path: "/leave/:type?",
+      permission_name: "List",
+      permission_path: 1,
+      permission_category: "LEAVE",
+    },
+    {
+      permission_name: "Create",
+      permission_path: 2,
+      permission_category: "LEAVE",
+    },
+    {
+      permission_name: "Update",
+      permission_path: 3,
+      permission_category: "LEAVE",
+    },
+    {
+      permission_name: "Delete",
+      permission_path: 4,
       permission_category: "LEAVE",
     },
 
     {
-      permission_name: "Roles list",
-      permission_path: "/roles-list",
+      permission_name: "List",
+      permission_path: 1,
       permission_category: "ROLES",
     },
-
+    {
+      permission_name: "Create",
+      permission_path: 2,
+      permission_category: "ROLES",
+    },
+    {
+      permission_name: "Update",
+      permission_path: 3,
+      permission_category: "ROLES",
+    },
+    {
+      permission_name: "Delete",
+      permission_path: 4,
+      permission_category: "ROLES",
+    },
     {
       permission_name: "SalaryGeneration",
       permission_path: "/salary-generation",
@@ -252,8 +359,23 @@ async function initializeDatabase() {
 
 
     {
-      permission_name: "Payment list",
-      permission_path: "/payment",
+      permission_name: "List",
+      permission_path: 1,
+      permission_category: "PAYMENT",
+    },
+    {
+      permission_name: "Create",
+      permission_path: 2,
+      permission_category: "PAYMENT",
+    },
+    {
+      permission_name: "Update",
+      permission_path: 3,
+      permission_category: "PAYMENT",
+    },
+    {
+      permission_name: "Delete",
+      permission_path: 4,
       permission_category: "PAYMENT",
     },
 

@@ -1,7 +1,8 @@
-const Role = require("./role_model");
-const RoleHasPermission = require("./role_has_permission_model");
-const sequelize = require("../db/db_config");
-const { QueryTypes } = require("sequelize");
+const Role = require('./role_model');
+const RoleHasPermission = require('./role_has_permission_model');
+
+const sequelize = require('../db/db_config');
+const { QueryTypes } = require('sequelize');
 
 // Create a new role
 async function createRole(req, res) {
@@ -11,16 +12,18 @@ async function createRole(req, res) {
     for (const permissionId of permissionsLists) {
       await RoleHasPermission.create({
         rhp_role_id: role.role_id,
-        rhp_permission_id: permissionId,
+        rhp_permission_id: permissionId
       });
     }
     return res.json({ code: 1 });
+
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: err, code: 123 });
   }
 }
 
+// Update an existing role
 async function updateRole(req, res) {
   try {
     const { role_name, permissionList, role_id } = req.body;
@@ -62,6 +65,7 @@ async function updateRole(req, res) {
   }
 }
 
+
 // Get all roles
 async function getAllRoles(req, res) {
   try {
@@ -96,6 +100,7 @@ const getRoleById = async (req, res) => {
   }
 };
 
+
 // Delete a role by ID
 async function deleteRole(req, res) {
   try {
@@ -105,33 +110,20 @@ async function deleteRole(req, res) {
       await role.destroy();
       res.status(204).send();
     } else {
-      res.status(404).json({ error: "Role not found" });
+      res.status(404).json({ error: 'Role not found' });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Unable to delete the role" });
+    res.status(500).json({ error: 'Unable to delete the role' });
   }
 }
 
-// Get Permissions List
-async function getPermissionsList(req, res) {
-  const { role_id } = req.params;
-  DB.serialize(() => {
-    DB.all(
-      `
-        SELECT * FROM role_has_permissions
-        INNER JOIN permissions on permissions.permission_id = role_has_permissions.rhp_permission_id
-        WHERE role_has_permissions.rhp_role_id = "${role_id}"
-        `,
-      (err, rows) => res.json(rows)
-    );
-  });
-}
+
 module.exports = {
   createRole,
   getAllRoles,
   getRoleById,
   updateRole,
   deleteRole,
-  getPermissionsList,
+  // getPermissionsList
 };
