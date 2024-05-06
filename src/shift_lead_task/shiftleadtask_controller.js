@@ -30,14 +30,19 @@ const transferLead = async (req, res) => {
       parsedTempEmployee[index] = slt_send_to;
     }
 
-    await ShiftLeadTask.create({
+    const shiftLeadtask = await ShiftLeadTask.create({
       slt_send_to,
       slt_send_by,
-      slt_lead_id,
+      slt_lead_id: slt_lead_id ? slt_lead_id : 0,
       slt_reason,
-      slt_task_id,
+      slt_task_id: slt_task_id ? slt_task_id : 0,
     });
-    if (!req.body.slt_lead_id) {
+    if (!shiftLeadtask) {
+      res.json({
+        error: "Error creating shiftlead and task!"
+      })
+    }
+    if (slt_lead_id == "") {
       const findTaskbyId = await Task.findByPk(slt_task_id);
       if (!findTaskbyId) {
         res.json({ message: "Task not found!", status: 0 });
@@ -48,25 +53,27 @@ const transferLead = async (req, res) => {
       });
       const user = await User.findByPk(parseInt(slt_send_by));
       const notificationn = await Notifaction.findOne({
-        where:{
-          user_id:parseInt(slt_send_by)
+        where: {
+          user_id: parseInt(slt_send_by)
         }
       })
       await notificationn.destroy();
       const user2 = await User.findByPk(slt_send_to);
-      const admins = await User.findAll({where:{
-        u_type:1
-      }})
+      const admins = await User.findAll({
+        where: {
+          u_type: 1
+        }
+      })
 
       admins.forEach(async (admin) => {
         await Notifaction.create({
           user_id: admin.uid, // Assuming admin has an 'id' property
-          assigned_data_id: slt_lead_id,
+          assigned_data_id: slt_task_id,
           notification_type: 2,
           notification_description: `Task Shifted from ${user.name} to ${user2.name}`,
         });
       });
-      
+
       await Notifaction.create({
         user_id: parseInt(slt_send_to),
         assigned_data_id: slt_task_id,
@@ -81,19 +88,21 @@ const transferLead = async (req, res) => {
       if (!findLeadbyId) {
         res.json({ message: "Lead not found!", status: 0 });
       }
-      
+
       const user = await User.findByPk(parseInt(slt_send_by));
       const notificationn = await Notifaction.findOne({
-        where:{
-          user_id:parseInt(slt_send_by)
+        where: {
+          user_id: parseInt(slt_send_by)
         }
       })
       const user2 = await User.findByPk(slt_send_to);
       await notificationn.destroy();
 
-      const admins = await User.findAll({where:{
-        u_type:1
-      }})
+      const admins = await User.findAll({
+        where: {
+          u_type: 1
+        }
+      })
 
       admins.forEach(async (admin) => {
         await Notifaction.create({
@@ -103,7 +112,7 @@ const transferLead = async (req, res) => {
           notification_description: `Lead Shifted from ${user.name} to ${user2.name}`,
         });
       });
-      
+
       await Notifaction.create({
         user_id: parseInt(slt_send_to),
         assigned_data_id: slt_lead_id,
@@ -114,18 +123,18 @@ const transferLead = async (req, res) => {
         assigned_by: `[${parsedTempEmployee}]`,
       });
       if (updateLead) {
-        return res.json({ message: "Task shifted succefully!", status: 1 });
+        return res.json({ message: "Leads shifted succefully!", status: 1 });
       }
     }
   } catch (error) {
     console.log(error);
-    res.json({ error: "Failed To trasfer data" });
+    res.json({ message: "Failed To trasfer data", error });
   }
 };
 
 const index = async (req, res) => {
   try {
-    const { leadOrTask, slt_send_by,assigned_by } = req.body;
+    const { leadOrTask, slt_send_by, assigned_by } = req.body;
     let query = ``;
     if (leadOrTask == 0) {
       query += `
