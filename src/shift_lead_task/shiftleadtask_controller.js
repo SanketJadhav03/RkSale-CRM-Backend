@@ -122,6 +122,8 @@ const transferLead = async (req, res) => {
       const updateLead = await findLeadbyId.update({
         assigned_by: `[${parsedTempEmployee}]`,
       });
+      req.app.io.emit('fetchNotifications');
+
       if (updateLead) {
         return res.json({ message: "Leads shifted succefully!", status: 1 });
       }

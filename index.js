@@ -12,6 +12,21 @@ expressApp.use(express.json());
 expressApp.use(cors());
 expressApp.use(bodyParser.urlencoded({ extended: true }));
 expressApp.use(bodyParser.json());
+
+// socket 
+
+const http = require('http');
+const socketIo = require('socket.io');
+const server = http.createServer(expressApp);
+const io = socketIo(server, {
+  cors: {
+    origin: '*',
+  }
+});
+expressApp.io = io;
+// socket ends
+
+
 expressApp.use(express.static(path.join(__dirname, "public/images")));
 expressApp.use(
   fileUpload({
@@ -170,7 +185,21 @@ expressApp.use("/back-end", SalaryPay)
 
 
 // ################################ END #####################################################
+expressApp.on('newNotification', (data) => {
+  // Emit a Socket.IO event to all connected clients
+  io.emit('notification', data);
+});
+
+// Socket.IO for notifications
+io.on('connection', socket => {
+  console.log('New client connected');
+io.emit("data","hello");
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
 const port = process.env.PORT || 8880;
-expressApp.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+
+server.listen(port, () => {
+  console.log(`Server is listening at http://localhost:8880/`);
 });

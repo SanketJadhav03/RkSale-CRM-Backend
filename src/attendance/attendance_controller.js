@@ -105,6 +105,7 @@ const store = async (req, res) => {
 
         // Wait for all notifications to be created
         await Promise.all(notificationPromises);
+        req.app.io.emit('fetchNotifications');
       } else {
         // Handle the case where no user with role 1 is found
         console.error("No admins with role 1 found");

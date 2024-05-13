@@ -120,6 +120,7 @@ const store = async (req, res) => {
         });
       })
     );
+    req.app.io.emit('fetchNotifications');
 
     return res.json({ message: "Task added successfully!", status: 1 });
   } catch (error) {
