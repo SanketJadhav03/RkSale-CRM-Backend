@@ -174,7 +174,7 @@ const sotreFlutter = async (req, res) => {
       path.join(
         rootPath,
         "public/images/attendance",
-        in_photo ? in_photo.name : null
+        in_photo ? attendanceDate+in_photo.name : null
       )
     );
 
@@ -189,7 +189,7 @@ const sotreFlutter = async (req, res) => {
         attendance_in_latitude: attendance_in_latitude ? attendance_in_latitude : null,
         attendance_in_longitude: attendance_in_longitude ? attendance_in_longitude : null,
         remark: 1,
-        in_photo: in_photo ? imageintime : null,
+        in_photo: in_photo ? attendanceDate+in_photo.name: null,
       });
 
       const admins = await User.findAll({
@@ -498,7 +498,7 @@ const store_outimeFlutter = async (req, res) => {
       path.join(
         rootPath,
         "public/images/attendance",
-        (out_time_photo ? out_time_photo.name : null)
+        (out_time_photo ? attendance_id+out_time_photo.name : null)
       )
     );
 
@@ -514,7 +514,7 @@ const store_outimeFlutter = async (req, res) => {
       out_location: out_location,
       attendance_out_latitude: attendance_out_latitude,
       attendance_out_longitude: attendance_out_longitude,
-      out_photo: req.files.out_photo.name,
+      out_photo: attendance_id+req.files.out_photo.name,
     });
     // res.json(updatedAttendance);
     return res.status(200).json({ message: 'Check Out successfully', status: 1 });
