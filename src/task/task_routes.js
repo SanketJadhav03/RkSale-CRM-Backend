@@ -13,5 +13,7 @@ router.put('/task/update',controller.update)
 
 router.post('/task/filter',controller.filterData);
 
+router.post('/task/flutter/filter',controller.flutterFilter)
+
 
 module.exports = router;

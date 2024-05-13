@@ -335,10 +335,62 @@ const filterData = async (req, res) => {
     console.log(error);
   }
 };
+const flutterFilter = async (req, res) => {
+  try {
+    const {
+      start_date,
+      end_date,
+      customer_name,
+      assigned_by,
+      task_id,
+      status_name,
+    } = req.body;
+    let sql = `SELECT * 
+    FROM tbl_tasks 
+    INNER JOIN users ON tbl_tasks.task_created_by = users.uid
+    INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
+    INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
+    INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
+    INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
+    INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
+    INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
+    `;
+    const replacements = {
+      startDate: start_date,
+      endDate: end_date,
+    };
+    if (customer_name > 0) {
+      sql += ` AND tbl_tasks.customer = :customer_name`;
+      replacements.customer_name = customer_name;
+    }
+    if (status_name > 0) {
+      sql += ` AND tbl_tasks.status = :status_name`;
+      replacements.status_name = status_name;
+    }
+    if (assigned_by > 0) {
+      sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
+      replacements.assigned_by = assigned_by;
+    }
+    if (task_id > 0) {
+      sql += ` AND tbl_tasks.task_id = :Task_id`;
+      replacements.Task_id = task_id;
+    }
+    sql += ` ORDER BY tbl_tasks.createdAt DESC`;
+    const data = await sequelize.query(sql, {
+      replacements,
+      type: QueryTypes.SELECT,
+      model: Task,
+    });
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   store,
   index,
   show,
   update,
   filterData,
+  flutterFilter
 };

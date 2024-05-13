@@ -224,11 +224,16 @@ const userleave = async (req, res) => {
     try {
         const user_leave = await sequelize.query(
             `SELECT 
-                leaves.*,
-                users_leave.*
-            FROM tbl_leaves AS leaves
-            INNER JOIN users AS users_leave ON leaves.leave_user_id = users_leave.uid
-            WHERE leaves.leave_user_id =:id
+            leaves.*,
+            users_leave.*
+        FROM 
+            tbl_leaves AS leaves
+        INNER JOIN 
+            users AS users_leave ON leaves.leave_user_id = users_leave.uid
+        WHERE 
+            leaves.leave_user_id = :id
+        ORDER BY 
+            leaves.createdAt DESC
             `,
             {
                 type: QueryTypes.SELECT,

@@ -4,6 +4,7 @@ const sequelize = require("../db/db_config");
 const Attendance = require("./attendance_model");
 const path = require("path");
 const Notifaction = require("../notification/notification_model");
+const moment = require("moment");
 
 const store = async (req, res) => {
   try {
@@ -113,6 +114,106 @@ const store = async (req, res) => {
       return res.status(201).json({ message: 'Check in  successfully', status: 1 });
     }
     // return res.status(201).json({ message: 'czdcxcvvxdcv xcfully', status: 1 });
+  } catch (error) {
+    console.log(error);
+    res.json({ error: "Failed To Store Attendance" });
+  }
+};
+const sotreFlutter = async (req, res) => {
+  try {
+    const {
+      user_id,
+      attendance_date,
+      in_time,
+      in_location,
+      attendance_in_latitude,
+      attendance_in_longitude,
+    } = req.body;
+
+    // Parse the date string with the correct format
+    const attendanceDate = moment(attendance_date, 'DD/MM/YYYY');
+
+    console.log(req.body);
+
+    const rootPath = process.cwd();
+
+    const in_photo = req.files.in_photo;
+
+    const Olddata = await Attendance.findAll({
+      where: {
+        user_id: user_id,
+        attendance_date: attendanceDate,
+      },
+    });
+
+    const validateAndMove = (file, uploadPath) => {
+      if (!file) {
+        // Skip the file if it's null
+        console.log("File is null");
+        return null;
+      }
+
+      if (!file.name) {
+        return res.status(400).json({ error: "Invalid file object" });
+      }
+
+      file.mv(uploadPath, (err) => {
+        if (err) {
+          console.error("Error moving file:", err);
+          return res.status(500).json({ error: "Error uploading file" });
+        }
+        // Do something with the file path, for example, save it in the database
+        // ...
+      });
+
+      return file.name; // Return the filename for use in the database
+    };
+
+    const imageintime = validateAndMove(
+      in_photo,
+      path.join(
+        rootPath,
+        "public/images/attendance",
+        in_photo ? in_photo.name : null
+      )
+    );
+
+    if (Olddata && Olddata.length > 0) {
+      return res.status(200).json({ message: 'already Check in  successfully', status: 1 });
+    } else {
+      const newAttendance = await Attendance.create({
+        user_id: user_id ? user_id : null,
+        attendance_date: attendanceDate.isValid() ? attendanceDate.toDate() : null,
+        in_time: in_time ? in_time : null,
+        in_location: in_location ? in_location : null,
+        attendance_in_latitude: attendance_in_latitude ? attendance_in_latitude : null,
+        attendance_in_longitude: attendance_in_longitude ? attendance_in_longitude : null,
+        remark: 1,
+        in_photo: in_photo ? imageintime : null,
+      });
+
+      const admins = await User.findAll({
+        where: { u_type: 1 },
+        attributes: ['uid'],
+      });
+      const user = await User.findByPk(user_id);
+      if (admins.length > 0) {
+        const notificationPromises = admins.map(async (admin) => {
+          return await Notifaction.create({
+            user_id: admin.uid,
+            assigned_data_id: newAttendance.attendance_id,
+            notification_type: 1,
+            notification_description: `${user.name} Checked In ${newAttendance.in_location}`
+          });
+        });
+
+        await Promise.all(notificationPromises);
+        req.app.io.emit('fetchNotifications');
+      } else {
+        console.error("No admins with role 1 found");
+      }
+      return res.status(200).json({ message: 'Check in successfully', status: 1 });
+    }
   } catch (error) {
     console.log(error);
     res.json({ error: "Failed To Store Attendance" });
@@ -361,6 +462,68 @@ const store_outime = async (req, res) => {
   }
 };
 
+const store_outimeFlutter = async (req, res) => {
+  try {
+    const { attendance_id, user_id, out_time, out_location, attendance_out_longitude, attendance_out_latitude } = req.body;
+    console.log(req.body);
+    const rootPath = process.cwd();
+
+    const out_time_photo = req.files.out_photo;
+
+    const validateAndMove = (file, uploadPath) => {
+      if (!file) {
+        // Skip the file if it's null
+        console.log("File is null");
+        return null;
+      }
+
+      if (!file.name) {
+        return res.status(400).json({ error: "Invalid file object" });
+      }
+
+      file.mv(uploadPath, (err) => {
+        if (err) {
+          console.error("Error moving file:", err);
+          return res.status(500).json({ error: "Error uploading file" });
+        }
+        // Do something with the file path, for example, save it in the database
+        // ...
+      });
+
+      return file.name; // Return the filename for use in the database
+    };
+
+    validateAndMove(
+      out_time_photo,
+      path.join(
+        rootPath,
+        "public/images/attendance",
+        (out_time_photo ? out_time_photo.name : null)
+      )
+    );
+
+    const attendance = await Attendance.findOne({
+      where: {
+        attendance_id: attendance_id,
+        user_id: user_id,
+
+      },
+    });
+    const updatedAttendance = await attendance.update({
+      out_time: out_time,
+      out_location: out_location,
+      attendance_out_latitude: attendance_out_latitude,
+      attendance_out_longitude: attendance_out_longitude,
+      out_photo: req.files.out_photo.name,
+    });
+    // res.json(updatedAttendance);
+    return res.status(200).json({ message: 'Check Out successfully', status: 1 });
+  } catch (error) {
+    console.log(error);
+    res.json({ error: "Failed To Store Attendance" });
+  }
+};
+
 
 const adminindex = async (req, res) => {
   try {
@@ -492,6 +655,39 @@ const getPresentAbsent = async (req, res) => {
   }
 };
 
+const showFlutter = async (req, res) => {
+  try {
+    const { id } = req.body;
+    // const UserAttendance = await Attendance.findAll({
+    //   where: {
+    //     user_id: id,
+    //   },
+    // });
+    // Execute the raw SQL query
+    const UserAttendance = await sequelize.query(
+      `SELECT tbl_attendances.*, users.*, tbl_attendances.in_photo, tbl_attendances.out_photo
+      FROM tbl_attendances
+      INNER JOIN users ON tbl_attendances.user_id = users.uid
+      WHERE tbl_attendances.user_id = :id
+      ORDER BY tbl_attendances.createdAt DESC`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: { id },
+      }
+    );
+    const attendanceWithCompletePaths = UserAttendance.map((attendance) => {
+      return {
+        ...attendance,
+        in_photo: `/attendance/${attendance.in_photo}`, // Adjust field name if needed
+        out_photo: `/attendance/${attendance.out_photo}`, // Adjust field name if needed
+      };
+    });
+    res.json(attendanceWithCompletePaths);
+  } catch (error) {
+    console.log(error);
+    res.json({ error: "Failed To Find Attendance By User" });
+  }
+}
 module.exports = {
   store,
   index,
@@ -501,5 +697,8 @@ module.exports = {
   adminindex,
   filterData,
   getPresentAbsent,
-  show
+  show,
+  sotreFlutter,
+  showFlutter,
+  store_outimeFlutter
 };
