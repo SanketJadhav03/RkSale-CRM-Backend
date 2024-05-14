@@ -8,6 +8,8 @@ router.get('/task/list',controller.index)
 
 router.get('/task/show/:id',controller.show)
 
+router.post('/task/show/flutter',controller.showFlutter)
+
 router.put('/task/update',controller.update)
 
 

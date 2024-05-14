@@ -177,6 +177,32 @@ const show = async (req, res) => {
   }
 };
 
+const showFlutter = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const data = await sequelize.query(
+      `SELECT * FROM tbl_tasks 
+        INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
+        INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
+        INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
+        INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
+        INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
+        WHERE tbl_tasks.task_id = :id
+        `,
+
+      {
+        replacements: { id },
+        type: QueryTypes.SELECT, // Specify the model for Sequelize to map the result to
+      }
+    );
+
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+    res.json({ error: "Failed To Show By Id " });
+  }
+};
+
 const update = async (req, res) => {
   try {
     const {
@@ -392,5 +418,6 @@ module.exports = {
   show,
   update,
   filterData,
-  flutterFilter
+  flutterFilter,
+  showFlutter
 };
