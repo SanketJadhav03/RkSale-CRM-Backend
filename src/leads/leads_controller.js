@@ -345,10 +345,67 @@ const filterData = async (req, res) => {
     console.log(error);
   }
 };
+
+
+const filterDataFlutter = async (req,res)=>{
+  try {
+    const {
+      start_date,
+      end_date,
+      customer_name,
+      assigned_by,
+      lead_id,
+      status_name,
+    } = req.body;
+    let sql = `SELECT * FROM tbl_leads 
+    INNER JOIN users ON tbl_leads.lead_created_by = users.uid
+      INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
+      INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
+      INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
+      INNER JOIN tbl_products ON tbl_leads.product = tbl_products.product_id
+      INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
+      INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
+      INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
+      `;
+
+    const replacements = {
+      startDate: start_date,
+      endDate: end_date,
+    };
+
+    if (customer_name > 0) {
+      sql += ` AND tbl_leads.customer = :customer_name`;
+      replacements.customer_name = customer_name;
+    }
+    if (status_name > 0) {
+      sql += ` AND tbl_leads.status = :status_name`;
+      replacements.status_name = status_name;
+    }
+    if (lead_id > 0) {
+      sql += ` AND tbl_leads.lead_id = :Lead_id`;
+      replacements.Lead_id = lead_id;
+    }
+    if (assigned_by > 0) {
+      sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
+      replacements.assigned_by = assigned_by;
+    }
+    sql += ` ORDER BY tbl_leads.createdAt DESC`;
+    const data = await sequelize.query(sql, {
+      replacements,
+      type: QueryTypes.SELECT,
+      model: Leads,
+    });
+
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+}
 module.exports = {
   store,
   index,
   show,
   update,
   filterData,
+  filterDataFlutter
 };

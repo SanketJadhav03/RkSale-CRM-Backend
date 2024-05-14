@@ -12,4 +12,6 @@ router.put('/leads/update',controller.update)
 
 router.post('/leads/filter',controller.filterData)
 
+router.post('/lead/filter/flutter',controller.filterDataFlutter)
+
 module.exports = router;
