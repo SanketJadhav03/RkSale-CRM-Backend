@@ -5,7 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const index = async (req, res) => {
     const bussiness_settings = await sequelize.query(
-        'SELECT tbl_business_settings.*, tbl_industry_types.* FROM tbl_business_settings JOIN tbl_industry_types ON tbl_business_settings.business_industry_type = tbl_industry_types.industry_type_id',
+        `SELECT tbl_business_settings.* FROM tbl_business_settings
+         `,
         {
             model: Business_setting,
             mapToModel: true, // Map the result to the Customer model
@@ -23,79 +24,86 @@ const index = async (req, res) => {
 
 const store = async (req, res) => {
     try {
-        const {
-            business_name,
-            business_company_phone_no,
-            business_company_email,
-            business_billing_address,
-            business_state,
-            business_state_code,
-            business_pincode,
-            business_city,
-            business_gst_no,
-            business_pan_number,
-            business_type,
-            business_industry_type,
-            business_registration_type,
-        } = req.body;
+        const data = await Business_setting.findAll();
+        // return res.json(data);
+        console.log(data.length);
+        if (data.length > 0) {
+            return res.status(201).json({ message: 'Bussiness Setting already added!', status: 1 });
+        } else {
+            const {
+                business_name,
+                business_company_phone_no,
+                business_company_email,
+                business_billing_address,
+                business_state,
+                business_state_code,
+                business_pincode,
+                business_city,
+                business_gst_no,
+                business_pan_number,
+                business_type,
+                business_registration_type,
+            } = req.body;
 
-        const business_logo = req.files.business_logo;
+
+            const business_logo = req.files.business_logo;
 
 
 
 
-        const validateAndMove = (file, uploadPath) => {
-            if (!file) {
-                // Skip the file if it's null
-                console.log("File is null");
-                return null;
-            }
+            const validateAndMove = (file, uploadPath) => {
+                if (!file) {
+                    // Skip the file if it's null
+                    console.log("File is null");
+                    return null;
+                }
 
-            if (!file.name) {
-                return res.status(400).json({ error: "Invalid file object" });
-            }
+                if (!file.name) {
+                    return res.status(400).json({ error: "Invalid file object" });
+                }
 
-            return new Promise((resolve, reject) => {
-                file.mv(uploadPath, (err) => {
-                    if (err) {
-                        console.error("Error moving file:", err);
-                        reject({ error: "Error uploading file" });
-                    }
-                    // Resolve with the file path after successful move
-                    resolve(uploadPath);
+                return new Promise((resolve, reject) => {
+                    file.mv(uploadPath, (err) => {
+                        if (err) {
+                            console.error("Error moving file:", err);
+                            reject({ error: "Error uploading file" });
+                        }
+                        // Resolve with the file path after successful move
+                        resolve(uploadPath);
+                    });
                 });
+            };
+
+            const rootPath = process.cwd();
+            const uploadedFilePath = await validateAndMove(
+                business_logo,
+                path.join(
+                    rootPath,
+                    "public/images/business_setting",
+                    (business_logo ? business_logo.name : "")
+                )
+            );
+
+            const business = await Business_setting.create({
+                business_name,
+                business_company_phone_no,
+                business_billing_address,
+                business_company_email,
+                business_state,
+                business_state_code,
+                business_pincode,
+                business_city,
+                business_gst_no,
+                business_pan_number,
+                business_type,
+                business_registration_type,
+                business_logo: uploadedFilePath ? path.basename(uploadedFilePath) : null // Store file path in the database
             });
-        };
 
-        const rootPath = process.cwd();
-        const uploadedFilePath = await validateAndMove(
-            business_logo,
-            path.join(
-                rootPath,
-                "public/images/business_setting",
-                "crm" + "-" + (business_logo ? business_logo.name : "")
-            )
-        );
+            // res.json(business);
+            return res.status(201).json({ message: 'Bussiness Setting added successfully !', status: 1 });
+        }
 
-        const business = await Business_setting.create({
-            business_name,
-            business_company_phone_no,
-            business_billing_address,
-            business_company_email,
-            business_state,
-            business_state_code,
-            business_pincode,
-            business_city,
-            business_gst_no,
-            business_pan_number,
-            business_type,
-            business_industry_type,
-            business_registration_type,
-            business_logo: uploadedFilePath ? path.basename(uploadedFilePath) : null // Store file path in the database
-        });
-
-        // res.json(business);
-        return res.status(201).json({ message: 'Bussiness Setting added successfully !', status: 1 });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: "Failed To Create Business Setting!" });
@@ -107,7 +115,7 @@ const show = async (req, res) => {
         const { id } = req.params;
         const data = await sequelize.query(
             `SELECT * FROM tbl_business_settings 
-      INNER JOIN tbl_industry_types ON tbl_business_settings.business_industry_type = tbl_industry_types.industry_type_id
+     
       
       WHERE tbl_business_settings.business_id = :id
       `,
@@ -141,7 +149,7 @@ const update = async (req, res) => {
             business_gst_no,
             business_pan_number,
             business_type,
-            business_industry_type,
+
             business_registration_type,
         } = req.body;
 
@@ -155,7 +163,7 @@ const update = async (req, res) => {
             const uploadedFile = req.files.business_logo;
 
             // Remove the existing file
-            const filePath = `public/images/business_setting/${"crm-" + existingBusiness.business_logo}`;
+            const filePath = `public/images/business_setting/${existingBusiness.business_logo}`;
             fs.unlink(filePath, (err) => {
                 if (err) {
                     console.error('Error deleting existing file:', err);
@@ -163,7 +171,7 @@ const update = async (req, res) => {
             });
 
             // Save the new file
-            uploadedFile.mv(`public/images/business_setting/${"crm-" + uploadedFile.name}`, (err) => {
+            uploadedFile.mv(`public/images/business_setting/${uploadedFile.name}`, (err) => {
                 if (err) {
                     console.error('Error saving new file:', err);
                 }
@@ -182,9 +190,8 @@ const update = async (req, res) => {
                 business_gst_no,
                 business_pan_number,
                 business_type,
-                business_industry_type,
                 business_registration_type,
-                business_logo: "crm-" + uploadedFile.name,
+                business_logo: uploadedFile.name,
             });
         } else {
             // If no new file is provided, update other business details without changing the logo
@@ -200,7 +207,6 @@ const update = async (req, res) => {
                 business_gst_no,
                 business_pan_number,
                 business_type,
-                business_industry_type,
                 business_registration_type,
             });
         }

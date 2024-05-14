@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../db/db_config'); // Your Sequelize connection
 
 const Payment = sequelize.define('tbl_payment', {
-    payment_id: {
+  payment_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
@@ -24,7 +24,7 @@ const Payment = sequelize.define('tbl_payment', {
   },
 
   payment_receiver: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: true,
   },
   payment_mode: {
@@ -46,7 +46,7 @@ const Payment = sequelize.define('tbl_payment', {
   },
   payment_status: {
     type: DataTypes.STRING,
-    defaultValue:1,
+    defaultValue: 1,
     allowNull: true,
   },
 

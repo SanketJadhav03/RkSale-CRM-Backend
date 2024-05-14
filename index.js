@@ -193,7 +193,7 @@ expressApp.on('newNotification', (data) => {
 // Socket.IO for notifications
 io.on('connection', socket => {
   console.log('New client connected');
-io.emit("data","hello");
+  io.emit("data", "hello");
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
