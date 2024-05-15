@@ -188,20 +188,25 @@ const showFlutter = async (req, res) => {
         INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
         INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
         WHERE tbl_tasks.task_id = :id
-        `,
-
+      `,
       {
         replacements: { id },
         type: QueryTypes.SELECT, // Specify the model for Sequelize to map the result to
       }
     );
 
-    res.json(data);
+    // Check if data is not empty
+    if (data.length > 0) {
+      res.json(data[0]); // Return the first (and only) object directly
+    } else {
+      res.json({}); // Return an empty object if no data found
+    }
   } catch (error) {
     console.log(error);
-    res.json({ error: "Failed To Show By Id " });
+    res.json({ error: "Failed To Show By Id" });
   }
 };
+
 
 const update = async (req, res) => {
   try {

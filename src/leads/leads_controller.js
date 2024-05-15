@@ -174,7 +174,7 @@ const show = async (req, res) => {
       }
     );
 
-    res.json(data);
+    res.status(200).json(data[0]);
   } catch (error) {
     console.log(error);
     res.json({ error: "Failed To Show By Id " });
