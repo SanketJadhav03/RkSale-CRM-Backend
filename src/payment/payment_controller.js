@@ -44,12 +44,15 @@ const index = async (req, res) => {
         const offset = (page - 1) * limitPerPage;
 
         const data = await sequelize.query(
-            `SELECT * 
+            `SELECT  tbl_payments.*, tbl_payments.createdAt AS payment_date, tbl_payment_modes.*, 
+            sender.*, 
+            receiver.*, 
+            tbl_payment_types.*
             FROM tbl_payments 
-            INNER JOIN tbl_payment_modes ON tbl_payments.payment_mode = tbl_payment_modes.payment_mode_id
-            INNER JOIN users AS sender ON tbl_payments.payment_send_user = sender.uid
-            INNER JOIN users AS receiver ON tbl_payments.payment_receiver = receiver.uid
-            INNER JOIN tbl_payment_types ON tbl_payments.payment_type = tbl_payment_types.payment_type_id
+            LEFT JOIN tbl_payment_modes ON tbl_payments.payment_mode = tbl_payment_modes.payment_mode_id
+            LEFT JOIN users AS sender ON tbl_payments.payment_send_user = sender.uid
+            LEFT JOIN users AS receiver ON tbl_payments.payment_receiver = receiver.uid
+            LEFT JOIN tbl_payment_types ON tbl_payments.payment_type = tbl_payment_types.payment_type_id
             LIMIT ${limitPerPage} OFFSET ${offset}`, // Apply LIMIT and OFFSET for pagination
             {
                 type: QueryTypes.SELECT,

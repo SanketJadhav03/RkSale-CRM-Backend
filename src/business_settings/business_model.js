@@ -38,7 +38,7 @@ const Business_setting = sequelize.define(
       allowNull: true,
     },
     business_pincode: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     business_city: {
@@ -58,7 +58,7 @@ const Business_setting = sequelize.define(
       allowNull: true,
     },
     business_industry_type: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
     business_registration_type: {
