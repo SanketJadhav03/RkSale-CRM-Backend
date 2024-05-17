@@ -17,5 +17,7 @@ router.post('/task/filter',controller.filterData);
 
 router.post('/task/flutter/filter',controller.flutterFilter)
 
+router.post('/task/flutter/store',controller.Flutterstore)
+
 
 module.exports = router;
