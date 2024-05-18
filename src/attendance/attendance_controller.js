@@ -174,7 +174,7 @@ const sotreFlutter = async (req, res) => {
       path.join(
         rootPath,
         "public/images/attendance",
-        in_photo ? attendanceDate+in_photo.name : null
+        in_photo ? attendanceDate + in_photo.name : null
       )
     );
 
@@ -189,7 +189,7 @@ const sotreFlutter = async (req, res) => {
         attendance_in_latitude: attendance_in_latitude ? attendance_in_latitude : null,
         attendance_in_longitude: attendance_in_longitude ? attendance_in_longitude : null,
         remark: 1,
-        in_photo: in_photo ? attendanceDate+in_photo.name: null,
+        in_photo: in_photo ? attendanceDate + in_photo.name : null,
       });
 
       const admins = await User.findAll({
@@ -454,6 +454,31 @@ const store_outime = async (req, res) => {
       attendance_out_longitude: attendance_out_longitude,
       out_photo: req.files.out_photo.name,
     });
+    const admins = await User.findAll({
+      where: { u_type: 1 },
+      attributes: ['uid'],
+    });
+    const user = await User.findByPk(user_id);
+    // return console.log(user);
+    if (admins.length > 0) {
+      // If admins with role 1 are found, create a notification for each of them
+
+      const notificationPromises = admins.map(async (admin) => {
+        return await Notifaction.create({
+          user_id: admin.uid,
+          assigned_data_id: updatedAttendance.attendance_id,
+          notification_type: 1,
+          notification_description: `${user.name} Checked OUT ${updatedAttendance.out_location}`
+        });
+      });
+
+      // Wait for all notifications to be created
+      await Promise.all(notificationPromises);
+      req.app.io.emit('fetchNotifications');
+    } else {
+      // Handle the case where no user with role 1 is found
+      console.error("No admins with role 1 found");
+    }
     // res.json(updatedAttendance);
     return res.status(201).json({ message: 'Check Out successfully', status: 1 });
   } catch (error) {
@@ -498,7 +523,7 @@ const store_outimeFlutter = async (req, res) => {
       path.join(
         rootPath,
         "public/images/attendance",
-        (out_time_photo ? attendance_id+out_time_photo.name : null)
+        (out_time_photo ? attendance_id + out_time_photo.name : null)
       )
     );
 
@@ -514,7 +539,7 @@ const store_outimeFlutter = async (req, res) => {
       out_location: out_location,
       attendance_out_latitude: attendance_out_latitude,
       attendance_out_longitude: attendance_out_longitude,
-      out_photo: attendance_id+req.files.out_photo.name,
+      out_photo: attendance_id + req.files.out_photo.name,
     });
     // res.json(updatedAttendance);
     return res.status(200).json({ message: 'Check Out successfully', status: 1 });

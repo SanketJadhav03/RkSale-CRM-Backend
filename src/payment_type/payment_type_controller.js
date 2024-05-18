@@ -1,6 +1,37 @@
 const Payment_Type = require("./payment_type_model");
 
+const xlsx = require('xlsx');
+const upload = async (req, res) => {
+    try {
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({ message: 'No file uploaded', status: 0 });
+        }
 
+        const file = req.files.file;
+
+        // Use xlsx to read the Excel or CSV file
+        const workbook = xlsx.read(file.data, { type: 'buffer' });
+        const sheetNameList = workbook.SheetNames;
+        const payment_typeData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetNameList[0]], { raw: true });
+
+        // Prepare an array of payment_type objects
+        const payment_type = payment_typeData.map(row => ({
+            payment_type_id: row.payment_type_id,
+            payment_type_name: row.payment_type_name,
+            payment_type_status: row.payment_type_status,
+        }));
+
+        // Use Sequelize bulk insert
+        const results = await Payment_Type.bulkCreate(payment_type, {
+            updateOnDuplicate: ['payment_type_name', 'payment_type_status']
+        });
+
+        res.status(201).json({ message: `${results.length} payment_type added or updated successfully`, status: 1 });
+    } catch (error) {
+        console.error('Error adding payment_type:', error);
+        res.status(500).json({ error: 'Error adding payment_type' });
+    }
+}
 const store = async (req, res) => {
     try {
         const { payment_type_name } = req.body;
@@ -90,6 +121,7 @@ const show = async (req, res) => {
 
 }
 module.exports = {
+    upload,
     store,
     index,
     update,

@@ -6,7 +6,58 @@ const fs = require("fs");
 const Notifaction = require("../notification/notification_model");
 const Product = require("../product/product_model");
 const Customer = require("../customer/customer_model");
+const xlsx = require('xlsx');
+const upload = async (req, res) => {
+  try {
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).json({ message: 'No file uploaded', status: 0 });
+    }
 
+    const file = req.files.file;
+
+    // Use xlsx to read the Excel or CSV file
+    const workbook = xlsx.read(file.data, { type: 'buffer' });
+    const sheetNameList = workbook.SheetNames;
+    const leadData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetNameList[0]], { raw: true });
+    // Prepare an array of city objects
+    const leads = leadData.map(row => ({
+      lead_id: row.lead_id,
+      customer: row.customer,
+      lead_created_by: row.lead_created_by,
+      product: row.product,
+      value: row.value,
+      repeat_every_day: row.repeat_every_day,
+      total_cycles: row.total_cycles,
+      today_date: new Date(),
+      minimum_due_date: new Date(),
+      ref_by: row.ref_by,
+      image: row.image,
+      maximum_due_date: new Date(),
+      source: row.source,
+      priority: row.priority,
+      description: row.description,
+      assigned_by: row.assigned_by,
+      tags: row.tags,
+      status: row.status,
+      lead_status: row.lead_status,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    }));
+    // return res.status(201).json(leads);
+
+    // Use Sequelize bulk insert
+    const results = await Leads.bulkCreate(leads, {
+      updateOnDuplicate: ['customer', 'lead_created_by', 'product', 'value', 'repeat_every_day', 'total_cycles', 'today_date', 'minimum_due_date', 'ref_by',
+        'image', 'maximum_due_date', 'source', 'priority', 'description', 'assigned_by', 'tags', 'status', 'lead_status']
+    });
+
+    return res.status(201).json({ message: `${results.length} leads added or updated successfully`, status: 1 });
+    // return res.json({ message: "Lead added successfully!", status: 1 });
+  } catch (error) {
+    console.error('Error adding Task:', error);
+    res.status(500).json({ message: 'Error adding leads', status: 0 });
+  }
+}
 const store = async (req, res) => {
   try {
     const {
@@ -347,7 +398,7 @@ const filterData = async (req, res) => {
 };
 
 
-const filterDataFlutter = async (req,res)=>{
+const filterDataFlutter = async (req, res) => {
   try {
     const {
       start_date,
@@ -555,6 +606,7 @@ const Flutterstore = async (req, res) => {
   }
 };
 module.exports = {
+  upload,
   store,
   index,
   show,

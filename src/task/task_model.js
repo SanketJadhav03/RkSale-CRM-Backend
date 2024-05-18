@@ -8,7 +8,7 @@ const Task = sequelize.define('tbl_task', {
     primaryKey: true,
     autoIncrement: true,
   },
-  
+
   task_created_by: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -29,7 +29,7 @@ const Task = sequelize.define('tbl_task', {
     type: DataTypes.DATE,
     allowNull: false,
   },
-  minimum_due_date : {
+  minimum_due_date: {
     type: DataTypes.DATE,
     allowNull: false,
   },
@@ -37,7 +37,7 @@ const Task = sequelize.define('tbl_task', {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  image:{
+  image: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -65,17 +65,17 @@ const Task = sequelize.define('tbl_task', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  repeat_every_day:{
-type:DataTypes.STRING,
-allowNull:true
+  repeat_every_day: {
+    type: DataTypes.STRING,
+    allowNull: true
   },
-//   total_cycles:{
-// type:DataTypes.STRING,
-// allowNull:true
-//   },
-  status:{
-    type:DataTypes.INTEGER,
-    allowNull:false
+  //   total_cycles:{
+  // type:DataTypes.STRING,
+  // allowNull:true
+  //   },
+  status: {
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   task_status: {
     type: DataTypes.INTEGER,

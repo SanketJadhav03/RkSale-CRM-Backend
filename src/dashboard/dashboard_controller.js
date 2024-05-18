@@ -51,7 +51,7 @@ const index = async (req, res) => {
           userId > 0 ? { user_id: userId } : {}, // Include user_id condition if userId > 0
           sequelize.literal(`attendance_date = '${today}'`),
           sequelize.literal(`in_time != ''`),
-          sequelize.where(sequelize.literal('out_time'), '=', null), // Filter by today's date and null out_time
+          // sequelize.where(sequelize.literal('out_time'), '=', null), // Filter by today's date and null out_time
         ],
       },
     });
