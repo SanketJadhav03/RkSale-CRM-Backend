@@ -208,10 +208,17 @@ const Flutterstore = async (req, res) => {
   }
   
   
-
-  
-  
     const assignedByArray = JSON.parse(assigned_by);
+    const assignedByArray2 = Array.isArray(assigned_by) ? assigned_by.map(Number) : [parseInt(assigned_by)];
+
+    // Convert the array to a JSON string
+    const assignedByJsonString = JSON.stringify(assignedByArray2);
+
+    const tagsByArray = Array.isArray(tags) ? tags.map(Number) : [parseInt(tags)];
+
+    // Convert the array to a JSON string
+    const tagsByJsonString = JSON.stringify(tagsByArray);
+
     const newtask = await Task.create({
       task_created_by: task_created_by,
       customer: customer,
@@ -224,8 +231,8 @@ const Flutterstore = async (req, res) => {
       source: source,
       priority: priority,
       description: description,
-      assigned_by: assigned_by,
-      tags: tags,
+      assigned_by:assignedByJsonString,
+      tags: tagsByJsonString,
       repeat_every_day: repeat_every_day,
       total_cycles: total_cycles,
       status: status,

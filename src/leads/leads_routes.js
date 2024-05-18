@@ -14,4 +14,7 @@ router.post('/leads/filter',controller.filterData)
 
 router.post('/lead/filter/flutter',controller.filterDataFlutter)
 
+router.post('/lead/flutter/store',controller.Flutterstore)
+
+
 module.exports = router;

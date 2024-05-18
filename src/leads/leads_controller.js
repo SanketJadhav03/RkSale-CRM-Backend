@@ -401,11 +401,166 @@ const filterDataFlutter = async (req,res)=>{
     console.log(error);
   }
 }
+
+
+const Flutterstore = async (req, res) => {
+  try {
+
+    const {
+      task_created_by,
+      customer,
+      product,
+      value,
+      today_date,
+      minimum_due_date,
+      ref_by,
+      maximum_due_date,
+      source,
+      priority,
+      description,
+      tags,
+      repeat_every_day,
+      total_cycles,
+      status,
+    } = req.body;
+
+      let {assigned_by} = req.body
+
+    let imageFilenames = [];
+
+    if (req.files && req.files.img !== null) {
+      const rootPath = process.cwd();
+
+      // Function to validate and move each image
+      const validateAndMove = (file) => {
+        if (!file) {
+          // Skip the file if it's null
+          console.log("File is null");
+          return null;
+        }
+
+        if (!file.name) {
+          return res.status(400).json({ error: "Invalid file object" });
+        }
+
+        const uploadPath = path.join(
+          rootPath,
+          "public/images/lead",
+          "CRM"+file.name
+    
+        );
+
+        file.mv(uploadPath, (err) => {
+          if (err) {
+            console.error("Error moving file:", err);
+            return res.status(500).json({ error: "Error uploading file" });
+          }
+          // Do something with the file path, for example, save it in the database
+          // ...
+        });
+
+        return file.name; // Return the filename for use in the database
+      };
+
+      // Validate and move each image
+      if (Array.isArray(req.files["image[]"])) {
+        // Validate and move each image
+        imageFilenames = req.files["image[]"].map((image) =>
+          validateAndMove(image)
+        );
+      } else {
+        // Only one image is coming
+        const singleImage = req.files["image[]"];
+        imageFilenames.push(validateAndMove(singleImage));
+      }
+
+
+  
+    }
+    if (Array.isArray(assigned_by) || typeof assigned_by === 'object') {
+      // If it's an array or object, concatenate it with an empty array to create a new array with the original string value as its only element
+      assigned_by = [assigned_by + ''];
+  }
+  
+  
+    const assignedByArray = JSON.parse(assigned_by);
+    const assignedByArray2 = Array.isArray(assigned_by) ? assigned_by.map(Number) : [parseInt(assigned_by)];
+
+    // Convert the array to a JSON string
+    const assignedByJsonString = JSON.stringify(assignedByArray2);
+
+    const tagsByArray = Array.isArray(tags) ? tags.map(Number) : [parseInt(tags)];
+
+    // Convert the array to a JSON string
+    const tagsByJsonString = JSON.stringify(tagsByArray);
+
+    const newtask = await Leads.create({
+      lead_created_by: task_created_by,
+      customer: customer,
+      product: product,
+      value: value,
+      today_date: today_date,
+      minimum_due_date: minimum_due_date,
+      ref_by: ref_by,
+      maximum_due_date: maximum_due_date,
+      source: source,
+      priority: priority,
+      description: description,
+      assigned_by:assignedByJsonString,
+      tags: tagsByJsonString,
+      repeat_every_day: today_date,
+      total_cycles: "",
+      status: status,
+      image: `[${imageFilenames}]`,
+    });
+
+    const productdata = await Product.findOne({
+      where: {
+        product_id: product
+      }
+    })
+
+
+    const customerData = await Customer.findOne({
+      where: {
+        customer_id: customer
+      }
+    })
+
+    await Promise.all(
+      Array.isArray(assignedByArray)
+        ? assignedByArray.map(async (assignedUserId) => {
+            await Notifaction.create({
+              user_id: assignedUserId,
+              assigned_data_id: newtask.task_id,
+              notification_description: `Task Assigned Of ${productdata.product_name},${customerData.customer_name}`,
+              notification_type: 3,
+            });
+          })
+        : [assignedByArray].map(async (assignedUserId) => {
+            await Notifaction.create({
+              user_id: assignedUserId,
+              assigned_data_id: newtask.task_id,
+              notification_description: `Task Assigned Of ${productdata.product_name},${customerData.customer_name}`,
+              notification_type: 3,
+            });
+          })
+    );
+    
+    req.app.io.emit('fetchNotifications');
+
+    return res.status(200).json({ message: "Task added successfully!", status: 1 });
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   store,
   index,
   show,
   update,
   filterData,
-  filterDataFlutter
+  filterDataFlutter,
+Flutterstore 
+
 };
