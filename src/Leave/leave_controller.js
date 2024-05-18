@@ -46,7 +46,7 @@ const store = async (req, res) => {
 
             // Wait for all notifications to be created
             await Promise.all(notificationPromises);
-        req.app.io.emit('fetchNotifications');
+            req.app.io.emit('fetchNotifications');
 
         } else {
             // Handle the case where no user with role 1 is found
@@ -324,7 +324,7 @@ const singleview = async (req, res) => {
         const user_leave = await sequelize.query(
             `SELECT 
                 leaves.*,
-                users_leave.*
+                users_leave.*,leaves.createdAt as leavesdate
             FROM tbl_leaves AS leaves
             INNER JOIN users AS users_leave ON leaves.leave_user_id = users_leave.uid
             WHERE leaves.leave_id =:id

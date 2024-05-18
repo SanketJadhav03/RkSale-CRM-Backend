@@ -1,6 +1,37 @@
 const Payment_Mode = require("./payment_mode_model");
 
+const xlsx = require('xlsx');
+const upload = async (req, res) => {
+    try {
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({ message: 'No file uploaded', status: 0 });
+        }
 
+        const file = req.files.file;
+
+        // Use xlsx to read the Excel or CSV file
+        const workbook = xlsx.read(file.data, { type: 'buffer' });
+        const sheetNameList = workbook.SheetNames;
+        const payment_modeData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetNameList[0]], { raw: true });
+
+        // Prepare an array of payment_mode objects
+        const payment_mode = payment_modeData.map(row => ({
+            payment_mode_id: row.payment_mode_id,
+            payment_mode_name: row.payment_mode_name,
+            payment_mode_status: row.payment_mode_status,
+        }));
+
+        // Use Sequelize bulk insert
+        const results = await Payment_Mode.bulkCreate(payment_mode, {
+            updateOnDuplicate: ['payment_mode_name', 'payment_mode_status']
+        });
+
+        res.status(201).json({ message: `${results.length} payment_mode added or updated successfully`, status: 1 });
+    } catch (error) {
+        console.error('Error adding payment_mode:', error);
+        res.status(500).json({ error: 'Error adding payment_mode' });
+    }
+}
 const store = async (req, res) => {
     try {
         const { payment_mode_name } = req.body;
@@ -88,6 +119,7 @@ const show = async (req, res) => {
 
 }
 module.exports = {
+    upload,
     store,
     index,
     update,

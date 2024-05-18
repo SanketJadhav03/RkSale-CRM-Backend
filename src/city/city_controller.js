@@ -1,7 +1,38 @@
 
 const Customer = require("../customer/customer_model");
 const City = require("./city_model")
+const xlsx = require('xlsx');
+const upload = async (req, res) => {
+    try {
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({ message: 'No file uploaded', status: 0 });
+        }
 
+        const file = req.files.file;
+
+        // Use xlsx to read the Excel or CSV file
+        const workbook = xlsx.read(file.data, { type: 'buffer' });
+        const sheetNameList = workbook.SheetNames;
+        const cityData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetNameList[0]], { raw: true });
+
+        // Prepare an array of city objects
+        const cities = cityData.map(row => ({
+            city_id: row.city_id,
+            city_name: row.city_name,
+            city_status: row.city_status,
+        }));
+
+        // Use Sequelize bulk insert
+        const results = await City.bulkCreate(cities, {
+            updateOnDuplicate: ['city_name', 'city_status']
+        });
+
+        res.status(201).json({ message: `${results.length} cities added or updated successfully`, status: 1 });
+    } catch (error) {
+        console.error('Error adding cities:', error);
+        res.status(500).json({ error: 'Error adding cities' });
+    }
+}
 const index = async (req, res) => {
     try {
         const page = req.query.page || 1; // Get the page number from the query parameters or default to page 1
@@ -41,6 +72,7 @@ const store = async (req, res) => {
         res.status(500).json({ error: "Error adding city" });
     }
 }
+
 const show = async (req, res) => {
     try {
         const { id } = req.params;
@@ -98,5 +130,5 @@ module.exports = {
     store,
     show,
     updated,
-    deleted
+    deleted, upload
 };
