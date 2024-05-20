@@ -285,6 +285,139 @@ const store = async (req, res) => {
   }
 };
 
+const storeFlutter = async (req, res) => {
+  try {
+    // Destructure user data from request body
+    const rootPath = process.cwd();
+    const {
+      u_type,
+      name,
+      address,
+      user_role_id,
+      date_of_joining,
+      last_experience,
+      last_working_company,
+      last_company_salary,
+      shift_id,
+      salary,
+      mobile_no,
+      emergency_contact,
+      email,
+      password,
+      aadhar_no,
+      pan_no,
+      user_upi,
+    } = req.body;
+
+    console.log(req.body);
+
+    // Hash the password using bcrypt
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Validate and move uploaded files
+    const validateAndMove = (file, uploadPath) => {
+      if (!file) {
+        console.log("File is null");
+        return null;
+      }
+
+      if (!file.name) {
+        return res.status(400).json({ error: "Invalid file object" });
+      }
+
+      // Move the file to the specified upload path
+      file.mv(uploadPath, (err) => {
+        if (err) {
+          console.error("Error moving file:", err);
+          return res.status(500).json({ error: "Error uploading file" });
+        }
+        // File uploaded successfully
+        console.log('File uploaded successfully');
+      });
+
+      return file.name; // Return the filename for use in the database
+    };
+
+    // Check if files were uploaded
+    if (req.files.profile_image) {
+      // Access the profile_photo file from req.files
+      const profilePhotoFile = req.files.profile_image;
+    
+      // Determine upload path for the profile photo
+      const uploadPath = path.join(
+        rootPath,
+        'public/images/user',
+        name + "-Profile-" + profilePhotoFile.name
+      );
+    
+      // Move the profile photo to the specified upload path
+      validateAndMove(profilePhotoFile, uploadPath);
+    }
+
+    if (req.files.adhaar_image) {
+      // Access the profile_photo file from req.files
+      const profilePhotoFile = req.files.adhaar_image;
+    
+      // Determine upload path for the profile photo
+      const uploadPath = path.join(
+        rootPath,
+        'public/images/user',
+        name + "-Adhaar-" + profilePhotoFile.name
+      );
+    
+      // Move the profile photo to the specified upload path
+      validateAndMove(profilePhotoFile, uploadPath);
+    }
+
+    if (req.files.pan_photo) {
+      // Access the profile_photo file from req.files
+      const profilePhotoFile = req.files.pan_photo;
+    
+      // Determine upload path for the profile photo
+      const uploadPath = path.join(
+        rootPath,
+        'public/images/user',
+        name + "-Pan-" + profilePhotoFile.name
+      );
+    
+      // Move the profile photo to the specified upload path
+      validateAndMove(profilePhotoFile, uploadPath);
+    }
+
+    console.log(req.files.pan_photo);
+    // Create a new User object with the user data
+    const user = new User({
+      u_type:2,
+      name,
+      address,
+      user_role_id:2,
+      date_of_joining,
+      last_experience,
+      last_working_company,
+      last_company_salary,
+      shift_id,
+      salary,
+      mobile_no,
+      emergency_contact,
+      email,
+      password: hashedPassword, // Store the hashed password
+      aadhar_no,
+      pan_no,
+      user_upi,
+      profile_photo: req.files && req.files.profile_image ?  name + "-Profile-" + req.files.profile_image.name : '', // Store the filename
+      aadhar_photo: req.files && req.files.adhaar_image ?  name + "-Adhaar-" + req.files.adhaar_image.name : '', // Store the filename
+      pan_photo: req.files && req.files.pan_photo ?  name + "-Pan-" + req.files.pan_photo.name : '', // Store the filename
+    });
+
+    // Save the user object to the database
+    await user.save();
+
+    res.status(201).json({ message: "Employee added successfully", status: 1 });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 const show = async (req, res) => {
   try {
     const { id } = req.params;
@@ -532,5 +665,6 @@ module.exports = {
   store,
   updated,
   deleted,
-  updatePass
+  updatePass,
+  storeFlutter
 };

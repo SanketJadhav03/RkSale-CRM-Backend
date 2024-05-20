@@ -11,7 +11,9 @@ router.post("/user/login", userController.login)
 
 
 // post to save data  
-router.post("/user/store", userController.store)
+router.post("/user/store", userController.store);
+
+router.post("/user/store/flutter",userController.storeFlutter);
 
 
 
