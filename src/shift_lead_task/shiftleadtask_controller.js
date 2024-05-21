@@ -57,7 +57,13 @@ const transferLead = async (req, res) => {
           user_id: parseInt(slt_send_by)
         }
       })
+
+      if (notificationn)
+
+    {
       await notificationn.destroy();
+
+    }
       const user2 = await User.findByPk(slt_send_to);
       const admins = await User.findAll({
         where: {

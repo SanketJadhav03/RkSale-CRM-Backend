@@ -165,7 +165,7 @@ const leadmsg = async (req, res) => {
 
 
 const sendmsg = async (req, res) => {
-  const url = 'https://app.wapify.net/api/media-message.php';
+  const url = 'https://wa.bizup.in/api/send';
   try {
     const { number, type, media, category_type } = req.body;
     let data = {}; // Initialize data object
