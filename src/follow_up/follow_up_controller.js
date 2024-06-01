@@ -111,8 +111,61 @@ const addFollowUp = async (req, res) => {
     return res.status(500).json({ error: "Error creating followup" });
   }
 };
+const followup = async (req, res) => {
+  try {
+    const { startdate, enddate } = req.body;
+    let querytask = ``;
+    let querylead = ``;
+
+    querylead += `
+      SELECT tbl_follow_ups.createdAt as created_date, tbl_leads.*, tbl_lead_statuses.*, tbl_sources.*, tbl_follow_ups.*, tbl_customers.*, tbl_cities.*, tbl_customer_groups.*, tbl_references.*, tbl_products.*,users.*
+      FROM tbl_follow_ups
+      INNER JOIN tbl_leads ON tbl_follow_ups.follow_up_lead_id = tbl_leads.lead_id 
+      INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
+      INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
+      INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
+      INNER JOIN tbl_products ON tbl_leads.product = tbl_products.product_id
+      INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
+      INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
+      INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
+      INNER JOIN users ON users.uid = tbl_follow_ups.follow_up_send_by
+      WHERE tbl_follow_ups.createdAt BETWEEN :startdate AND :enddate
+      ;`;
+
+    querytask += `
+      SELECT tbl_follow_ups.createdAt as created_date, tbl_tasks.*, tbl_follow_ups.*, tbl_customers.*, tbl_products.*, tbl_references.*, tbl_lead_statuses.*, tbl_sources.*,users.*
+      FROM tbl_follow_ups
+      INNER JOIN tbl_tasks ON tbl_follow_ups.follow_up_task_id = tbl_tasks.task_id 
+      INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
+      INNER JOIN tbl_products ON tbl_tasks.product = tbl_products.product_id
+      INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
+      INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
+      INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
+      INNER JOIN users ON users.uid = tbl_follow_ups.follow_up_send_by
+      WHERE tbl_follow_ups.createdAt BETWEEN :startdate AND :enddate
+      ;`;
+
+    const dataLead = await sequelize.query(querylead, {
+      type: QueryTypes.SELECT,
+      replacements: { startdate, enddate },
+    });
+
+    const dataTask = await sequelize.query(querytask, {
+      type: QueryTypes.SELECT,
+      replacements: { startdate, enddate },
+    });
+
+    // Combine and sort by created_date
+    const combinedData = [...dataLead, ...dataTask].sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+
+    res.json({ followups: combinedData });
+  } catch (error) {
+    console.log(error);
+    res.json({ error: "Failed To Get follow up data" });
+  }
+};
 
 module.exports = {
   addFollowUp,
-  index,
+  index, followup,
 };
