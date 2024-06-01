@@ -169,10 +169,6 @@ const index = async (req, res) => {
       INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
       WHERE tbl_slts.slt_send_by= ${slt_send_by};`;
     }
-    if (assigned_by > 0) {
-      sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
-      replacements.assigned_by = assigned_by;
-    }
     const data = await sequelize.query(query, {
       type: QueryTypes.SELECT,
       model: Leads, // Specify the model for Sequelize to map the result to
@@ -183,6 +179,7 @@ const index = async (req, res) => {
     res.json({ error: "Failed To Get Shift data" });
   }
 };
+
 
 const getDetails = async (req, res) => {
   try {

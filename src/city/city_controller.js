@@ -26,7 +26,6 @@ const upload = async (req, res) => {
         const results = await City.bulkCreate(cities, {
             updateOnDuplicate: ['city_name', 'city_status']
         });
-
         res.status(201).json({ message: `${results.length} cities added or updated successfully`, status: 1 });
     } catch (error) {
         console.error('Error adding cities:', error);

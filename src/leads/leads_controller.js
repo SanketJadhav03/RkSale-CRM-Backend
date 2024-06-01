@@ -583,17 +583,17 @@ const Flutterstore = async (req, res) => {
         ? assignedByArray.map(async (assignedUserId) => {
             await Notifaction.create({
               user_id: assignedUserId,
-              assigned_data_id: newtask.task_id,
-              notification_description: `Task Assigned Of ${productdata.product_name},${customerData.customer_name}`,
-              notification_type: 3,
+              assigned_data_id: newtask.lead_id,
+              notification_description: `Lead Assigned Of ${productdata.product_name},${customerData.customer_name}`,
+              notification_type: 2,
             });
           })
         : [assignedByArray].map(async (assignedUserId) => {
             await Notifaction.create({
               user_id: assignedUserId,
-              assigned_data_id: newtask.task_id,
-              notification_description: `Task Assigned Of ${productdata.product_name},${customerData.customer_name}`,
-              notification_type: 3,
+              assigned_data_id: newtask.lead_id,
+              notification_description: `Lead Assigned Of ${productdata.product_name},${customerData.customer_name}`,
+              notification_type: 2,
             });
           })
     );
