@@ -113,12 +113,12 @@ const addFollowUp = async (req, res) => {
 };
 const followup = async (req, res) => {
   try {
-    const { startdate, enddate } = req.body;
+    const { startdate, enddate, user_id } = req.body;
     let querytask = ``;
     let querylead = ``;
 
     querylead += `
-      SELECT tbl_follow_ups.createdAt as created_date, tbl_leads.*, tbl_lead_statuses.*, tbl_sources.*, tbl_follow_ups.*, tbl_customers.*, tbl_cities.*, tbl_customer_groups.*, tbl_references.*, tbl_products.*,users.*
+      SELECT tbl_follow_ups.createdAt as created_date, tbl_leads.*, tbl_lead_statuses.*, tbl_sources.*, tbl_follow_ups.*, tbl_customers.*, tbl_cities.*, tbl_customer_groups.*, tbl_references.*, tbl_products.*, users.*
       FROM tbl_follow_ups
       INNER JOIN tbl_leads ON tbl_follow_ups.follow_up_lead_id = tbl_leads.lead_id 
       INNER JOIN tbl_customers ON tbl_leads.customer = tbl_customers.customer_id
@@ -130,10 +130,11 @@ const followup = async (req, res) => {
       INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
       INNER JOIN users ON users.uid = tbl_follow_ups.follow_up_send_by
       WHERE tbl_follow_ups.createdAt BETWEEN :startdate AND :enddate
+      ${user_id !== 0 ? 'AND tbl_follow_ups.follow_up_send_by = :user_id' : ''}
       ;`;
 
     querytask += `
-      SELECT tbl_follow_ups.createdAt as created_date, tbl_tasks.*, tbl_follow_ups.*, tbl_customers.*, tbl_products.*, tbl_references.*, tbl_lead_statuses.*, tbl_sources.*,users.*
+      SELECT tbl_follow_ups.createdAt as created_date, tbl_tasks.*, tbl_follow_ups.*, tbl_customers.*, tbl_products.*, tbl_references.*, tbl_lead_statuses.*, tbl_sources.*, users.*
       FROM tbl_follow_ups
       INNER JOIN tbl_tasks ON tbl_follow_ups.follow_up_task_id = tbl_tasks.task_id 
       INNER JOIN tbl_customers ON tbl_tasks.customer = tbl_customers.customer_id
@@ -143,16 +144,22 @@ const followup = async (req, res) => {
       INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
       INNER JOIN users ON users.uid = tbl_follow_ups.follow_up_send_by
       WHERE tbl_follow_ups.createdAt BETWEEN :startdate AND :enddate
+      ${user_id !== 0 ? 'AND tbl_follow_ups.follow_up_send_by = :user_id' : ''}
       ;`;
+
+    const replacements = { startdate, enddate };
+    if (user_id !== 0) {
+      replacements.user_id = user_id;
+    }
 
     const dataLead = await sequelize.query(querylead, {
       type: QueryTypes.SELECT,
-      replacements: { startdate, enddate },
+      replacements,
     });
 
     const dataTask = await sequelize.query(querytask, {
       type: QueryTypes.SELECT,
-      replacements: { startdate, enddate },
+      replacements,
     });
 
     // Combine and sort by created_date
@@ -164,6 +171,7 @@ const followup = async (req, res) => {
     res.json({ error: "Failed To Get follow up data" });
   }
 };
+
 
 module.exports = {
   addFollowUp,
