@@ -8,4 +8,8 @@ router.post("/shifted/lead", controller.index);
 
 router.post("/slt/details", controller.getDetails);
 
+// router.post("/slt/details/flutter", controller.getDetailsFlutter);
+
+
+
 module.exports = router;

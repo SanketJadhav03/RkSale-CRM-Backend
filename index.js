@@ -185,19 +185,19 @@ expressApp.use("/back-end", SalaryPay)
 
 
 // ################################ END #####################################################
-expressApp.on('newNotification', (data) => {
-  // Emit a Socket.IO event to all connected clients
-  io.emit('notification', data);
-});
-
-// Socket.IO for notifications
-io.on('connection', socket => {
-  console.log('New client connected');
-  io.emit("data", "hello");
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
+  expressApp.on('newNotification', (data) => {
+    // Emit a Socket.IO event to all connected clients
+    io.emit('notification', data);
   });
-});
+
+  // Socket.IO for notifications
+  io.on('connection', socket => {
+    console.log('New client connected');
+    io.emit("data", "hello");
+    socket.on('disconnect', () => {
+      console.log('Client disconnected');
+    });
+  });
 const port = process.env.PORT || 8880;
 
 server.listen(port, () => {
