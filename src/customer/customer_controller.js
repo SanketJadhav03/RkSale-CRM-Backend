@@ -61,13 +61,12 @@ const index = async (req, res) => {
           SELECT * FROM tbl_customers 
           INNER JOIN tbl_cities ON tbl_customers.customer_city = tbl_cities.city_id
           INNER JOIN tbl_customer_groups ON tbl_customers.customer_group = tbl_customer_groups.customer_group_id
-          LIMIT :limit
-          OFFSET :offset
+       
           `,
             {
                 model: Customer,
                 mapToModel: true, // Map the result to the Customer model
-                replacements: { limit: limitPerPage, offset: offset },
+                // replacements: { limit: limitPerPage, offset: offset },
             }
         );
 
