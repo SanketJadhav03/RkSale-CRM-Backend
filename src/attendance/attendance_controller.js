@@ -6,6 +6,8 @@ const path = require("path");
 const Notifaction = require("../notification/notification_model");
 const moment = require("moment");
 
+
+
 const store = async (req, res) => {
   try {
 
@@ -174,7 +176,7 @@ const sotreFlutter = async (req, res) => {
       path.join(
         rootPath,
         "public/images/attendance",
-        in_photo ? attendanceDate + in_photo.name : null
+        in_photo ? user_id + attendanceDate + in_time + in_photo.name : null
       )
     );
 
@@ -189,7 +191,7 @@ const sotreFlutter = async (req, res) => {
         attendance_in_latitude: attendance_in_latitude ? attendance_in_latitude : null,
         attendance_in_longitude: attendance_in_longitude ? attendance_in_longitude : null,
         remark: 1,
-        in_photo: in_photo ? attendanceDate + in_photo.name : null,
+        in_photo: in_photo ? user_id  + attendanceDate + in_time + in_photo.name : null,
       });
 
       const admins = await User.findAll({
