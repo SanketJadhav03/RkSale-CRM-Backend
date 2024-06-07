@@ -597,7 +597,7 @@ const filterData = async (req, res) => {
     const replacements = {};
 
     if (start_date && end_date) {
-      sql += ` AND tbl_attendances.attendance_date >= :startDate AND tbl_attendances.attendance_date <= :endDate`;
+      sql += ` AND DATE(tbl_attendances.attendance_date) >= :startDate AND DATE(tbl_attendances.attendance_date) <= :endDate`;
       replacements.startDate = start_date;
       replacements.endDate = end_date;
     }
@@ -628,6 +628,7 @@ const filterData = async (req, res) => {
       attendance.out_photo = `/attendance/${attendance.out_photo}`; // Adjust field name if needed
       return attendance; // Return the modified attendance object
     });
+
 
     res.json(data);
   } catch (error) {

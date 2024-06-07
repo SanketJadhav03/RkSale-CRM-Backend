@@ -581,6 +581,8 @@ const flutterFilter = async (req, res) => {
       task_id,
       status_name,
     } = req.body;
+
+    console.log(req.body);
     let sql = `SELECT * 
     FROM tbl_tasks 
     INNER JOIN users ON tbl_tasks.task_created_by = users.uid
@@ -590,7 +592,7 @@ const flutterFilter = async (req, res) => {
     INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
     INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
     INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
-    `;
+    WHERE DATE(today_date) >= :startDate AND DATE(today_date) <= :endDate`;
     const replacements = {
       startDate: start_date,
       endDate: end_date,
@@ -604,7 +606,7 @@ const flutterFilter = async (req, res) => {
       replacements.status_name = status_name;
     }
     if (assigned_by > 0) {
-      sql += ` AND FIND_IN_SET(${assigned_by}, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
+      sql += ` AND FIND_IN_SET(:assigned_by, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
       replacements.assigned_by = assigned_by;
     }
     if (task_id > 0) {

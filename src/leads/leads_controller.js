@@ -417,6 +417,7 @@ const filterDataFlutter = async (req, res) => {
       INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
       INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
       INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
+      WHERE DATE(today_date) >= :startDate AND DATE(today_date) <= :endDate
       `;
 
     const replacements = {
