@@ -16,8 +16,9 @@ router.post("/user/store", userController.store);
 router.post("/user/store/flutter",userController.storeFlutter);
 
 
-
+router.put('/user/update/flutter',userController.updateFlutter)
 // put to update data
+
 router.put("/user/update", userController.updated)
 // put to update data
 router.get("/user/delete/:id/:status", userController.deleted)

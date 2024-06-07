@@ -621,6 +621,161 @@ const deleted = async (req, res) => {
   }
 };
 
+const updateFlutter = async (req,res) =>{
+  try {
+    const {
+      uid,
+      name,
+      address,
+      user_role_id,
+      date_of_joining,
+      last_experience,
+      last_working_company,
+      last_company_salary,
+      shift_id,
+      salary,
+      mobile_no,
+      emergency_contact,
+      email,
+      password,
+      aadhar_no,
+      pan_no,
+      user_upi,
+    } = req.body;
+
+    const user = await User.findByPk(uid);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    if (password) {
+      const passwordMatch = password === user.password;
+      if (!passwordMatch) {
+        const hashedNewPassword = await bcrypt.hash(password, 10);
+        await user.update({
+          password: hashedNewPassword
+        });
+      }
+    }
+
+    if (req.files && req.files.profile_photo) {
+      const uploadedFile = req.files.profile_photo;
+      const filePath = `public/images/user/${user.profile_photo}`;
+
+      if (user.profile_photo !== null) {
+        // Remove the existing file
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("Error deleting existing file:", err);
+          }
+        });
+      }
+      // Save the new file
+      uploadedFile.mv(`public/images/user/${uploadedFile.name}`, (err) => {
+        if (err) {
+          console.error("Error saving new file:", err);
+        }
+      });
+    }
+
+    if (req.files && req.files.aadhar_photo) {
+      const uploadedFile = req.files.aadhar_photo;
+      const filePath = `public/images/user/${user.aadhar_photo}`;
+
+      // Remove the existing file
+      if (user.aadhar_photo !== null) {
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("Error deleting existing file:", err);
+          }
+        });
+      }
+      // Save the new file
+      uploadedFile.mv(`public/images/user/${uploadedFile.name}`, (err) => {
+        if (err) {
+          console.error("Error saving new file:", err);
+        }
+      });
+    }
+
+    if (req.files && req.files.pan_photo) {
+      const uploadedFile = req.files.pan_photo;
+      const filePath = `public/images/user/${user.pan_photo}`;
+
+      // Remove the existing file
+      if (user.pan_photo !== null) {
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("Error deleting existing file:", err);
+          }
+        });
+      }
+      // Save the new file
+      uploadedFile.mv(`public/images/user/${uploadedFile.name}`, (err) => {
+        if (err) {
+          console.error("Error saving new file:", err);
+        }
+      });
+    }
+
+    if (req.files && req.files.bank_passbook_photo) {
+      const uploadedFile = req.files.bank_passbook_photo;
+      const filePath = `public/images/user/${user.bank_passbook_photo}`;
+
+      // Remove the existing file
+      if (user.bank_passbook_photo !== null) {
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("Error deleting existing file:", err);
+          }
+        });
+      }
+      // Save the new file
+
+      uploadedFile.mv(`public/images/user/${"bank-passbook"+uploadedFile.name}`, (err) => {
+        if (err) {
+          console.error("Error saving new file:", err);
+        }
+      });
+    }
+
+    const updateduser = await user.update({
+      name: name,
+      address: address,
+      user_role_id: user_role_id,
+      salary: salary,
+      mobile_no: mobile_no,
+      emergency_contact: emergency_contact,
+      email: email,
+      aadhar_no: aadhar_no,
+      pan_no: pan_no,
+      user_upi: user_upi,
+      date_of_joining: date_of_joining,
+      last_experience: last_experience,
+      last_working_company: last_working_company,
+      last_company_salary: last_company_salary,
+      shift_id: shift_id,
+      profile_photo:
+        req.files && req.files.profile_photo
+          ? req.files.profile_photo.name
+          : user.profile_photo,
+      aadhar_photo:
+        req.files && req.files.aadhar_photo
+          ? req.files.aadhar_photo.name
+          : user.aadhar_photo,
+      pan_photo:
+        req.files && req.files.pan_photo
+          ? req.files.pan_photo.name
+          : user.pan_photo,
+
+    });
+
+    res.status(200).json({ message: "User updated successfully", user, status: 1 });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 const updatePass = async (req, res) => {
   try {
     const {
@@ -666,5 +821,6 @@ module.exports = {
   updated,
   deleted,
   updatePass,
-  storeFlutter
+  storeFlutter,
+  updateFlutter
 };
