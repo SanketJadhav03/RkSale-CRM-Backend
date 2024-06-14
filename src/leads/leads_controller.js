@@ -423,6 +423,8 @@ const filterDataFlutter = async (req, res) => {
       WHERE tbl_leads.lead_status = 1
     `;
 
+    const replacements = {
+    };
    
     if (assigned_by)
       {
