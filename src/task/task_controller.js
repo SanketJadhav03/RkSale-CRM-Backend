@@ -594,11 +594,16 @@ const flutterFilter = async (req, res) => {
       INNER JOIN tbl_references ON tbl_tasks.ref_by = tbl_references.reference_id
       INNER JOIN tbl_lead_statuses ON tbl_tasks.status = tbl_lead_statuses.lead_status_id
       INNER JOIN tbl_sources ON tbl_tasks.source = tbl_sources.source_id
-      WHERE FIND_IN_SET(:assigned_by, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))
+      WHERE tbl_tasks.task_status = 1
     `;
 
+    if (assigned_by)
+      {
+        sql += ` AND FIND_IN_SET(:assigned_by, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
+        replacements.assigned_by = assigned_by;
+
+      }
     const replacements = {
-      assigned_by: assigned_by,
     };
 
     if (customer_name) {
