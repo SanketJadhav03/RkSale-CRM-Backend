@@ -420,12 +420,16 @@ const filterDataFlutter = async (req, res) => {
       INNER JOIN tbl_references ON tbl_leads.ref_by = tbl_references.reference_id
       INNER JOIN tbl_sources ON tbl_leads.source = tbl_sources.source_id
       INNER JOIN tbl_lead_statuses ON tbl_leads.status = tbl_lead_statuses.lead_status_id
-      WHERE FIND_IN_SET(:assigned_by, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))
+      WHERE tbl_leads.lead_status = 1
     `;
 
-    const replacements = {
-      assigned_by: assigned_by
-    };
+   
+    if (assigned_by)
+      {
+        sql += ` AND FIND_IN_SET(:assigned_by, REPLACE(REPLACE(assigned_by, '[', ''), ']', ''))`;
+        replacements.assigned_by = assigned_by;
+
+      }
 
     if (customer_name > 0) {
       sql += ` AND tbl_leads.customer = :customer_name`;

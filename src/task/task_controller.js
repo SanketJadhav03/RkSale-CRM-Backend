@@ -581,8 +581,7 @@ const flutterFilter = async (req, res) => {
       task_id,
       status_name,
     } = req.body;
-
-    console.log(req.body);
+ 
 
     let sql = `
       SELECT * 
